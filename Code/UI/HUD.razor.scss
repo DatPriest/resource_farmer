@@ -273,4 +273,81 @@ HUD {
             padding: 15px 0;
         }
     }
+
+    // --- Contextual Controls (Bottom-Center) ---
+    .contextual_controls {
+        position: absolute;
+        bottom: 80px; // Above the tool panel
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        // Initial state - hidden
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px); // Start slightly lower
+        transition: all 0.3s ease-out;
+        pointer-events: none;
+        z-index: 50; // Above other HUD elements
+
+        &.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0px); // Move to final position
+        }
+
+        .control_hint {
+            // Base styles for control hints
+            background: linear-gradient(145deg, rgba(40, 45, 58, 0.95), rgba(30, 33, 42, 0.95));
+            border: 1px solid rgba(110, 120, 140, 0.3);
+            border-radius: 20px; // Pill shape
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #e0e5ec;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+
+            &.enabled {
+                border-color: rgba(77, 157, 255, 0.5); // Accent blue
+                box-shadow: 0 2px 10px rgba(77, 157, 255, 0.2);
+            }
+
+            &.disabled {
+                color: #7a8290; // Muted text for disabled actions
+                border-color: rgba(110, 120, 140, 0.2);
+            }
+
+            &.secondary {
+                opacity: 0.7;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .keybind {
+                // Style keybind text differently
+                font-weight: 700;
+                color: #FFD700; // Gold accent for keys
+                background-color: rgba(10, 12, 18, 0.8);
+                padding: 2px 6px;
+                border-radius: 4px;
+                margin: 0 2px;
+                border: 1px solid rgba(255, 215, 0, 0.5);
+                display: inline-block;
+                min-width: 16px;
+                text-align: center;
+            }
+
+            // Hover effect for interactive hints
+            &.enabled:hover {
+                background: linear-gradient(145deg, rgba(50, 55, 68, 0.95), rgba(40, 43, 52, 0.95));
+                border-color: rgba(77, 157, 255, 0.7);
+                box-shadow: 0 4px 15px rgba(77, 157, 255, 0.3);
+                transform: translateY(-1px);
+            }
+        }
+    }
 }
