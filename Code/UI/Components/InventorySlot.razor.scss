@@ -1,0 +1,168 @@
+@import "../Styles/Theme.scss";
+
+.inventory-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    background: linear-gradient(145deg, rgba(60, 70, 90, 0.8), rgba(45, 55, 75, 0.8));
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 120px;
+    position: relative;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    &[draggable="true"] {
+        cursor: grab;
+        
+        &:active {
+            cursor: grabbing;
+        }
+    }
+
+    .resource-icon {
+        font-size: 24px;
+        margin-bottom: 8px;
+        opacity: 0.9;
+        transition: transform 0.2s ease;
+    }
+
+    &:hover .resource-icon {
+        transform: scale(1.1);
+    }
+
+    .resource-info {
+        text-align: center;
+        margin-bottom: 8px;
+        flex: 1;
+        
+        .resource-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+        
+        .resource-amount {
+            font-size: 13px;
+            font-weight: 700;
+            color: #b8c5d6;
+        }
+    }
+
+    .resource-actions {
+        display: flex;
+        gap: 4px;
+        width: 100%;
+        
+        .use-btn,
+        .sell-btn {
+            flex: 1;
+            font-size: 10px;
+            padding: 4px 6px;
+            min-height: 24px;
+        }
+    }
+
+    // Rarity-based styling
+    &.common {
+        border-color: rgba(155, 155, 155, 0.3);
+        
+        &:hover {
+            border-color: rgba(155, 155, 155, 0.6);
+            box-shadow: 0 6px 16px rgba(155, 155, 155, 0.1);
+        }
+    }
+
+    &.uncommon {
+        border-color: rgba(30, 255, 0, 0.3);
+        
+        &:hover {
+            border-color: rgba(30, 255, 0, 0.6);
+            box-shadow: 0 6px 16px rgba(30, 255, 0, 0.1);
+        }
+    }
+
+    &.rare {
+        border-color: rgba(0, 112, 221, 0.3);
+        
+        &:hover {
+            border-color: rgba(0, 112, 221, 0.6);
+            box-shadow: 0 6px 16px rgba(0, 112, 221, 0.1);
+        }
+    }
+
+    &.epic {
+        border-color: rgba(163, 53, 238, 0.3);
+        
+        &:hover {
+            border-color: rgba(163, 53, 238, 0.6);
+            box-shadow: 0 6px 16px rgba(163, 53, 238, 0.1);
+        }
+    }
+
+    &.legendary {
+        border-color: rgba(255, 128, 0, 0.3);
+        
+        &:hover {
+            border-color: rgba(255, 128, 0, 0.6);
+            box-shadow: 0 6px 16px rgba(255, 128, 0, 0.1);
+        }
+    }
+
+    &.magical {
+        border-color: rgba(255, 20, 147, 0.3);
+        
+        &:hover {
+            border-color: rgba(255, 20, 147, 0.6);
+            box-shadow: 0 6px 16px rgba(255, 20, 147, 0.1);
+        }
+    }
+
+    &.mythic {
+        border: 2px solid transparent;
+        background: linear-gradient(145deg, rgba(60, 70, 90, 0.8), rgba(45, 55, 75, 0.8));
+        background-clip: padding-box;
+        position: relative;
+        
+        &::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                rgba(255, 0, 0, 0.5), 
+                rgba(255, 128, 0, 0.5), 
+                rgba(255, 255, 0, 0.5), 
+                rgba(0, 255, 0, 0.5), 
+                rgba(0, 255, 255, 0.5), 
+                rgba(0, 0, 255, 0.5), 
+                rgba(128, 0, 255, 0.5), 
+                rgba(255, 0, 255, 0.5)
+            );
+            border-radius: 8px;
+            z-index: -1;
+            animation: rainbow-rotate 3s linear infinite;
+        }
+        
+        &:hover {
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+        }
+    }
+}
+
+@keyframes rainbow-rotate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}

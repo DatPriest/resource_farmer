@@ -1,0 +1,142 @@
+@using Sandbox
+@using Sandbox.UI
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.Components
+
+<div class="filter-buttons">
+	<div class="search-container">
+		<input class="search-input" 
+			   @bind="SearchFilter" 
+			   @bind:event="oninput" 
+			   placeholder="@SearchPlaceholder" />
+		<i class="search-icon">🔍</i>
+	</div>
+	
+	<div class="sort-container">
+		<select class="sort-select" @bind="SortMode">
+			@foreach (var option in SortOptions)
+			{
+				<option value="@option.Value">@option.Text</option>
+			}
+		</select>
+	</div>
+	
+	@if (ShowActionButtons)
+	{
+		<div class="action-buttons">
+			@foreach (var action in ActionButtons)
+			{
+				<BaseButton 
+					Text="@action.Text" 
+					Icon="@action.Icon"
+					CssClass="@($"action-btn {action.CssClass}")" 
+					Variant="@action.Variant"
+					Disabled="@action.IsDisabled"
+					OnClick="@action.OnClick"
+					Tooltip="@action.Tooltip" />
+			}
+		</div>
+	}
+</div>
+
+@code {
+	[Property] public string SearchFilter { get; set; } = "";
+	[Property] public string SortMode { get; set; } = "Name";
+	[Property] public string SearchPlaceholder { get; set; } = "Search...";
+	[Property] public bool ShowActionButtons { get; set; } = true;
+	[Property] public Action<string> OnSearchChanged { get; set; }
+	[Property] public Action<string> OnSortChanged { get; set; }
+
+	public List<SortOption> SortOptions { get; set; } = new()
+	{
+		new("Name", "Sort by Name"),
+		new("Amount", "Sort by Amount"),
+		new("Type", "Sort by Type")
+	};
+
+	public List<ActionButtonInfo> ActionButtons { get; set; } = new();
+
+	protected override void OnStart()
+	{
+		base.OnStart();
+		
+		// Watch for changes and notify parent
+		StateHasChanged();
+	}
+
+	protected override void OnUpdate()
+	{
+		base.OnUpdate();
+		
+		// Notify parent of filter changes
+		OnSearchChanged?.Invoke(SearchFilter);
+		OnSortChanged?.Invoke(SortMode);
+	}
+
+	public class SortOption
+	{
+		public string Value { get; set; }
+		public string Text { get; set; }
+
+		public SortOption(string value, string text)
+		{
+			Value = value;
+			Text = text;
+		}
+	}
+
+	public class ActionButtonInfo
+	{
+		public string Text { get; set; } = "";
+		public string Icon { get; set; } = "";
+		public string CssClass { get; set; } = "";
+		public string Tooltip { get; set; } = "";
+		public BaseButton.ButtonVariant Variant { get; set; } = BaseButton.ButtonVariant.Primary;
+		public bool IsDisabled { get; set; } = false;
+		public Action OnClick { get; set; }
+
+		public ActionButtonInfo(string text, Action onClick)
+		{
+			Text = text;
+			OnClick = onClick;
+		}
+
+		public ActionButtonInfo(string text, string icon, Action onClick, BaseButton.ButtonVariant variant = BaseButton.ButtonVariant.Primary)
+		{
+			Text = text;
+			Icon = icon;
+			OnClick = onClick;
+			Variant = variant;
+		}
+	}
+
+	public void AddSortOption(string value, string text)
+	{
+		SortOptions.Add(new SortOption(value, text));
+		StateHasChanged();
+	}
+
+	public void AddActionButton(string text, Action onClick)
+	{
+		ActionButtons.Add(new ActionButtonInfo(text, onClick));
+		StateHasChanged();
+	}
+
+	public void AddActionButton(string text, string icon, Action onClick, BaseButton.ButtonVariant variant = BaseButton.ButtonVariant.Primary)
+	{
+		ActionButtons.Add(new ActionButtonInfo(text, icon, onClick, variant));
+		StateHasChanged();
+	}
+
+	protected override int BuildHash()
+	{
+		var hash = new HashCode();
+		hash.Add(SearchFilter);
+		hash.Add(SortMode);
+		hash.Add(SearchPlaceholder);
+		hash.Add(ShowActionButtons);
+		hash.Add(SortOptions.Count);
+		hash.Add(ActionButtons.Count);
+		return hash.ToHashCode();
+	}
+}
