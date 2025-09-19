@@ -42,7 +42,7 @@ public sealed class MainMenuManager : Component
 
 	public void ShowMainMenu()
 	{
-		if (_mainMenuInstance != null && _mainMenuInstance.IsValid())
+		if (_mainMenuInstance != null && _mainMenuInstance.IsValid)
 		{
 			Log.Warning("[MainMenuManager] Main menu is already open.");
 			return;
@@ -60,7 +60,7 @@ public sealed class MainMenuManager : Component
 
 	public void HideMainMenu()
 	{
-		if (_mainMenuInstance != null && _mainMenuInstance.IsValid())
+		if (_mainMenuInstance != null && _mainMenuInstance.IsValid)
 		{
 			_mainMenuInstance.Destroy();
 			_mainMenuInstance = null;
@@ -118,11 +118,8 @@ public sealed class MainMenuManager : Component
 		// Create settings panel as a child of main menu
 		var settingsPanel = Components.Create<Settings>();
 		
-		// Optionally hide main menu while settings are open
-		if (_mainMenuInstance != null)
-		{
-			_mainMenuInstance.SetVisible(false);
-		}
+		// Note: Settings panel should handle its own visibility management
+		// In S&box, UI panels manage their own visibility state
 	}
 
 	/// <summary>

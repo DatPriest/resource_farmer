@@ -99,13 +99,21 @@ public sealed partial class Player : Component
 	public static void UpgradeEquippedTool()
 	{
 		var caller = ConsoleSystem.Caller;
-		if ( caller?.Pawn is not Player player )
+		if ( caller == null )
 		{
-			Log.Warning( "[UpgradeEquippedTool] Invalid caller or player not found." );
+			Log.Warning( "[UpgradeEquippedTool] Invalid caller." );
 			return;
 		}
 
-		Log.Info( $"[UpgradeEquippedTool] Player {caller.DisplayName} requesting tool upgrade" );
+		// Find the player component from the caller's GameObject
+		var player = caller.GameObject?.Components.Get<Player>();
+		if ( player == null )
+		{
+			Log.Warning( "[UpgradeEquippedTool] Player component not found." );
+			return;
+		}
+
+		Log.Info( $"[UpgradeEquippedTool] Player requesting tool upgrade" );
 		player.ProcessToolUpgrade();
 	}
 
@@ -253,13 +261,21 @@ public sealed partial class Player : Component
 	public static void AddToolBonus()
 	{
 		var caller = ConsoleSystem.Caller;
-		if ( caller?.Pawn is not Player player )
+		if ( caller == null )
 		{
-			Log.Warning( "[AddToolBonus] Invalid caller or player not found." );
+			Log.Warning( "[AddToolBonus] Invalid caller." );
 			return;
 		}
 
-		Log.Info( $"[AddToolBonus] Player {caller.DisplayName} requesting to add tool bonus" );
+		// Find the player component from the caller's GameObject
+		var player = caller.GameObject?.Components.Get<Player>();
+		if ( player == null )
+		{
+			Log.Warning( "[AddToolBonus] Player component not found." );
+			return;
+		}
+
+		Log.Info( $"[AddToolBonus] Player requesting to add tool bonus" );
 		player.ProcessAddBonus();
 	}
 
@@ -267,9 +283,17 @@ public sealed partial class Player : Component
 	public static void RemoveToolBonus( string bonusName )
 	{
 		var caller = ConsoleSystem.Caller;
-		if ( caller?.Pawn is not Player player )
+		if ( caller == null )
 		{
-			Log.Warning( "[RemoveToolBonus] Invalid caller or player not found." );
+			Log.Warning( "[RemoveToolBonus] Invalid caller." );
+			return;
+		}
+
+		// Find the player component from the caller's GameObject
+		var player = caller.GameObject?.Components.Get<Player>();
+		if ( player == null )
+		{
+			Log.Warning( "[RemoveToolBonus] Player component not found." );
 			return;
 		}
 
@@ -279,7 +303,7 @@ public sealed partial class Player : Component
 			return;
 		}
 
-		Log.Info( $"[RemoveToolBonus] Player {caller.DisplayName} requesting to remove bonus {bonusName}" );
+		Log.Info( $"[RemoveToolBonus] Player requesting to remove bonus {bonusName}" );
 		player.ProcessRemoveBonus( parsedBonusName );
 	}
 
@@ -305,9 +329,17 @@ public sealed partial class Player : Component
 	public static void CraftItem( string toolType, string material, int level )
 	{
 		var caller = ConsoleSystem.Caller;
-		if ( caller?.Pawn is not Player player )
+		if ( caller == null )
 		{
-			Log.Warning( "[CraftItem] Invalid caller or player not found." );
+			Log.Warning( "[CraftItem] Invalid caller." );
+			return;
+		}
+
+		// Find the player component from the caller's GameObject
+		var player = caller.GameObject?.Components.Get<Player>();
+		if ( player == null )
+		{
+			Log.Warning( "[CraftItem] Player component not found." );
 			return;
 		}
 
@@ -326,7 +358,7 @@ public sealed partial class Player : Component
 			return;
 		}
 
-		Log.Info( $"[CraftItem] Player {caller.DisplayName} requesting craft: {recipe.Name}" );
+		Log.Info( $"[CraftItem] Player requesting craft: {recipe.Name}" );
 
 		// Use the existing crafting logic
 		player.ProcessCraftingRequest( recipe );
