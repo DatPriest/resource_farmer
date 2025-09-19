@@ -190,7 +190,12 @@ public sealed partial class Player : Component
 	/// </summary>
 	private void TrackUpgradeAchievement( ToolBase upgradedTool, Dictionary<ResourceType, float> costs )
 	{
-		if ( Networking.IsClient ) return; // Server-side only
+		if ( Networking.IsClient || upgradedTool == null || costs == null ) return; // Server-side only with null checks
+
+		// Ensure collections are initialized
+		UnlockedRecipes ??= new HashSet<string>();
+		ItemsCraftedCount ??= new Dictionary<string, int>();
+		MaterialsUsedCount ??= new Dictionary<string, int>();
 
 		// Track this as a "virtual recipe" for upgrade achievements
 		string upgradeRecipeName = $"Upgrade_{upgradedTool.Material}_{upgradedTool.ToolType}_to_Level_{upgradedTool.Level}";
@@ -351,7 +356,12 @@ public sealed partial class Player : Component
 	/// </summary>
 	private void TrackCraftingAchievement( CraftingRecipeResource recipe )
 	{
-		if ( Networking.IsClient ) return; // Server-side only
+		if ( Networking.IsClient || recipe == null ) return; // Server-side only with null check
+
+		// Ensure collections are initialized
+		UnlockedRecipes ??= new HashSet<string>();
+		ItemsCraftedCount ??= new Dictionary<string, int>();
+		MaterialsUsedCount ??= new Dictionary<string, int>();
 
 		// Track recipe as unlocked
 		UnlockedRecipes.Add( recipe.Name );

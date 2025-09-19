@@ -347,7 +347,7 @@ namespace ResourceFarmer.SavingService
 			// Apply inventory
 			player.Inventory = ConvertApiFormatToInventory( loadedData.ResourcesJson, loadedData.SteamId );
 			
-			// Apply equipped tool
+			// Apply equipped tool (backward compatible - new field might be null/empty)
 			var loadedTool = ConvertJsonToTool( loadedData.EquippedToolJson, loadedData.SteamId );
 			if ( loadedTool != null )
 			{
@@ -356,10 +356,11 @@ namespace ResourceFarmer.SavingService
 			}
 			else
 			{
-				Log.Info( $"[SavingServiceComponent] No equipped tool data found for {loadedData.SteamId}" );
+				// This is normal for older saves that didn't have tool data
+				Log.Info( $"[SavingServiceComponent] No equipped tool data found for {loadedData.SteamId} (backward compatibility)" );
 			}
 			
-			// Apply crafting progress
+			// Apply crafting progress (backward compatible - new field might be null/empty)
 			ApplyCraftingProgressFromJson( player, loadedData.CraftingProgressJson, loadedData.SteamId );
 			
 			Log.Info( $"[SavingServiceComponent] Finished applying data for SteamID: {loadedData.SteamId}" );
@@ -604,19 +605,25 @@ namespace ResourceFarmer.SavingService
 				}
 
 				// Convert bonuses back to AppliedBonusInstance
-				var bonuses = toolDto.AppliedBonuses?.Select( b => 
+				var bonuses = new List<AppliedBonusInstance>();
+				if ( toolDto.AppliedBonuses != null )
 				{
-					if ( Enum.TryParse<ToolBonusName>( b.Name, true, out var bonusName ) )
+					foreach ( var b in toolDto.AppliedBonuses )
 					{
-						return new AppliedBonusInstance
+						if ( Enum.TryParse<ToolBonusName>( b.Name, true, out var bonusName ) )
 						{
-							Name = bonusName,
-							ActualMagnitude = b.ActualMagnitude
-						};
+							bonuses.Add( new AppliedBonusInstance
+							{
+								Name = bonusName,
+								ActualMagnitude = b.ActualMagnitude
+							} );
+						}
+						else
+						{
+							Log.Warning( $"[SavingServiceComponent] Unknown bonus name '{b.Name}' for {steamIdForLogging}. Skipping bonus." );
+						}
 					}
-					Log.Warning( $"[SavingServiceComponent] Unknown bonus name '{b.Name}' for {steamIdForLogging}. Skipping bonus." );
-					return default( AppliedBonusInstance? );
-				} ).Where( b => b.HasValue ).Select( b => b!.Value ).ToList() ?? new List<AppliedBonusInstance>();
+				}
 
 				return new ToolBase( toolType, toolDto.Material, toolDto.Level, toolDto.Quality, bonuses );
 			}

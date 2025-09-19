@@ -22,6 +22,14 @@
 			@* <div class="exp_bar"><div class="exp_fill" style="width: @(ExpValue / ExpToLevelValue * 100.0)%;"></div></div> *@
 		</div>
 		<div class="stat_row"><label>Prestige:</label> <value>@PrestigeValue</value></div>
+		
+		@* NEW: Crafting Achievement Summary *@
+		<div class="achievements_section">
+			<div class="section_header">Crafting Progress</div>
+			<div class="stat_row"><label>Recipes:</label> <value>@(LocalPlayer?.TotalRecipesUnlocked ?? 0)</value></div>
+			<div class="stat_row"><label>Items Crafted:</label> <value>@(LocalPlayer?.TotalItemsCrafted ?? 0)</value></div>
+			<div class="stat_row"><label>Materials Used:</label> <value>@(LocalPlayer?.TotalMaterialsUsed ?? 0)</value></div>
+		</div>
 	</div>
 
 	@* Top-Center Resources Panel *@
@@ -161,6 +169,8 @@
 		// --- Add ALL data that affects the UI ---
 		// Stats
 		hash.Add(MoneyValue); hash.Add(LevelValue); hash.Add(ExpValue); hash.Add(ExpToLevelValue); hash.Add(PrestigeValue);
+		// Achievements 
+		hash.Add(LocalPlayer?.TotalRecipesUnlocked ?? 0); hash.Add(LocalPlayer?.TotalItemsCrafted ?? 0); hash.Add(LocalPlayer?.TotalMaterialsUsed ?? 0);
 		// Inventory (cache)
 		if (_resourceCache != null) { hash.Add(_resourceCache.Count); foreach (var kvp in _resourceCache.OrderBy(x => x.Key)) { hash.Add(kvp.Key); hash.Add(kvp.Value); } } else { hash.Add(0); }
 		// Tool

@@ -53,6 +53,11 @@ public sealed partial class Player : Component
 	[Property] public double CurrentTotalInventoryItems => Inventory.Sum(kvp => kvp.Value); // Total items in inventory
 	public float ExperienceToNextLevel => Level * 100; // Example formula
 
+	// NEW: Achievement summary properties for UI
+	public int TotalRecipesUnlocked => UnlockedRecipes?.Count ?? 0;
+	public int TotalItemsCrafted => ItemsCraftedCount?.Values.Sum() ?? 0;
+	public int TotalMaterialsUsed => MaterialsUsedCount?.Values.Sum() ?? 0;
+
 	// Add properties for new components
 	public PlayerInteractionComponent Interaction => Components.Get<PlayerInteractionComponent>();
 	public PlayerGatheringComponent Gathering => Components.Get<PlayerGatheringComponent>();
