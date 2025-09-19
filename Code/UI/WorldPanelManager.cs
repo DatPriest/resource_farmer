@@ -3,61 +3,92 @@ using System;
 using System.Collections.Generic;
 using ResourceFarmer.Resources;
 using ResourceFarmer.PlayerBase;
+using ResourceFarmer.UI.Components;
 namespace ResourceFarmer.UI;
+
+/// <summary>
+/// Legacy WorldPanelManager - now serves as a compatibility layer and delegates to WorldPanelVisibilityManager.
+/// This maintains backward compatibility while transitioning to the new modular system.
+/// DEPRECATED: Use WorldPanelVisibilityManager directly for new implementations.
+/// </summary>
+[Obsolete("Use WorldPanelVisibilityManager instead - this is kept for backward compatibility")]
 public sealed class WorldPanelManager : Component
 {
-	// How often to check distances (in seconds)
+	/// <summary>
+	/// How often to check distances (in seconds)
+	/// </summary>
 	[Property] public float UpdateInterval { get; set; } = 0.1f;
+	
+	// Legacy functionality for old ResourceNodePanel system
 	private TimeSince _timeSinceLastUpdate = 0f;
-
-
-	// Track GameObjects with active panels controlled by this client
 	private HashSet<GameObject> _nodesWithActivePanels = new();
-
-	[Property] public int CountActivePanels => _nodesWithActivePanels.Count; // Expose count for debugging
+	
+	// New modular system
+	private WorldPanelVisibilityManager _visibilityManager;
+	
+	[Property] public int CountActivePanels => _nodesWithActivePanels.Count; // Maintain API compatibility
+	
+	protected override void OnAwake()
+	{
+		base.OnAwake();
+		
+		// Create the new visibility manager if it doesn't exist
+		_visibilityManager = Components.GetOrCreate<WorldPanelVisibilityManager>();
+		_visibilityManager.UpdateInterval = UpdateInterval;
+		
+		Log.Warning("[WorldPanelManager] This component is deprecated. Use WorldPanelVisibilityManager directly for new implementations.");
+	}
 
 
 	protected override void OnUpdate()
 	{
 		// Run only for the client that owns the Player pawn this is attached to
-		// or if this is a global client-side manager. Adjust condition if needed.
-		if (IsProxy) return; // Ensure this runs on the correct client
+		if (IsProxy) return;
 
 		// Throttle the update frequency
 		if (_timeSinceLastUpdate < UpdateInterval) return;
 		_timeSinceLastUpdate = 0f;
-		var localPlayer = GetComponent<Player>(); // Get the Player component
-
+		
+		var localPlayer = GetComponent<Player>();
+		if (localPlayer == null) return;
+		
 		var playerPos = localPlayer.Transform.Position;
 
-		// Keep track of nodes processed this frame to remove stale entries later
+		// Keep track of nodes processed this frame
 		var processedNodeIds = new HashSet<Guid>();
-
+		
+		// Handle legacy ResourceNode panels that haven't been converted yet
 		var allNodes = Scene.GetAllComponents<ResourceNode>();
-
+		
 		foreach (var node in allNodes)
 		{
-			if (node == null || !node.IsValid() || !node.Enabled) continue; // Skip invalid nodes
-
-			processedNodeIds.Add(node.GameObject.Id); // Mark this node as processed
-
+			if (node == null || !node.IsValid() || !node.Enabled) continue;
+			
+			processedNodeIds.Add(node.GameObject.Id);
+			
+			// Check if this node is using the new modular system
+			var worldPanel = node.GetWorldPanelComponent();
+			if (worldPanel != null)
+			{
+				// Skip - handled by WorldPanelVisibilityManager
+				continue;
+			}
+			
+			// Handle legacy ResourceNodePanel system
 			float distance = Vector3.DistanceBetween(playerPos, node.Transform.Position);
-			float visibilityRange = node.InteractionRange; // Get range from the node instance
+			float visibilityRange = node.InteractionRange;
 
-			PanelComponent panel = node.GetPanelComponent(); // Use the accessor from ResourceNode
+			PanelComponent panel = node.GetPanelComponent();
 
 			if (panel != null && panel.IsValid())
 			{
 				bool shouldBeVisible = distance <= visibilityRange;
 
-				// --- Control ONLY the Enabled state ---
 				if (panel.Enabled != shouldBeVisible)
 				{
 					panel.Enabled = shouldBeVisible;
-					// Log.Info($"Set panel for {node.GameObject.Name} Enabled: {shouldBeVisible}");
 				}
 
-				// Track which nodes currently have their panel enabled by this client
 				if (shouldBeVisible)
 				{
 					_nodesWithActivePanels.Add(node.GameObject);
@@ -69,20 +100,15 @@ public sealed class WorldPanelManager : Component
 			}
 			else if (_nodesWithActivePanels.Contains(node.GameObject))
 			{
-				// Node used to have a valid panel we tracked, but now it doesn't
 				_nodesWithActivePanels.Remove(node.GameObject);
-				// Log.Warning($"Panel for {node.GameObject.Name} became invalid, untracking.");
 			}
 		}
 
-		// --- Cleanup Stale Entries ---
-		// Find tracked nodes that were NOT processed this frame (likely destroyed)
+		// Cleanup stale entries
 		var staleNodes = _nodesWithActivePanels.Where(go => go == null || !go.IsValid || !processedNodeIds.Contains(go.Id)).ToList();
 		foreach (var staleNode in staleNodes)
 		{
-			// Just remove from tracking - no panel to disable if the node is gone/invalid
 			_nodesWithActivePanels.Remove(staleNode);
-			// Log.Info($"Stopped tracking panel for stale/destroyed node (ID: {staleNode?.Id})");
 		}
 	}
 

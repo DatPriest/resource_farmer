@@ -1,0 +1,142 @@
+// ResourceWorldPanel component styles - Modular world panel for resource nodes
+@import "../Styles/Colors.scss";
+@import "../Styles/Layout.scss";
+@import "../Styles/Text.scss";
+
+.resource-world-panel {
+	// Position absolutely for world-space positioning
+	position: absolute;
+	pointer-events: none; // Prevent UI interactions from blocking world interaction
+	z-index: 100; // Ensure it appears above world elements
+	
+	.panel-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		
+		// Modern panel styling using theme variables
+		background-color: rgba($background-dark, 0.85);
+		backdrop-filter: blur(8px);
+		border: $border-width-thin solid rgba($accent-blue, 0.6);
+		border-radius: $border-radius-medium;
+		box-shadow: $panel-shadow;
+		
+		padding: $padding-small $padding-medium;
+		min-width: 120px;
+		max-width: 200px;
+		
+		font-family: $font-family-main;
+		text-align: center;
+		overflow: hidden;
+		
+		// Smooth transitions for all property changes
+		transition: all 0.3s ease-out;
+		
+		// Entrance/exit animation support
+		opacity: 1;
+		transform: scale(1) translateY(0);
+		
+		&.entering {
+			transform: scale(0.8) translateY(10px);
+			opacity: 0;
+		}
+		
+		&.exiting {
+			transform: scale(1.1) translateY(-5px);
+			opacity: 0;
+		}
+		
+		// Resource type header
+		.resource-type {
+			font-size: $font-size-medium;
+			font-weight: $font-weight-semibold;
+			color: $text-primary;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin-bottom: $margin-tiny;
+			text-shadow: 0 1px 3px rgba($shadow-color, 0.8);
+		}
+		
+		// Main resource amount display
+		.resource-amount {
+			font-size: $font-size-large;
+			font-weight: $font-weight-bold;
+			color: $accent-blue-light;
+			margin-bottom: $margin-tiny;
+			text-shadow: 0 0 8px rgba($accent-blue-light, 0.5);
+		}
+		
+		// Difficulty level display
+		.resource-difficulty {
+			font-size: $font-size-small;
+			font-weight: $font-weight-normal;
+			color: $text-secondary;
+			margin-bottom: $margin-tiny;
+		}
+		
+		// Required tool display
+		.resource-tool-req {
+			font-size: $font-size-tiny;
+			font-weight: $font-weight-light;
+			color: rgba($text-secondary, 0.8);
+			font-style: italic;
+		}
+	}
+	
+	// Responsive scaling based on distance (controlled by WorldPanelComponent)
+	&.scale-close {
+		.panel-container {
+			transform: scale(1.2);
+		}
+	}
+	
+	&.scale-medium {
+		.panel-container {
+			transform: scale(1.0);
+		}
+	}
+	
+	&.scale-far {
+		.panel-container {
+			transform: scale(0.8);
+		}
+	}
+	
+	// Color variations based on resource rarity (can be extended)
+	&.rarity-common .panel-container {
+		border-color: rgba($text-secondary, 0.5);
+	}
+	
+	&.rarity-uncommon .panel-container {
+		border-color: rgba($accent-green, 0.6);
+		.resource-amount {
+			color: $accent-green;
+			text-shadow: 0 0 8px rgba($accent-green, 0.5);
+		}
+	}
+	
+	&.rarity-rare .panel-container {
+		border-color: rgba($accent-blue, 0.6);
+		.resource-amount {
+			color: $accent-blue-light;
+			text-shadow: 0 0 8px rgba($accent-blue-light, 0.5);
+		}
+	}
+	
+	&.rarity-epic .panel-container {
+		border-color: rgba($warning-color, 0.6);
+		.resource-amount {
+			color: $warning-color;
+			text-shadow: 0 0 8px rgba($warning-color, 0.5);
+		}
+	}
+	
+	&.rarity-legendary .panel-container {
+		border-color: rgba($error-color, 0.6);
+		.resource-amount {
+			color: $error-color;
+			text-shadow: 0 0 8px rgba($error-color, 0.5);
+		}
+	}
+}

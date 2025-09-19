@@ -1,0 +1,112 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using ResourceFarmer.Resources;
+@using ResourceFarmer.UI.Components;
+@attribute [StyleSheet]
+@inherits WorldPanelComponent
+@namespace ResourceFarmer.UI.Components
+
+<root class="resource-world-panel">
+	<div class="panel-container">
+		<div class="resource-type">@ResourceTypeDisplay</div>
+		<div class="resource-amount">@ResourceAmountDisplay</div>
+		<div class="resource-difficulty">@ResourceDifficulty</div>
+		<div class="resource-tool-req">@RequiredToolDisplay</div>
+	</div>
+</root>
+
+@code {
+	/// <summary>
+	/// The ResourceNode this panel displays information for
+	/// </summary>
+	[Property] public ResourceNode ResourceNode { get; set; }
+	
+	// Display properties
+	private string ResourceTypeDisplay { get; set; } = "Unknown";
+	private string ResourceAmountDisplay { get; set; } = "0.0";
+	private string ResourceDifficulty { get; set; } = "0.0";
+	private string RequiredToolDisplay { get; set; } = "None";
+	
+	protected override void OnAwake()
+	{
+		base.OnAwake();
+		
+		// Try to get ResourceNode from parent if not explicitly set
+		if (ResourceNode == null)
+			ResourceNode = GameObject.Components.GetInParentOrSelf<ResourceNode>();
+			
+		if (ResourceNode == null)
+		{
+			Log.Warning($"[ResourceWorldPanel] No ResourceNode found on {GameObject.Name}");
+			return;
+		}
+		
+		// Set TargetObject to the ResourceNode's GameObject
+		TargetObject = ResourceNode.GameObject;
+		
+		// Configure panel properties based on resource node
+		VisibilityRange = ResourceNode.InteractionRange;
+		HeightOffset = 60f; // Slightly above resource nodes
+	}
+	
+	protected override void UpdateContent()
+	{
+		if (ResourceNode == null || !ResourceNode.IsValid())
+		{
+			ResourceTypeDisplay = "Error";
+			ResourceAmountDisplay = "N/A";
+			ResourceDifficulty = "N/A";
+			RequiredToolDisplay = "N/A";
+			return;
+		}
+		
+		// Update display values
+		ResourceTypeDisplay = ResourceNode.ResourceType.GetDisplayName();
+		ResourceAmountDisplay = ResourceNode.Amount.ToString("F1");
+		ResourceDifficulty = $"Lv.{ResourceNode.Difficulty:F0}";
+		
+		// Format required tool display
+		if (ResourceNode.RequiredToolType == ResourceType.None)
+		{
+			RequiredToolDisplay = "Hand";
+		}
+		else
+		{
+			RequiredToolDisplay = $"{ResourceNode.RequiredToolType.GetDisplayName()} Lv.{ResourceNode.RequiredToolLevel}";
+		}
+	}
+	
+	protected override void OnPlayerEnterRange(GameObject player, float distance)
+	{
+		base.OnPlayerEnterRange(player, distance);
+		
+		// Optional: Add entrance animation or effects here
+		Style.Opacity = 0f;
+		Style.Transitions = new() { new() { Property = "opacity", Duration = 0.3f } };
+		Style.Opacity = 1f;
+	}
+	
+	protected override void OnPlayerExitRange()
+	{
+		// Optional: Add exit animation
+		Style.Transitions = new() { new() { Property = "opacity", Duration = 0.2f } };
+		Style.Opacity = 0f;
+		
+		// Delay actual disable to allow animation
+		_ = Task.DelaySeconds(0.2f).ContinueWith(_ => {
+			if (IsValid())
+				base.OnPlayerExitRange();
+		});
+	}
+	
+	protected override int BuildHash()
+	{
+		return HashCode.Combine(
+			base.BuildHash(),
+			ResourceTypeDisplay,
+			ResourceAmountDisplay,
+			ResourceDifficulty,
+			RequiredToolDisplay
+		);
+	}
+}

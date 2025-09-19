@@ -1,0 +1,126 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using ResourceFarmer.UI.Components;
+@attribute [StyleSheet]
+@inherits WorldPanelComponent
+@namespace ResourceFarmer.UI.Components
+
+<root class="example-world-panel">
+	<div class="panel-container">
+		<div class="panel-title">@Title</div>
+		<div class="panel-status">@Status</div>
+		<div class="panel-info">@InfoText</div>
+	</div>
+</root>
+
+@code {
+	/// <summary>
+	/// Example custom world panel - Template for creating new world panel types
+	/// 
+	/// Usage:
+	/// 1. Copy this file and rename it to YourCustomWorldPanel.razor
+	/// 2. Update the class name and namespace
+	/// 3. Modify the HTML template and properties as needed
+	/// 4. Implement UpdateContent() to define how the panel updates
+	/// 5. Add to any GameObject and it will automatically be managed by WorldPanelVisibilityManager
+	/// </summary>
+	
+	// Custom properties for this panel type
+	[Property] public string Title { get; set; } = "Example Panel";
+	[Property] public string Status { get; set; } = "Ready";
+	[Property] public string InfoText { get; set; } = "This is an example world panel";
+	
+	// Optional: Reference to a specific component this panel is displaying info about
+	[Property] public Component TargetComponent { get; set; }
+	
+	protected override void OnAwake()
+	{
+		base.OnAwake();
+		
+		// Configure panel properties
+		VisibilityRange = 100f;     // How far away players can see this panel
+		HeightOffset = 40f;         // Height above the target object
+		UseDistanceScaling = true;  // Scale based on distance
+		MinScale = 0.7f;           // Smallest scale when far away
+		MaxScale = 1.1f;           // Largest scale when close
+		
+		// If no target object specified, use the GameObject this component is attached to
+		if (TargetObject == null)
+			TargetObject = GameObject;
+	}
+	
+	/// <summary>
+	/// Called every frame while at least one player is within visibility range.
+	/// Use this to update the panel's content based on game state.
+	/// </summary>
+	protected override void UpdateContent()
+	{
+		// Example: Update status based on some condition
+		if (TargetComponent != null && TargetComponent.IsValid())
+		{
+			Status = "Active";
+			InfoText = $"Component: {TargetComponent.GetType().Name}";
+		}
+		else
+		{
+			Status = "Inactive";
+			InfoText = "No target component";
+		}
+		
+		// Example: Dynamic title update
+		if (ClosestPlayer != null)
+		{
+			var distance = DistanceToClosestPlayer;
+			Title = $"Distance: {distance:F0}m";
+		}
+	}
+	
+	/// <summary>
+	/// Called when the first player enters visibility range
+	/// </summary>
+	protected override void OnPlayerEnterRange(GameObject player, float distance)
+	{
+		base.OnPlayerEnterRange(player, distance);
+		
+		// Optional: Custom behavior when player enters range
+		Log.Info($"Player {player.Name} can now see {GameObject.Name} panel");
+		
+		// Optional: Add entrance animation
+		Style.Opacity = 0f;
+		Style.Transitions = new() { new() { Property = "opacity", Duration = 0.2f } };
+		Style.Opacity = 1f;
+	}
+	
+	/// <summary>
+	/// Called when the last player exits visibility range
+	/// </summary>
+	protected override void OnPlayerExitRange()
+	{
+		// Optional: Custom behavior when no players in range
+		Log.Info($"No players can see {GameObject.Name} panel anymore");
+		
+		// Optional: Add exit animation before disabling
+		Style.Transitions = new() { new() { Property = "opacity", Duration = 0.1f } };
+		Style.Opacity = 0f;
+		
+		// Delay actual disable to allow animation
+		_ = Task.DelaySeconds(0.1f).ContinueWith(_ => {
+			if (IsValid())
+				base.OnPlayerExitRange();
+		});
+	}
+	
+	/// <summary>
+	/// Include relevant properties in the hash to trigger UI updates when they change
+	/// </summary>
+	protected override int BuildHash()
+	{
+		return HashCode.Combine(
+			base.BuildHash(),
+			Title,
+			Status,
+			InfoText,
+			TargetComponent?.GetHashCode() ?? 0
+		);
+	}
+}

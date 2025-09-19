@@ -3,6 +3,38 @@ namespace ResourceFarmer.Resources;
 public static class ResourceTypeExtensions
 {
 	/// <summary>
+	/// Gets a user-friendly display name for the resource type
+	/// </summary>
+	public static string GetDisplayName(this ResourceType type)
+	{
+		return type switch
+		{
+			ResourceType.None => "None",
+			ResourceType.Wood => "Wood",
+			ResourceType.Stone => "Stone",
+			ResourceType.Fiber => "Fiber",
+			ResourceType.CopperOre => "Copper Ore",
+			ResourceType.TinOre => "Tin Ore",
+			ResourceType.IronOre => "Iron Ore",
+			ResourceType.Coal => "Coal",
+			ResourceType.SilverOre => "Silver Ore",
+			ResourceType.GoldOre => "Gold Ore",
+			ResourceType.MithrilOre => "Mithril Ore",
+			ResourceType.AdamantiteOre => "Adamantite Ore",
+			ResourceType.Quartz => "Quartz",
+			ResourceType.RubyRough => "Ruby (Rough)",
+			ResourceType.SapphireRough => "Sapphire (Rough)",
+			ResourceType.EmeraldRough => "Emerald (Rough)",
+			ResourceType.DiamondRough => "Diamond (Rough)",
+			ResourceType.CrystalShard => "Crystal Shard",
+			ResourceType.EssenceDust => "Essence Dust",
+			ResourceType.DragonScale => "Dragon Scale",
+			ResourceType.PhoenixFeather => "Phoenix Feather",
+			_ => type.ToString()
+		};
+	}
+	
+	/// <summary>
 	/// Determines if a specific tool is generally required to gather this resource.
 	/// Basic resources might be gatherable by hand (slowly).
 	/// </summary>

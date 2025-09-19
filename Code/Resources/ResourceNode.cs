@@ -5,6 +5,7 @@ using ResourceFarmer.Utility; // Assuming this namespace exists
 using Sandbox.UI;
 using System.Linq;
 using ResourceFarmer.Items;
+using ResourceFarmer.UI.Components;
 
 using ResourceFarmer.PlayerBase;
 using static Sandbox.Component;
@@ -37,6 +38,11 @@ public sealed partial class ResourceNode : Interactable, IGatherable, ITriggerLi
 
 	private PanelComponent _cachedPanelComponent;
 	public PanelComponent GetPanelComponent() => _cachedPanelComponent;
+	
+	/// <summary>
+	/// Gets the WorldPanelComponent (new modular system) if present
+	/// </summary>
+	public WorldPanelComponent GetWorldPanelComponent() => Components.Get<WorldPanelComponent>(FindMode.InChildren);
 
 	private bool _isLocalPlayerNearby = false;
 	private Player _localPlayerReference = null;
