@@ -43,4 +43,13 @@
             margin-top: $margin-tiny; // Use theme variable
             text-shadow: 0 0 5px rgba($shadow-color, 0.5); // Use theme variable
         }
+        
+        // --- Required Tool Type ---
+        .resource-req-tooltype {
+            font-size: $font-size-tiny; // Use theme variable
+            font-weight: $font-weight-light; // Use theme variable
+            color: rgba($text-secondary, 0.8); // Use theme variable
+            margin-top: $margin-tiny; // Use theme variable
+            font-style: italic;
+        }
     }
