@@ -1,0 +1,89 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using ResourceFarmer.UI.Components;
+@attribute [StyleSheet]
+@inherits WorldPanelComponent
+@namespace ResourceFarmer.UI.Components
+
+<root class="generic-info-world-panel">
+	<div class="panel-container">
+		@if (!string.IsNullOrEmpty(Title))
+		{
+			<div class="panel-title">@Title</div>
+		}
+		
+		@if (!string.IsNullOrEmpty(MainText))
+		{
+			<div class="panel-main-text">@MainText</div>
+		}
+		
+		@if (!string.IsNullOrEmpty(SubText))
+		{
+			<div class="panel-sub-text">@SubText</div>
+		}
+		
+		@if (ShowDistance && DistanceToClosestPlayer < float.MaxValue)
+		{
+			<div class="panel-distance">@($"{DistanceToClosestPlayer:F0}m")</div>
+		}
+	</div>
+</root>
+
+@code {
+	/// <summary>
+	/// Title text displayed at the top of the panel
+	/// </summary>
+	[Property] public string Title { get; set; } = "";
+	
+	/// <summary>
+	/// Main text content
+	/// </summary>
+	[Property] public string MainText { get; set; } = "";
+	
+	/// <summary>
+	/// Secondary/subtitle text
+	/// </summary>
+	[Property] public string SubText { get; set; } = "";
+	
+	/// <summary>
+	/// Whether to show distance to player
+	/// </summary>
+	[Property] public bool ShowDistance { get; set; } = false;
+	
+	/// <summary>
+	/// Custom CSS class for styling variations
+	/// </summary>
+	[Property] public string PanelClass { get; set; } = "";
+	
+	/// <summary>
+	/// Callback for dynamic content updates
+	/// </summary>
+	[Property] public Action<GenericInfoWorldPanel> UpdateCallback { get; set; }
+	
+	protected override void UpdateContent()
+	{
+		// Allow external updates via callback
+		UpdateCallback?.Invoke(this);
+	}
+	
+	protected override void OnAwake()
+	{
+		base.OnAwake();
+		
+		// Set default height offset for generic panels
+		if (HeightOffset == 50f) // If not manually set
+			HeightOffset = 40f;
+	}
+	
+	protected override int BuildHash()
+	{
+		return HashCode.Combine(
+			base.BuildHash(),
+			Title,
+			MainText,
+			SubText,
+			ShowDistance,
+			PanelClass
+		);
+	}
+}
