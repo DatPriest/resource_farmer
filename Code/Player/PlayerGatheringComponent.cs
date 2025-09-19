@@ -38,14 +38,35 @@ public sealed class PlayerGatheringComponent : Component
 		var tool = OwnerPlayer.EquippedTool; // ToolBase instance
 
 		// Check basic type/level requirements first
-		bool requirementsMet = tool != null &&
-							   tool.ToolType == targetNode.RequiredToolType &&
-							   tool.Level >= targetNode.RequiredToolLevel;
+		bool requirementsMet = false;
+		
+		if ( targetNode.RequiredToolType == ResourceType.None )
+		{
+			// No specific tool needed - can gather with hands
+			requirementsMet = true;
+		}
+		else
+		{
+			// Specific tool required
+			requirementsMet = tool != null &&
+							  tool.ToolType == targetNode.RequiredToolType &&
+							  tool.Level >= targetNode.RequiredToolLevel;
+		}
 
-		if ( targetNode.RequiredToolType == ResourceType.None || requirementsMet )
+		if ( requirementsMet )
 		{
 			// --- Calculate Amount ---
-			float amountMultiplier = tool?.GetGatherAmountMultiplier( targetNode.ResourceType ) ?? 0.5f; // Use 50% if no tool/wrong type
+			float amountMultiplier;
+			if ( tool != null )
+			{
+				amountMultiplier = tool.GetGatherAmountMultiplier( targetNode.ResourceType );
+			}
+			else
+			{
+				// Hand gathering - reduced efficiency but still possible for basic resources
+				amountMultiplier = targetNode.RequiredToolType == ResourceType.None ? 0.5f : 0.1f;
+			}
+			
 			float playerLevelBonus = 1.0f + (OwnerPlayer.Level * 0.02f); // Smaller level bonus to amount
 			float finalAmount = BaseGatherAmountPerHit * amountMultiplier * playerLevelBonus;
 
@@ -60,7 +81,12 @@ public sealed class PlayerGatheringComponent : Component
 			}
 
 			// --- Call Gather on Node ---
-			targetNode.Gather( OwnerPlayer, finalAmount, tool ); ;
+			targetNode.Gather( OwnerPlayer, finalAmount, tool );
+			
+			// --- Play Hit Effects ---
+			var hitPoint = targetNode.Transform.Position;
+			var hitNormal = Vector3.Up; // Default normal, could be improved with proper surface detection
+			targetNode.PlayHitEffect( hitPoint, hitNormal );
 		}
 		else
 		{
