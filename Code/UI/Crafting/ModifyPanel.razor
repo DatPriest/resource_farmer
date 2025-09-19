@@ -149,7 +149,7 @@
 	{
 		if (Player == null || EquippedTool == null) return;
 		Log.Info("[ModifyPanel] Upgrade Requested");
-		Player.RequestUpgradeEquippedTool();
+		ConsoleSystem.Run("upgrade_tool");
 		// Optional: Add optimistic UI update or feedback
 		CalculateUpgradeCosts(); // Recalculate costs immediately after request
 	}

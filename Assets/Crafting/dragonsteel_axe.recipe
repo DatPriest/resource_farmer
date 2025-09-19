@@ -1,0 +1,27 @@
+{
+  "Name": "Dragonsteel Axe",
+  "Category": "Legendary Axes",
+  "ToolType": "Axe",
+  "Material": "Dragonsteel", 
+  "Level": 10,
+  "OutputQuality": 0.95,
+  "CanHaveBonuses": true,
+  "MinBonuses": 3,
+  "MaxBonuses": 5,
+  "BasePower": 10.0,
+  "PossibleBonuses": [
+    "MoonTouched",
+    "Sturdy",
+    "Efficient"
+  ],
+  "RequiredProfessionLevel": 50,
+  "Costs": {
+    "DragonScale": 25,
+    "MithrilOre": 50,
+    "CrystalShard": 10,
+    "EssenceDust": 15,
+    "PhoenixFeather": 5
+  },
+  "__references": [],
+  "__version": 0
+}

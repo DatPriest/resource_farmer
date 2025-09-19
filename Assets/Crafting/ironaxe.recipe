@@ -1,0 +1,25 @@
+{
+  "Name": "Iron Axe",
+  "Category": "Axes",
+  "ToolType": "Axe", 
+  "Material": "Iron",
+  "Level": 2,
+  "OutputQuality": 0.4,
+  "CanHaveBonuses": true,
+  "MinBonuses": 1,
+  "MaxBonuses": 3,
+  "BasePower": 2.0,
+  "PossibleBonuses": [
+    "MoonTouched",
+    "Sturdy", 
+    "Efficient"
+  ],
+  "RequiredProfessionLevel": 5,
+  "Costs": {
+    "IronOre": 15,
+    "Coal": 5,
+    "Wood": 3
+  },
+  "__references": [],
+  "__version": 0
+}
