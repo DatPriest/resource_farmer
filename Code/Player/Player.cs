@@ -328,31 +328,6 @@ public sealed partial class Player : Component
 		Log.Info($"Server: Received request to buy Prestige Upgrade: {upgradeId}");
 	}
 
-	/// <summary>
-	/// Gets the profession level for a specific tool type.
-	/// For now, this is simplified to use the overall player level.
-	/// In the future, this could track individual profession levels.
-	/// </summary>
-	/// <param name="toolType">The ResourceType representing the profession</param>
-	/// <returns>The profession level for this tool type</returns>
-	public int GetProfessionLevel(ResourceType toolType)
-	{
-		// Simple implementation: use overall player level as profession level
-		// In a more complex system, you could have separate profession levels
-		// stored in a Dictionary<ResourceType, int> ProfessionLevels property
-		return Level;
-	}
-
-	/// <summary>
-	/// Gets the maximum profession level possible in the game.
-	/// </summary>
-	/// <returns>The maximum profession level</returns>
-	public int GetMaxProfessionLevel()
-	{
-		// Define the maximum profession level
-		return 100; // Example maximum level
-	}
-
 	[Rpc.Broadcast(NetFlags.Reliable)]
 	public void Prestige()
 	{

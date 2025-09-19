@@ -147,7 +147,7 @@ public sealed class PlayerInventoryComponent : Component
 			OwnerPlayer.Inventory.Remove(resourceType);
 		}
 
-		Log.Info($"[PlayerInventoryComponent] Removed {actualAmount:F2} {resourceType}. Remaining: {OwnerPlayer.Inventory.GetValueOrDefault(resourceType, 0f):F2}");
+		Log.Info($"[PlayerInventoryComponent] Removed {actualAmount:F2} {resourceType}. Remaining: {(OwnerPlayer.Inventory.TryGetValue(resourceType, out var remaining) ? remaining : 0f):F2}");
 
 		// Update ResourceManager to trigger UI updates
 		ResourceManager.Instance?.UpdateInventory(OwnerPlayer.Inventory);
@@ -195,7 +195,7 @@ public sealed class PlayerInventoryComponent : Component
 		if (OwnerPlayer?.Inventory == null)
 			return 0f;
 
-		return OwnerPlayer.Inventory.GetValueOrDefault(resourceType, 0f);
+		return OwnerPlayer.Inventory.TryGetValue(resourceType, out var amount) ? amount : 0f;
 	}
 
 	/// <summary>
