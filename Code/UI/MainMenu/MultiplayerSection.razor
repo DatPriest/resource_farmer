@@ -1,0 +1,74 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using ResourceFarmer.UI.Components;
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.MainMenu
+
+<div class="menu-section">
+	<h3 class="section-title">Multiplayer</h3>
+	
+	<div class="menu-buttons">
+		<BaseButton 
+			Text="🏠 Host Game" 
+			CssClass="menu-primary"
+			OnClick="@(() => OnAction?.Invoke("host_game"))"
+			Tooltip="Start a server for other players to join" />
+			
+		<BaseButton 
+			Text="🔍 Join Game" 
+			CssClass="menu-primary"
+			OnClick="@(() => OnAction?.Invoke("join_game"))"
+			Tooltip="Connect to an existing server" />
+			
+		<BaseButton 
+			Text="📋 Server Browser" 
+			CssClass="menu-secondary"
+			Disabled="true"
+			Tooltip="Coming Soon - Server browser not yet implemented" />
+			
+		<div class="server-input-section">
+			<label class="input-label">Server Address:</label>
+			<div class="input-group">
+				<input type="text" 
+					   class="server-input" 
+					   placeholder="localhost:27015" 
+					   @bind="ServerAddress" />
+				<BaseButton 
+					Text="Connect" 
+					CssClass="menu-primary"
+					OnClick="@(() => ConnectToServer())" />
+			</div>
+		</div>
+			
+		<div class="button-group button-group--horizontal">
+			<BaseButton 
+				Text="↩️ Back" 
+				CssClass="menu-secondary"
+				OnClick="@(() => OnBack?.Invoke())" />
+		</div>
+	</div>
+</div>
+
+@code {
+	[Property] public Action OnBack { get; set; }  
+	[Property] public Action<string> OnAction { get; set; }
+
+	private string ServerAddress { get; set; } = "localhost:27015";
+
+	private void ConnectToServer()
+	{
+		if (string.IsNullOrWhiteSpace(ServerAddress))
+		{
+			Log.Warning("[MultiplayerSection] Server address is empty.");
+			return;
+		}
+
+		Log.Info($"[MultiplayerSection] Connecting to server: {ServerAddress}");
+		OnAction?.Invoke($"connect:{ServerAddress}");
+	}
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine("multiplayer_section", ServerAddress);
+	}
+}

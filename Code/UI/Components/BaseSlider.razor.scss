@@ -1,0 +1,166 @@
+// BaseSlider component styles - extends the base slider styles from Controls.scss
+@import "../Styles/Colors.scss";
+@import "../Styles/Layout.scss";
+@import "../Styles/Text.scss";
+
+.base-slider {
+	display: flex;
+	flex-direction: column;
+	gap: $gap-small;
+
+	.slider-label {
+		font-size: $font-size-base;
+		font-weight: $font-weight-medium;
+		color: $text-primary;
+		margin-bottom: $margin-tiny;
+	}
+
+	.slider-container {
+		display: flex;
+		align-items: center;
+		gap: $gap-medium;
+	}
+
+	.slider-track {
+		position: relative;
+		flex: 1;
+		height: 6px;
+		background-color: $background-dark;
+		border: $border-width-base solid $border-color;
+		border-radius: 3px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+
+		&:hover {
+			border-color: $text-secondary;
+		}
+
+		.slider-fill {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			background-image: linear-gradient(90deg, $accent-gold, $accent-gold-light);
+			border-radius: 2px;
+			transition: width 0.1s ease;
+		}
+
+		.slider-thumb {
+			position: absolute;
+			top: 50%;
+			width: 16px;
+			height: 16px;
+			background-color: $accent-gold-light;
+			border: 2px solid $accent-gold;
+			border-radius: 50%;
+			transform: translate(-50%, -50%);
+			cursor: pointer;
+			transition: all 0.2s ease;
+			box-shadow: 0 0 4px rgba($shadow-color, 0.5);
+
+			&:hover {
+				transform: translate(-50%, -50%) scale(1.1);
+				box-shadow: 0 0 8px rgba($accent-gold, 0.6);
+			}
+
+			&:active {
+				transform: translate(-50%, -50%) scale(0.95);
+			}
+		}
+	}
+
+	.slider-value {
+		font-size: $font-size-small;
+		font-weight: $font-weight-medium;
+		color: $text-secondary;
+		min-width: 40px;
+		text-align: right;
+	}
+
+	// Disabled state
+	&.disabled {
+		opacity: 0.6;
+		pointer-events: none;
+
+		.slider-track {
+			cursor: not-allowed;
+			border-color: $border-color;
+
+			.slider-fill {
+				background-color: $text-disabled;
+			}
+
+			.slider-thumb {
+				background-color: $text-disabled;
+				border-color: $text-disabled;
+			}
+		}
+	}
+
+	// Size variants
+	&.slider--small {
+		.slider-track {
+			height: 4px;
+		}
+
+		.slider-thumb {
+			width: 12px;
+			height: 12px;
+		}
+
+		.slider-label,
+		.slider-value {
+			font-size: $font-size-small;
+		}
+	}
+
+	&.slider--large {
+		.slider-track {
+			height: 8px;
+		}
+
+		.slider-thumb {
+			width: 20px;
+			height: 20px;
+		}
+
+		.slider-label,
+		.slider-value {
+			font-size: $font-size-large;
+		}
+	}
+
+	// Color variants
+	&.slider--success {
+		.slider-track .slider-fill {
+			background-image: linear-gradient(90deg, $accent-success, rgba($accent-success, 0.8));
+		}
+
+		.slider-thumb {
+			background-color: $accent-success;
+			border-color: rgba($accent-success, 0.8);
+		}
+	}
+
+	&.slider--warning {
+		.slider-track .slider-fill {
+			background-image: linear-gradient(90deg, $accent-warning, rgba($accent-warning, 0.8));
+		}
+
+		.slider-thumb {
+			background-color: $accent-warning;
+			border-color: rgba($accent-warning, 0.8);
+		}
+	}
+
+	&.slider--danger {
+		.slider-track .slider-fill {
+			background-image: linear-gradient(90deg, $accent-danger, rgba($accent-danger, 0.8));
+		}
+
+		.slider-thumb {
+			background-color: $accent-danger;
+			border-color: rgba($accent-danger, 0.8);
+		}
+	}
+}

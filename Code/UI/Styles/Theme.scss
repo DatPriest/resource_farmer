@@ -1,5 +1,4 @@
-﻿@import "Buttons.scss";
-// --- Main Theme File ---
+﻿// --- Main Theme File ---
 // Imports all other SCSS partials
 
 @import "Colors.scss";
@@ -10,6 +9,16 @@
 @import "Controls.scss";
 @import "Hud.scss";
 @import "MenuSystem.scss";
+
+// Import new modular UI components
+@import "../Components/BaseButton.razor.scss";
+@import "../Components/BasePanel.razor.scss";
+@import "../Components/BaseSlider.razor.scss";
+
+// Import main menu components
+@import "../MainMenu/MainMenuPanel.razor.scss";
+@import "../MainMenu/MultiplayerSection.razor.scss";
+@import "../MainMenu/MenuSettingsSection.razor.scss";
 
 // Import optional components if they exist and are used
 // @import "DamageIndicator.scss";

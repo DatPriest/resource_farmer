@@ -1,0 +1,65 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.Components
+
+<div class="base-slider @CssClass">
+	@if (!string.IsNullOrEmpty(Label))
+	{
+		<label class="slider-label">@Label</label>
+	}
+	
+	<div class="slider-container">
+		<div class="slider-track" onclick=@OnTrackClick>
+			<div class="slider-fill" style="width: @GetFillPercentage()%"></div>
+			<div class="slider-thumb" style="left: @GetThumbPosition()%"></div>
+		</div>
+		
+		@if (ShowValue)
+		{
+			<span class="slider-value">@GetDisplayValue()</span>
+		}
+	</div>
+</div>
+
+@code {
+	[Property] public string Label { get; set; } = "";
+	[Property] public string CssClass { get; set; } = "";
+	[Property] public float Value { get; set; } = 0f;
+	[Property] public float MinValue { get; set; } = 0f;
+	[Property] public float MaxValue { get; set; } = 100f;
+	[Property] public float Step { get; set; } = 1f;
+	[Property] public bool ShowValue { get; set; } = true;
+	[Property] public string ValueFormat { get; set; } = "F0"; // Number format
+	[Property] public string ValueSuffix { get; set; } = "";
+	[Property] public Action<float> OnValueChanged { get; set; }
+
+	private float GetFillPercentage()
+	{
+		if (MaxValue <= MinValue) return 0f;
+		return Math.Clamp((Value - MinValue) / (MaxValue - MinValue) * 100f, 0f, 100f);
+	}
+
+	private float GetThumbPosition()
+	{
+		return GetFillPercentage();
+	}
+
+	private string GetDisplayValue()
+	{
+		var formattedValue = Value.ToString(ValueFormat);
+		return string.IsNullOrEmpty(ValueSuffix) ? formattedValue : $"{formattedValue}{ValueSuffix}";
+	}
+
+	private void OnTrackClick()
+	{
+		// Simplified click handling - in a real S&box implementation,
+		// you'd need to get the click position and calculate the value
+		Log.Info($"[BaseSlider] Track clicked for {Label}");
+	}
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine(Label, CssClass, Value, MinValue, MaxValue, Step, ShowValue, ValueFormat, ValueSuffix);
+	}
+}

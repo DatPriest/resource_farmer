@@ -24,6 +24,16 @@ $text-danger: #FF4D4D;
 $text-success: #59FFAA;
 $text-disabled: #555C6A;
 
+// Additional semantic colors for components
+$accent-success: #59FFAA;
+$accent-danger: #FF4D4D;
+$accent-warning: #FFB347;
+
+// Background variants
+$background-dark: $primary-dark;
+$background-medium: $primary-medium;
+$background-light: $primary-light;
+
 // Functional Colors
 $border-color: rgba($accent-blue, 0.2); // Default subtle border
 $border-highlight: $accent-blue; // Bright border for focus/hover
