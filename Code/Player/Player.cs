@@ -50,6 +50,7 @@ public sealed partial class Player : Component
 	// Add properties for new components
 	public PlayerInteractionComponent Interaction => Components.Get<PlayerInteractionComponent>();
 	public PlayerGatheringComponent Gathering => Components.Get<PlayerGatheringComponent>();
+	public PlayerInventoryComponent InventoryComponent => Components.Get<PlayerInventoryComponent>();
 
 	// Reference to the saving service
 	private SavingServiceComponent? _savingService;
@@ -78,7 +79,10 @@ public sealed partial class Player : Component
 		if (gatheringComp != null) gatheringComp.OwnerPlayer = this;
 		var interactionComp = Components.GetOrCreate<PlayerInteractionComponent>();
 		if (interactionComp != null) interactionComp.OwnerPlayer = this;
-		Inventory[ResourceType.Wood] = 20f; // Initialize with 0 wood
+		var inventoryComp = Components.GetOrCreate<PlayerInventoryComponent>();
+		if (inventoryComp != null) inventoryComp.OwnerPlayer = this;
+		
+		Inventory[ResourceType.Wood] = 20f; // Initialize with 20 wood
 
 		if ( Body.IsValid() && BodyRenderer == null ) BodyRenderer = Body.Components.Get<SkinnedModelRenderer>();
 		if ( BodyRenderer != null && Body.IsValid() ) ClothingContainer.CreateFromLocalUser().Apply( BodyRenderer );
@@ -184,14 +188,32 @@ public sealed partial class Player : Component
 	{
 		if (type == ResourceType.None) return; // Don't add None to inventory
 
-		Inventory.TryGetValue(type, out var currentAmount);
-		Inventory[type] = currentAmount + amount;
-
-		Log.Info($"Gathered {amount:F2} {type}. Total: {Inventory[type]:F2}"); // Log float
-
-		ResourceManager.Instance?.UpdateInventory(Inventory); // UI needs to handle float
-		var experience = amount * 3 * resourceDifficulty; // Example XP for gathering (float)
-		AddExperience(experience); // Grant XP based on amount gathered
+		// Use the enhanced inventory component if available
+		var inventoryComp = InventoryComponent;
+		if (inventoryComp != null)
+		{
+			float actualAmount = inventoryComp.AddResource(type, amount);
+			if (actualAmount < amount)
+			{
+				Log.Info($"[Player] Inventory full! Only added {actualAmount:F2} of {amount:F2} {type}");
+			}
+			
+			if (actualAmount > 0)
+			{
+				var experience = actualAmount * 3 * resourceDifficulty;
+				AddExperience(experience);
+			}
+		}
+		else
+		{
+			// Fallback to old method
+			Inventory.TryGetValue(type, out var currentAmount);
+			Inventory[type] = currentAmount + amount;
+			Log.Info($"Gathered {amount:F2} {type}. Total: {Inventory[type]:F2}");
+			ResourceManager.Instance?.UpdateInventory(Inventory);
+			var experience = amount * 3 * resourceDifficulty;
+			AddExperience(experience);
+		}
 	}
 
 

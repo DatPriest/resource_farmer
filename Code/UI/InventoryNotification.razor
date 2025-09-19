@@ -1,0 +1,95 @@
+@using ResourceFarmer.PlayerBase
+@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@inherits PanelComponent
+@namespace ResourceFarmer.UI
+
+<root class="inventory_notification @GetNotificationClass()">
+    <div class="notification_content">
+        <div class="notification_icon">@GetNotificationIcon()</div>
+        <div class="notification_text">@NotificationText</div>
+    </div>
+</root>
+
+@code 
+{
+    public enum NotificationType
+    {
+        InventoryFull,
+        CapacityWarning,
+        ItemAdded,
+        ItemRemoved
+    }
+
+    [Property] public NotificationType Type { get; set; } = NotificationType.InventoryFull;
+    [Property] public string NotificationText { get; set; } = "";
+    [Property] public float DisplayDuration { get; set; } = 3.0f;
+
+    private TimeSince _displayStartTime;
+    private bool _isVisible = false;
+
+    protected override void OnStart()
+    {
+        base.OnStart();
+        Style.Display = DisplayMode.None;
+    }
+
+    protected override void OnUpdate()
+    {
+        base.OnUpdate();
+        
+        if (_isVisible && _displayStartTime > DisplayDuration)
+        {
+            HideNotification();
+        }
+    }
+
+    public void ShowNotification(NotificationType type, string text)
+    {
+        Type = type;
+        NotificationText = text;
+        _displayStartTime = 0;
+        _isVisible = true;
+        Style.Display = DisplayMode.Flex;
+        
+        // Auto fade out after duration
+        _ = FadeOutAfterDelay();
+    }
+
+    private async Task FadeOutAfterDelay()
+    {
+        await GameTask.Delay((int)(DisplayDuration * 1000));
+        HideNotification();
+    }
+
+    private void HideNotification()
+    {
+        _isVisible = false;
+        Style.Display = DisplayMode.None;
+    }
+
+    private string GetNotificationClass()
+    {
+        return Type switch
+        {
+            NotificationType.InventoryFull => "full",
+            NotificationType.CapacityWarning => "warning", 
+            NotificationType.ItemAdded => "success",
+            NotificationType.ItemRemoved => "info",
+            _ => "info"
+        };
+    }
+
+    private string GetNotificationIcon()
+    {
+        return Type switch
+        {
+            NotificationType.InventoryFull => "⚠️",
+            NotificationType.CapacityWarning => "📦",
+            NotificationType.ItemAdded => "✅",
+            NotificationType.ItemRemoved => "➖",
+            _ => "ℹ️"
+        };
+    }
+}
