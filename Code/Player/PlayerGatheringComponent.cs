@@ -33,7 +33,7 @@ public sealed class PlayerGatheringComponent : Component
 	/// </summary>
 	public void ProcessHit( ResourceNode targetNode )
 	{
-		if ( OwnerPlayer == null || targetNode == null || !targetNode.IsValid() ) return;
+		if ( OwnerPlayer == null || targetNode == null || !targetNode.IsValid ) return;
 
 		var tool = OwnerPlayer.EquippedTool; // ToolBase instance
 

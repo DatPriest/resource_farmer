@@ -82,7 +82,7 @@ public sealed class PlayerContextualControlsComponent : Component
 		{
 			// Check for resource node
 			var resourceNode = tr.GameObject.Components.Get<ResourceNode>();
-			if (resourceNode != null && resourceNode.IsValid())
+			if (resourceNode != null && resourceNode.IsValid)
 			{
 				newPrompt = GetResourceNodePrompt(resourceNode);
 				hasTarget = true;

@@ -98,15 +98,15 @@ public sealed partial class Player : Component
 	[ConCmd.Server("upgrade_tool")]
 	public static void UpgradeEquippedTool()
 	{
-		var caller = ConsoleSystem.Caller;
-		if ( caller == null )
+		var connection = Connection.Local;
+		if ( connection?.Pawn == null )
 		{
-			Log.Warning( "[UpgradeEquippedTool] Invalid caller." );
+			Log.Warning( "[UpgradeEquippedTool] No valid connection or pawn found." );
 			return;
 		}
 
-		// Find the player component from the caller's GameObject
-		var player = caller.GameObject?.Components.Get<Player>();
+		// Find the player component from the connection's pawn GameObject
+		var player = connection.Pawn.Components.Get<Player>();
 		if ( player == null )
 		{
 			Log.Warning( "[UpgradeEquippedTool] Player component not found." );
@@ -260,15 +260,15 @@ public sealed partial class Player : Component
 	[ConCmd.Server("add_tool_bonus")]
 	public static void AddToolBonus()
 	{
-		var caller = ConsoleSystem.Caller;
-		if ( caller == null )
+		var connection = Connection.Local;
+		if ( connection?.Pawn == null )
 		{
-			Log.Warning( "[AddToolBonus] Invalid caller." );
+			Log.Warning( "[AddToolBonus] No valid connection or pawn found." );
 			return;
 		}
 
-		// Find the player component from the caller's GameObject
-		var player = caller.GameObject?.Components.Get<Player>();
+		// Find the player component from the connection's pawn GameObject
+		var player = connection.Pawn.Components.Get<Player>();
 		if ( player == null )
 		{
 			Log.Warning( "[AddToolBonus] Player component not found." );
@@ -282,15 +282,15 @@ public sealed partial class Player : Component
 	[ConCmd.Server("remove_tool_bonus")]
 	public static void RemoveToolBonus( string bonusName )
 	{
-		var caller = ConsoleSystem.Caller;
-		if ( caller == null )
+		var connection = Connection.Local;
+		if ( connection?.Pawn == null )
 		{
-			Log.Warning( "[RemoveToolBonus] Invalid caller." );
+			Log.Warning( "[RemoveToolBonus] No valid connection or pawn found." );
 			return;
 		}
 
-		// Find the player component from the caller's GameObject
-		var player = caller.GameObject?.Components.Get<Player>();
+		// Find the player component from the connection's pawn GameObject
+		var player = connection.Pawn.Components.Get<Player>();
 		if ( player == null )
 		{
 			Log.Warning( "[RemoveToolBonus] Player component not found." );
@@ -328,15 +328,15 @@ public sealed partial class Player : Component
 	[ConCmd.Server("craft_item")]
 	public static void CraftItem( string toolType, string material, int level )
 	{
-		var caller = ConsoleSystem.Caller;
-		if ( caller == null )
+		var connection = Connection.Local;
+		if ( connection?.Pawn == null )
 		{
-			Log.Warning( "[CraftItem] Invalid caller." );
+			Log.Warning( "[CraftItem] No valid connection or pawn found." );
 			return;
 		}
 
-		// Find the player component from the caller's GameObject
-		var player = caller.GameObject?.Components.Get<Player>();
+		// Find the player component from the connection's pawn GameObject
+		var player = connection.Pawn.Components.Get<Player>();
 		if ( player == null )
 		{
 			Log.Warning( "[CraftItem] Player component not found." );

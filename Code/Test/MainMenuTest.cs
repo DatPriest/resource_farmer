@@ -94,15 +94,15 @@ public static class MainMenuTestCommands
 	[ConCmd.Server("test_main_menu")]
 	public static void TestMainMenu()
 	{
-		var caller = ConsoleSystem.Caller;
-		if (caller == null) return;
+		var connection = Connection.Local;
+		if (connection?.Pawn == null) return;
 
 		Log.Info("[MainMenuTestCommands] Running main menu test...");
 		
-		var testComponent = caller.GameObject?.Components.Get<MainMenuTest>();
+		var testComponent = connection.Pawn.Components.Get<MainMenuTest>();
 		if (testComponent == null)
 		{
-			testComponent = caller.GameObject?.Components.Create<MainMenuTest>();
+			testComponent = connection.Pawn.Components.Create<MainMenuTest>();
 		}
 		
 		Log.Info("[MainMenuTestCommands] Test component ready.");
@@ -111,13 +111,13 @@ public static class MainMenuTestCommands
 	[ConCmd.Server("show_main_menu")]
 	public static void ShowMainMenu()
 	{
-		var caller = ConsoleSystem.Caller;
-		if (caller == null) return;
+		var connection = Connection.Local;
+		if (connection?.Pawn == null) return;
 
-		var mainMenuManager = caller.GameObject?.Components.Get<MainMenuManager>();
+		var mainMenuManager = connection.Pawn.Components.Get<MainMenuManager>();
 		if (mainMenuManager == null)
 		{
-			mainMenuManager = caller.GameObject?.Components.Create<MainMenuManager>();
+			mainMenuManager = connection.Pawn.Components.Create<MainMenuManager>();
 		}
 		
 		mainMenuManager.ShowMainMenu();

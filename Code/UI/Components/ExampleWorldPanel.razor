@@ -57,7 +57,7 @@
 	protected override void UpdateContent()
 	{
 		// Example: Update status based on some condition
-		if (TargetComponent != null && TargetComponent.IsValid())
+		if (TargetComponent != null && TargetComponent.IsValid)
 		{
 			Status = "Active";
 			InfoText = $"Component: {TargetComponent.GetType().Name}";
@@ -106,7 +106,7 @@
 		
 		// Delay actual disable to allow animation
 		_ = Task.DelaySeconds(0.1f).ContinueWith(_ => {
-			if (IsValid())
+			if (IsValid)
 				base.OnPlayerExitRange();
 		});
 	}

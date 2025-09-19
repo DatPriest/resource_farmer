@@ -169,7 +169,7 @@ public sealed class ResourceSpawner : Component
                 GameObject spawnedObject = selectedPrefabSource.Clone(spawnPosition);
 
                 // Set the parent if found
-                if (_resourceNodeParent.IsValid())
+                if (_resourceNodeParent.IsValid)
                 {
                     spawnedObject.SetParent(_resourceNodeParent, false); // worldPositionStays = false to keep world position
                 }
@@ -219,7 +219,7 @@ public sealed class ResourceSpawner : Component
         Log.Info($"[{nameof(ResourceSpawner)}] Cleaning up {_spawnedResources.Count} previously spawned resources...");
         foreach (var resource in _spawnedResources)
         {
-            if (resource.IsValid()) // Check if it hasn't been destroyed already
+            if (resource.IsValid) // Check if it hasn't been destroyed already
             {
                 resource.Destroy();
             }

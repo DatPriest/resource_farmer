@@ -112,7 +112,7 @@ public sealed class PlayerInteractionComponent : Component
 			// Check if the hit object has a ResourceNode component
 			// Important: Use tr.GameObject.Components - tr.Component might be the Collider
 			var resourceNode = tr.GameObject.Components.Get<ResourceNode>();
-			if ( resourceNode != null && resourceNode.IsValid() )
+			if ( resourceNode != null && resourceNode.IsValid )
 			{
 				// Found a resource node, process the hit via GatheringComponent
 				Gathering?.ProcessHit( resourceNode );

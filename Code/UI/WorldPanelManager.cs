@@ -62,7 +62,7 @@ public sealed class WorldPanelManager : Component
 		
 		foreach (var node in allNodes)
 		{
-			if (node == null || !node.IsValid() || !node.Enabled) continue;
+			if (node == null || !node.IsValid || !node.Enabled) continue;
 			
 			processedNodeIds.Add(node.GameObject.Id);
 			
@@ -80,7 +80,7 @@ public sealed class WorldPanelManager : Component
 
 			PanelComponent panel = node.GetPanelComponent();
 
-			if (panel != null && panel.IsValid())
+			if (panel != null && panel.IsValid)
 			{
 				bool shouldBeVisible = distance <= visibilityRange;
 
@@ -124,7 +124,7 @@ public sealed class WorldPanelManager : Component
 			{
 				var node = nodeGo.Components.Get<ResourceNode>();
 				var panel = node?.GetPanelComponent();
-				if (panel != null && panel.IsValid())
+				if (panel != null && panel.IsValid)
 				{
 					panel.Enabled = false;
 				}

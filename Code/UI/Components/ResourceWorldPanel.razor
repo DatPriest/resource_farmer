@@ -52,7 +52,7 @@
 	
 	protected override void UpdateContent()
 	{
-		if (ResourceNode == null || !ResourceNode.IsValid())
+		if (ResourceNode == null || !ResourceNode.IsValid)
 		{
 			ResourceTypeDisplay = "Error";
 			ResourceAmountDisplay = "N/A";
@@ -95,7 +95,7 @@
 		
 		// Delay actual disable to allow animation
 		_ = Task.DelaySeconds(0.2f).ContinueWith(_ => {
-			if (IsValid())
+			if (IsValid)
 				base.OnPlayerExitRange();
 		});
 	}

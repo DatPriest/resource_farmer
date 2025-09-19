@@ -98,7 +98,7 @@ public sealed partial class ResourceNode : Interactable, IGatherable, ITriggerLi
 		if ( _amount <= 0.01f )
 		{
 			Log.Info( $"[ResourceNode Server Gather] {GameObject.Name} depleted. Destroying." );
-			if ( _cachedPanelComponent?.IsValid() ?? false ) DisablePanelClientRpc();
+			if ( _cachedPanelComponent?.IsValid ?? false ) DisablePanelClientRpc();
 			GameObject.Destroy();
 		}
 	}
@@ -116,7 +116,7 @@ public sealed partial class ResourceNode : Interactable, IGatherable, ITriggerLi
 			var effectObject = HitEffectPrefab.Clone( pos, rot );
 			Task.Delay( 2000 ).ContinueWith( _ =>
 			{
-				if ( effectObject.IsValid() )
+				if ( effectObject.IsValid )
 				{
 					effectObject.Destroy();
 				}
@@ -127,7 +127,7 @@ public sealed partial class ResourceNode : Interactable, IGatherable, ITriggerLi
 	[Rpc.Broadcast( NetFlags.Reliable )]
 	private void DisablePanelClientRpc()
 	{
-		if ( _cachedPanelComponent != null && _cachedPanelComponent.IsValid() )
+		if ( _cachedPanelComponent != null && _cachedPanelComponent.IsValid )
 		{
 			_cachedPanelComponent.Enabled = false;
 		}
@@ -209,7 +209,7 @@ public sealed partial class ResourceNode : Interactable, IGatherable, ITriggerLi
 		var highlight = Components.GetOrCreate<HighlightOutline>();
 		highlight.Enabled = _isLocalPlayerNearby; // Enable based on trigger presence
 
-		if ( highlight.Enabled && _localPlayerReference.IsValid() )
+		if ( highlight.Enabled && _localPlayerReference.IsValid )
 		{
 			// Calculate and apply color using the cached local player reference
 			Color outlineColor = GetOutlineColor( _localPlayerReference, _localPlayerReference.EquippedTool );
