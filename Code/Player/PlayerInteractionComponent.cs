@@ -20,12 +20,12 @@ public sealed class PlayerInteractionComponent : Component
 		}
 	}
 
-    // Schritt-für-Schritt-Pseudocode:
+    // Schritt-fï¿½r-Schritt-Pseudocode:
     // 1. Hole das Camera-Objekt.
-    // 2. Prüfe, ob eine Kamera vorhanden ist. Wenn nicht, Log-Warnung und return.
+    // 2. Prï¿½fe, ob eine Kamera vorhanden ist. Wenn nicht, Log-Warnung und return.
     // 3. Ermittle den Mittelpunkt des Bildschirms (Screen.Size * 0.5).
     // 4. Erzeuge mit camera.ScreenPointToRay(screenCenter) einen Ray vom Bildschirmmittelpunkt aus.
-    // 5. Führe den Raytrace mit origin + direction * InteractionDistance aus.
+    // 5. Fï¿½hre den Raytrace mit origin + direction * InteractionDistance aus.
     // 6. Zeige den Debug-Strahl an, um den Verlauf zu sehen.
 
 
@@ -77,13 +77,28 @@ public sealed class PlayerInteractionComponent : Component
 
 	/// <summary>
 	/// Server-side logic for the primary action (e.g., attacking/gathering).
-	/// Performs a raycast from the player's eye position.
+	/// Performs a raycast from the camera or player's eye position.
 	/// </summary>
 	private void PrimaryAction()
 	{
 		if ( OwnerPlayer == null ) return;
 
-		var tr = Scene.Trace.Ray( Scene.Camera.Transform.World.ForwardRay, GetLocalInteractionDistance() )
+		// Try to use the main camera, fall back to player's eye position
+		Ray ray;
+		var camera = Scene.Camera;
+		if ( camera != null )
+		{
+			ray = camera.Transform.World.ForwardRay;
+		}
+		else
+		{
+			// Fallback to player's eye position
+			var eyePos = OwnerPlayer.Eye?.Transform.Position ?? OwnerPlayer.Transform.Position + Vector3.Up * OwnerPlayer.EyeHeight;
+			var eyeDir = OwnerPlayer.Eye?.Transform.Rotation.Forward ?? OwnerPlayer.Transform.Rotation.Forward;
+			ray = new Ray( eyePos, eyeDir );
+		}
+
+		var tr = Scene.Trace.Ray( ray, GetLocalInteractionDistance() )
 			.Radius( 8 )
 			.WithoutTags( "Player" ) // Ignore the player itself
 			.Run();
@@ -131,7 +146,22 @@ public sealed class PlayerInteractionComponent : Component
 	{
 		if ( OwnerPlayer == null ) return;
 
-		var tr = Scene.Trace.Ray( Scene.Camera.Transform.World.ForwardRay, GetLocalInteractionDistance() )
+		// Try to use the main camera, fall back to player's eye position
+		Ray ray;
+		var camera = Scene.Camera;
+		if ( camera != null )
+		{
+			ray = camera.Transform.World.ForwardRay;
+		}
+		else
+		{
+			// Fallback to player's eye position
+			var eyePos = OwnerPlayer.Eye?.Transform.Position ?? OwnerPlayer.Transform.Position + Vector3.Up * OwnerPlayer.EyeHeight;
+			var eyeDir = OwnerPlayer.Eye?.Transform.Rotation.Forward ?? OwnerPlayer.Transform.Rotation.Forward;
+			ray = new Ray( eyePos, eyeDir );
+		}
+
+		var tr = Scene.Trace.Ray( ray, GetLocalInteractionDistance() )
 			.Radius( 8 )
 			.IgnoreGameObjectHierarchy( GameObject ).WithoutTags( "Player" ) // Ignore the player itself
 			.Run();
