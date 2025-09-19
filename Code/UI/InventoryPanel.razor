@@ -119,6 +119,15 @@
 		{
 			FindLocalPlayer();
 		}
+		
+		// Handle keyboard shortcuts when inventory is open
+		if (Style.Display == DisplayMode.Flex)
+		{
+			if (Input.Pressed("InventoryMenu") || Input.Pressed("Escape"))
+			{
+				CloseInventory();
+			}
+		}
 	}
 
 	void FindLocalPlayer()

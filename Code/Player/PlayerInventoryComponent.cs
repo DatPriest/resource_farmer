@@ -33,6 +33,11 @@ public sealed class PlayerInventoryComponent : Component
 	public float AvailableCapacity => MaxCapacity - CurrentCapacity;
 
 	/// <summary>
+	/// Whether inventory is at warning capacity (>80%)
+	/// </summary>
+	public bool IsNearFull => CurrentCapacity >= MaxCapacity * 0.8f;
+
+	/// <summary>
 	/// Whether inventory is full
 	/// </summary>
 	public bool IsFull => CurrentCapacity >= MaxCapacity;
@@ -43,11 +48,17 @@ public sealed class PlayerInventoryComponent : Component
 	public event Action<IDictionary<ResourceType, float>> OnInventoryChanged;
 
 	/// <summary>
+	/// Event triggered when inventory becomes near full (>80%)
+	/// </summary>
+	public event Action<bool> OnInventoryNearFullStatusChanged;
+
+	/// <summary>
 	/// Event triggered when inventory becomes full or has space
 	/// </summary>
 	public event Action<bool> OnInventoryFullStatusChanged;
 
 	private bool _wasFull = false;
+	private bool _wasNearFull = false;
 
 	protected override void OnStart()
 	{
@@ -243,6 +254,9 @@ public sealed class PlayerInventoryComponent : Component
 	private void CheckCapacityStatus()
 	{
 		bool isCurrentlyFull = IsFull;
+		bool isCurrentlyNearFull = IsNearFull;
+		
+		// Check full status
 		if (isCurrentlyFull != _wasFull)
 		{
 			_wasFull = isCurrentlyFull;
@@ -255,6 +269,18 @@ public sealed class PlayerInventoryComponent : Component
 			else
 			{
 				Log.Info("[PlayerInventoryComponent] Inventory has space available.");
+			}
+		}
+		
+		// Check near full status
+		if (isCurrentlyNearFull != _wasNearFull && !isCurrentlyFull)
+		{
+			_wasNearFull = isCurrentlyNearFull;
+			OnInventoryNearFullStatusChanged?.Invoke(isCurrentlyNearFull);
+			
+			if (isCurrentlyNearFull)
+			{
+				Log.Info("[PlayerInventoryComponent] Inventory is getting full (>80%)!");
 			}
 		}
 	}
