@@ -90,6 +90,10 @@ public sealed partial class Player : Component
 		if (gatheringComp != null) gatheringComp.OwnerPlayer = this;
 		var interactionComp = Components.GetOrCreate<PlayerInteractionComponent>();
 		if (interactionComp != null) interactionComp.OwnerPlayer = this;
+		
+		// Initialize contextual controls component for HUD prompts
+		var contextualComp = Components.GetOrCreate<PlayerContextualControlsComponent>();
+		if (contextualComp != null) contextualComp.OwnerPlayer = this;
 
 		Inventory[ResourceType.Wood] = 20f; // Initialize with 20 wood
 

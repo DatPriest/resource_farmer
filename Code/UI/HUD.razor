@@ -5,7 +5,8 @@
 @using System;
 @using System.Collections.Generic;
 @using ResourceFarmer.Resources;
-@using ResourceFarmer.Items; 
+@using ResourceFarmer.Items;
+@using Microsoft.AspNetCore.Components;
 @inherits PanelComponent
 @namespace ResourceFarmer.UI
 
@@ -92,6 +93,20 @@
 		}
 	</div>
 
+	@* Bottom-Center Contextual Controls *@
+	<div class="contextual_controls @GetContextualControlsVisibilityClass()">
+		@if (LocalPlayer?.Components.Get<PlayerContextualControlsComponent>() is PlayerContextualControlsComponent contextComp)
+		{
+			var controls = contextComp.GetCurrentControls();
+			@foreach (var control in controls)
+			{
+				<div class="control_hint @(control.IsSecondary ? "secondary" : "") @(control.IsEnabled ? "enabled" : "disabled")">
+					@RenderControlText(control.Text)
+				</div>
+			}
+		}
+	</div>
+
 </root>
 
 @code
@@ -170,6 +185,40 @@
 		return $"{materialClass} {typeClass}";
 	}
 
+	// --- Contextual Controls Helper Methods ---
+	string GetContextualControlsVisibilityClass()
+	{
+		var contextComp = LocalPlayer?.Components.Get<PlayerContextualControlsComponent>();
+		return contextComp?.HasInteractable == true ? "visible" : "";
+	}
+
+	RenderFragment RenderControlText(string text)
+	{
+		return builder =>
+		{
+			if (string.IsNullOrEmpty(text)) return;
+
+			// Parse text for keybind formatting (e.g., "Press [E] to interact")
+			var parts = text.Split('[', ']');
+			for (int i = 0; i < parts.Length; i++)
+			{
+				if (i % 2 == 0)
+				{
+					// Regular text
+					builder.AddContent(i, parts[i]);
+				}
+				else
+				{
+					// Keybind - wrap in special styling
+					builder.OpenElement(i, "span");
+					builder.AddAttribute(i + 1, "class", "keybind");
+					builder.AddContent(i + 2, parts[i]);
+					builder.CloseElement();
+				}
+			}
+		};
+	}
+
 	// --- BuildHash (Important for updates) ---
 	protected override int BuildHash()
 	{
@@ -187,6 +236,10 @@
 		hash.Add(tool?.ToolType ?? ResourceType.None); hash.Add(tool?.Material ?? string.Empty); hash.Add(tool?.Level ?? 0); hash.Add(tool?.Quality ?? 0f);
 		// Bonuses (Crucial: Hash name AND value)
 		if (tool?.AppliedBonuses != null) { hash.Add(tool.AppliedBonuses.Count); foreach (var bonus in tool.AppliedBonuses.OrderBy(b => b.Name).ThenBy(b => b.ActualMagnitude)) { hash.Add(bonus.Name); hash.Add(bonus.ActualMagnitude); } } else { hash.Add(0); }
+		// Contextual Controls
+		var contextComp = LocalPlayer?.Components.Get<PlayerContextualControlsComponent>();
+		hash.Add(contextComp?.CurrentPrompt ?? "");
+		hash.Add(contextComp?.HasInteractable ?? false);
 
 		return hash.ToHashCode();
 	}
