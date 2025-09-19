@@ -131,14 +131,20 @@
 	// Filter event handlers
 	private void OnSearchFilterChanged(string filter)
 	{
-		SearchFilter = filter ?? "";
-		StateHasChanged();
+		if (SearchFilter != filter)
+		{
+			SearchFilter = filter ?? "";
+			StateHasChanged();
+		}
 	}
 
 	private void OnSortModeChanged(string sortMode)
 	{
-		SortMode = sortMode ?? "Name";
-		StateHasChanged();
+		if (SortMode != sortMode)
+		{
+			SortMode = sortMode ?? "Name";
+			StateHasChanged();
+		}
 	}
 
 	// Tooltip event handlers

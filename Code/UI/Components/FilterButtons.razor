@@ -59,18 +59,32 @@
 	protected override void OnStart()
 	{
 		base.OnStart();
-		
-		// Watch for changes and notify parent
-		StateHasChanged();
 	}
 
 	protected override void OnUpdate()
 	{
 		base.OnUpdate();
+	}
+
+	private string _lastSearchFilter = "";
+	private string _lastSortMode = "";
+
+	protected override void OnAfterTreeRender(bool firstTime)
+	{
+		base.OnAfterTreeRender(firstTime);
 		
-		// Notify parent of filter changes
-		OnSearchChanged?.Invoke(SearchFilter);
-		OnSortChanged?.Invoke(SortMode);
+		// Check for changes and notify parent
+		if (_lastSearchFilter != SearchFilter)
+		{
+			_lastSearchFilter = SearchFilter;
+			OnSearchChanged?.Invoke(SearchFilter);
+		}
+		
+		if (_lastSortMode != SortMode)
+		{
+			_lastSortMode = SortMode;
+			OnSortChanged?.Invoke(SortMode);
+		}
 	}
 
 	public class SortOption
