@@ -5,10 +5,12 @@ using ResourceFarmer.UI;
 public sealed class UIManager : Component
 {
 	[Property] public string CraftingToggleAction { get; set; } = "CraftingMenu";
-	[Property] public string SettingsToggleAction { get; set; } = "SettingsMenu"; // New input action
+	[Property] public string SettingsToggleAction { get; set; } = "SettingsMenu";
+	[Property] public string InventoryToggleAction { get; set; } = "InventoryMenu"; // New input action
 
 	private CraftingRootPanel _craftingPanelInstance;
-	private Settings _settingsPanelInstance; // Add instance variable for settings
+	private Settings _settingsPanelInstance;
+	private InventoryPanel _inventoryPanelInstance; // Add instance variable for inventory
 
 	protected override void OnUpdate()
 	{
@@ -18,16 +20,36 @@ public sealed class UIManager : Component
 		{
 			Log.Info("[UIManager] Crafting toggle action pressed.");
 			ToggleCraftingPanel();
-			// Close settings if crafting is opened
-			if (_craftingPanelInstance != null) CloseSettingsPanel();
+			// Close other panels if crafting is opened
+			if (_craftingPanelInstance != null) 
+			{
+				CloseSettingsPanel();
+				CloseInventoryPanel();
+			}
 		}
 
 		if (Input.Pressed(SettingsToggleAction)) // Check for settings toggle
 		{
 			Log.Info("[UIManager] Settings toggle action pressed.");
 			ToggleSettingsPanel();
-			// Close crafting if settings is opened
-			if (_settingsPanelInstance != null) CloseCraftingPanel();
+			// Close other panels if settings is opened
+			if (_settingsPanelInstance != null) 
+			{
+				CloseCraftingPanel();
+				CloseInventoryPanel();
+			}
+		}
+
+		if (Input.Pressed(InventoryToggleAction)) // Check for inventory toggle
+		{
+			Log.Info("[UIManager] Inventory toggle action pressed.");
+			ToggleInventoryPanel();
+			// Close other panels if inventory is opened
+			if (_inventoryPanelInstance != null)
+			{
+				CloseCraftingPanel();
+				CloseSettingsPanel();
+			}
 		}
 	}
 
@@ -57,6 +79,20 @@ public sealed class UIManager : Component
 		}
 	}
 
+	public void ToggleInventoryPanel() // New method for inventory
+	{
+		if (_inventoryPanelInstance != null && _inventoryPanelInstance.IsValid())
+		{
+			CloseInventoryPanel();
+		}
+		else
+		{
+			_inventoryPanelInstance = Components.Create<InventoryPanel>();
+			_inventoryPanelInstance.ShowInventory();
+			Log.Info("[UIManager] Inventory panel opened.");
+		}
+	}
+
 	// Helper methods to explicitly close panels
 	private void CloseCraftingPanel()
 	{
@@ -78,6 +114,17 @@ public sealed class UIManager : Component
 		}
 	}
 
+	private void CloseInventoryPanel()
+	{
+		if (_inventoryPanelInstance != null && _inventoryPanelInstance.IsValid())
+		{
+			_inventoryPanelInstance.CloseInventory();
+			_inventoryPanelInstance.Destroy();
+			_inventoryPanelInstance = null;
+			Log.Info("[UIManager] Inventory panel closed.");
+		}
+	}
+
 	// Optional: Method for panels to call when they close themselves
 	public void NotifyPanelClosed(PanelComponent panel)
 	{
@@ -92,6 +139,11 @@ public sealed class UIManager : Component
 		{
 			_settingsPanelInstance = null;
 			Log.Info("[UIManager] Settings panel self-closed.");
+		}
+		else if (panel == _inventoryPanelInstance) // Handle inventory panel closing  
+		{
+			_inventoryPanelInstance = null;
+			Log.Info("[UIManager] Inventory panel self-closed.");
 		}
 	}
 }

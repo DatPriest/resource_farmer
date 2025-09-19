@@ -51,6 +51,9 @@
 				<div class="resource_item empty">Inventory Empty</div>
 			}
 		</div>
+		<button class="inventory_btn" onclick="@OpenInventory" title="Open Inventory (I)">
+			📦
+		</button>
 	</div>
 
 	@* Bottom-Right Equipped Tool Panel *@
@@ -149,6 +152,12 @@
 				: new Dictionary<ResourceType, float>();
 			StateHasChanged();
 		}
+	}
+
+	private void OpenInventory()
+	{
+		var uiManager = Game.ActiveScene?.GetAllComponents<UIManager>().FirstOrDefault();
+		uiManager?.ToggleInventoryPanel();
 	}
 
 	// --- Dynamic Class for Tool Panel ---
