@@ -1,0 +1,39 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using ResourceFarmer.UI.Components;
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.MainMenu
+
+<div class="menu-section">
+	<div class="menu-buttons">
+		<BaseButton 
+			Text="🎮 Play Game" 
+			CssClass="menu-primary"
+			OnClick="@(() => OnViewChanged?.Invoke(MainMenuPanel.MenuView.SinglePlayer))" />
+			
+		<BaseButton 
+			Text="🌐 Multiplayer" 
+			CssClass="menu-primary"
+			OnClick="@(() => OnViewChanged?.Invoke(MainMenuPanel.MenuView.Multiplayer))" />
+			
+		<BaseButton 
+			Text="⚙️ Settings" 
+			CssClass="menu-secondary"
+			OnClick="@(() => OnViewChanged?.Invoke(MainMenuPanel.MenuView.Settings))" />
+			
+		<BaseButton 
+			Text="🚪 Exit Game" 
+			CssClass="menu-danger"
+			OnClick="@(() => OnAction?.Invoke("exit"))" />
+	</div>
+</div>
+
+@code {
+	[Property] public Action<MainMenuPanel.MenuView> OnViewChanged { get; set; }
+	[Property] public Action<string> OnAction { get; set; }
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine("main_menu_section");
+	}
+}

@@ -1,0 +1,57 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.Components
+
+<button class="button @CssClass @GetVariantClass()" onclick=@HandleClick disabled=@Disabled title=@Tooltip>
+	@if (!string.IsNullOrEmpty(Icon))
+	{
+		<span class="button-icon">@Icon</span>
+	}
+	<span class="button-text">@Text</span>
+</button>
+
+@code {
+	[Property] public string Text { get; set; } = "";
+	[Property] public string Icon { get; set; } = "";
+	[Property] public string CssClass { get; set; } = "";
+	[Property] public string Tooltip { get; set; } = "";
+	[Property] public bool Disabled { get; set; } = false;
+	[Property] public ButtonVariant Variant { get; set; } = ButtonVariant.Primary;
+	[Property] public Action OnClick { get; set; }
+
+	public enum ButtonVariant
+	{
+		Primary,
+		Secondary,
+		Danger,
+		Success,
+		Warning
+	}
+
+	private void HandleClick()
+	{
+		if (!Disabled)
+		{
+			OnClick?.Invoke();
+		}
+	}
+
+	private string GetVariantClass()
+	{
+		return Variant switch
+		{
+			ButtonVariant.Primary => "button--primary",
+			ButtonVariant.Secondary => "button--secondary", 
+			ButtonVariant.Danger => "button--danger",
+			ButtonVariant.Success => "button--success",
+			ButtonVariant.Warning => "button--warning",
+			_ => "button--primary"
+		};
+	}
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine(Text, Icon, CssClass, Disabled, Variant);
+	}
+}

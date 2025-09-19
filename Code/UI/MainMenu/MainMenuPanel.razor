@@ -1,0 +1,116 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using ResourceFarmer.UI.Components;
+@using ResourceFarmer.UI.MainMenu;
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.MainMenu
+
+<root class="main-menu-root">
+	<div class="main-menu-background"></div>
+	
+	<div class="main-menu-container">
+		<div class="main-menu-header">
+			<h1 class="game-title">Resource Farmer</h1>
+			<p class="game-subtitle">Gather • Craft • Prosper</p>
+		</div>
+
+		<div class="main-menu-content">
+			@if (CurrentView == MenuView.Main)
+			{
+				<MainMenuSection OnViewChanged="@ChangeView" OnAction="@HandleMenuAction" />
+			}
+			else if (CurrentView == MenuView.SinglePlayer)
+			{
+				<SinglePlayerSection OnBack="@(() => ChangeView(MenuView.Main))" OnAction="@HandleMenuAction" />
+			}
+			else if (CurrentView == MenuView.Multiplayer)
+			{
+				<MultiplayerSection OnBack="@(() => ChangeView(MenuView.Main))" OnAction="@HandleMenuAction" />
+			}
+			else if (CurrentView == MenuView.Settings)
+			{
+				<MenuSettingsSection OnBack="@(() => ChangeView(MenuView.Main))" />
+			}
+		</div>
+
+		<div class="main-menu-footer">
+			<div class="version-info">
+				<span class="version-text">Version @GetGameVersion()</span>
+			</div>
+		</div>
+	</div>
+</root>
+
+@code {
+	public Action OnMenuClosed { get; set; }
+
+	public enum MenuView
+	{
+		Main,
+		SinglePlayer,
+		Multiplayer,
+		Settings
+	}
+
+	private MenuView CurrentView = MenuView.Main;
+
+	private void ChangeView(MenuView newView)
+	{
+		CurrentView = newView;
+		StateHasChanged();
+	}
+
+	private void HandleMenuAction(string action)
+	{
+		var mainMenuManager = Game.ActiveScene?.GetAllComponents<MainMenuManager>().FirstOrDefault();
+		
+		switch (action)
+		{
+			case "start_game":
+				mainMenuManager?.StartGame();
+				break;
+			case "join_game":
+				mainMenuManager?.JoinGame();
+				break;
+			case "settings":
+				mainMenuManager?.ShowSettings();
+				break;
+			case "exit":
+				mainMenuManager?.ExitGame();
+				break;
+			case "close":
+				CloseMenu();
+				break;
+		}
+	}
+
+	private void CloseMenu()
+	{
+		OnMenuClosed?.Invoke();
+		Destroy();
+	}
+
+	private string GetGameVersion()
+	{
+		// In S&box, you might get this from project settings or assembly info
+		return "1.0.0-dev";
+	}
+
+	protected override void OnStart()
+	{
+		base.OnStart();
+		
+		// In S&box, mouse visibility is typically handled differently
+		// This might not be necessary depending on the UI system
+	}
+
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+	}
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine(CurrentView);
+	}
+}

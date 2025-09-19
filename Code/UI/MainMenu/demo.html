@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Farmer - Main Menu Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(10, 12, 18, 0.95) 0%, rgba(20, 24, 34, 0.9) 50%, rgba(10, 12, 18, 0.95) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #E0E5EC;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+            animation: backgroundFloat 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(1deg); }
+            66% { transform: translateY(5px) rotate(-0.5deg); }
+        }
+
+        .main-menu-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 500px;
+            width: 90vw;
+            padding: 32px;
+            background-color: rgba(20, 24, 34, 0.8);
+            border: 1px solid rgba(77, 157, 255, 0.2);
+            border-radius: 4px;
+            box-shadow: 
+                0 0 30px rgba(77, 157, 255, 0.3),
+                0 0 60px rgba(255, 215, 0, 0.1);
+            backdrop-filter: blur(8px);
+            animation: menuEntrance 0.6s ease-out;
+        }
+
+        @keyframes menuEntrance {
+            from {
+                transform: scale(0.9) translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .main-menu-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .game-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #FFEA70;
+            text-shadow: 
+                0 0 10px rgba(255, 215, 0, 0.6),
+                0 2px 4px rgba(77, 157, 255, 0.3);
+            margin: 0 0 8px 0;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .game-subtitle {
+            font-size: 15px;
+            color: #A0A8B8;
+            margin: 0;
+            font-weight: 500;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .menu-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 32px;
+        }
+
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border-radius: 2px;
+            border: 1px solid #4D9DFF;
+            background-image: linear-gradient(135deg, #FFD700, rgba(255, 215, 0, 0.8));
+            color: #0A0C12;
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 50px;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background-image: linear-gradient(135deg, #FFEA70, #FFD700);
+            border-color: #FFEA70;
+            transform: translateY(-2px);
+            box-shadow: 
+                0 0 15px rgba(77, 157, 255, 0.3),
+                0 0 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button.menu-secondary {
+            background-image: linear-gradient(135deg, #1E2330, #141822);
+            border-color: rgba(77, 157, 255, 0.2);
+            color: #E0E5EC;
+        }
+
+        .button.menu-secondary:hover {
+            background-image: linear-gradient(135deg, #141822, #0A0C12);
+            border-color: #A0A8B8;
+        }
+
+        .button.menu-danger {
+            background-image: linear-gradient(135deg, #FF4D4D, rgba(255, 77, 77, 0.8));
+            border-color: rgba(255, 77, 77, 0.8);
+            color: #E0E5EC;
+        }
+
+        .button.menu-danger:hover {
+            background-image: linear-gradient(135deg, rgba(255, 77, 77, 0.9), #FF4D4D);
+            box-shadow: 
+                0 0 15px rgba(255, 77, 77, 0.6),
+                0 0 25px rgba(255, 77, 77, 0.3);
+        }
+
+        .version-info {
+            text-align: center;
+        }
+
+        .version-text {
+            color: #7A8290;
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .demo-note {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(20, 24, 34, 0.9);
+            border: 1px solid rgba(77, 157, 255, 0.3);
+            border-radius: 4px;
+            padding: 10px 15px;
+            font-size: 12px;
+            color: #A0A8B8;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-note">UI Demo - Resource Farmer Main Menu</div>
+    
+    <div class="main-menu-container">
+        <div class="main-menu-header">
+            <h1 class="game-title">Resource Farmer</h1>
+            <p class="game-subtitle">Gather • Craft • Prosper</p>
+        </div>
+
+        <div class="menu-section">
+            <button class="button" onclick="alert('Start Single Player Game')">🎮 Play Game</button>
+            <button class="button" onclick="alert('Join Multiplayer Game')">🌐 Multiplayer</button>
+            <button class="button menu-secondary" onclick="alert('Open Settings')">⚙️ Settings</button>
+            <button class="button menu-danger" onclick="alert('Exit Game')">🚪 Exit Game</button>
+        </div>
+
+        <div class="version-info">
+            <span class="version-text">Version 1.0.0-dev</span>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Add click animation
+                    this.style.transform = 'translateY(0) scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

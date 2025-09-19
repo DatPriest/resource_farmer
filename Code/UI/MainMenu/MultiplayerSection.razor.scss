@@ -1,0 +1,53 @@
+// MultiplayerSection specific styles
+@import "../Styles/Colors.scss";
+@import "../Styles/Layout.scss";
+@import "../Styles/Text.scss";
+
+.server-input-section {
+	display: flex;
+	flex-direction: column;
+	gap: $gap-small;
+	margin: $margin-base 0;
+
+	.input-label {
+		color: $text-primary;
+		font-size: $font-size-base;
+		font-weight: $font-weight-medium;
+	}
+
+	.input-group {
+		display: flex;
+		gap: $gap-small;
+		align-items: stretch;
+
+		.server-input {
+			flex: 1;
+			padding: $padding-small $padding-base;
+			background-color: rgba($background-dark, 0.8);
+			border: $border-width-base solid $border-color;
+			border-radius: $border-radius-slight;
+			color: $text-primary;
+			font-size: $font-size-base;
+			font-family: $font-family-main;
+			transition: all 0.2s ease;
+
+			&::placeholder {
+				color: $text-muted;
+			}
+
+			&:focus {
+				outline: none;
+				border-color: $accent-gold;
+				box-shadow: 0 0 5px rgba($accent-gold, 0.3);
+			}
+
+			&:hover {
+				border-color: $text-secondary;
+			}
+		}
+
+		.button {
+			min-width: 100px;
+		}
+	}
+}

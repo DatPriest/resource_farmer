@@ -1,0 +1,152 @@
+// BasePanel component styles - extends the base panel styles from Containers.scss
+@import "../Styles/Colors.scss";
+@import "../Styles/Layout.scss";
+@import "../Styles/Text.scss";
+
+.base-panel {
+	// Base container styles are inherited from Containers.scss via base-panel class
+	display: flex;
+	flex-direction: column;
+	background-color: $background-transparent-medium;
+	border: $border-width-base solid $border-color;
+	border-radius: $border-radius-slight;
+	padding: 0; // Panel manages its own internal padding
+	box-shadow: 0 0 10px 2px rgba($shadow-color, 0.7);
+	backdrop-filter: blur($backdrop-blur-strength);
+	color: $text-primary;
+	overflow: hidden;
+	transition: all 0.3s ease-out;
+	
+	// Animation states
+	transform: scale(1);
+	opacity: 1;
+
+	&:intro {
+		transform: scale(0.9) translateY(10px);
+		opacity: 0;
+	}
+
+	&:outro {
+		transform: scale(1.05) translateY(-5px);
+		opacity: 0;
+	}
+
+	// Panel header
+	.panel__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: $padding-base;
+		border-bottom: $border-width-base solid $border-color;
+		background-color: rgba($background-dark, 0.3);
+
+		.title {
+			margin: 0;
+			font-size: $font-size-large;
+			font-weight: $font-weight-bold;
+			color: $text-primary;
+		}
+
+		.close-button {
+			min-width: 32px;
+			height: 32px;
+			padding: $padding-tiny;
+			font-size: $font-size-large;
+			line-height: 1;
+		}
+	}
+
+	// Panel content
+	.panel__content {
+		flex: 1;
+		padding: $padding-base;
+		overflow-y: auto;
+		
+		// Add custom scrollbar styling if needed
+		&::-webkit-scrollbar {
+			width: 8px;
+		}
+		
+		&::-webkit-scrollbar-track {
+			background: rgba($background-dark, 0.3);
+		}
+		
+		&::-webkit-scrollbar-thumb {
+			background: rgba($text-secondary, 0.5);
+			border-radius: 4px;
+		}
+		
+		&::-webkit-scrollbar-thumb:hover {
+			background: rgba($text-secondary, 0.7);
+		}
+	}
+
+	// Panel footer
+	.panel__footer {
+		padding: $padding-base;
+		border-top: $border-width-base solid $border-color;
+		background-color: rgba($background-dark, 0.2);
+		display: flex;
+		gap: $gap-medium;
+		justify-content: flex-end;
+	}
+
+	// Size variants
+	&.panel--small {
+		width: 300px;
+		max-height: 400px;
+	}
+
+	&.panel--medium {
+		width: 500px;
+		max-height: 600px;
+	}
+
+	&.panel--large {
+		width: 700px;
+		max-height: 80vh;
+	}
+
+	&.panel--xl {
+		width: 900px;
+		max-height: 90vh;
+	}
+
+	&.panel--fullscreen {
+		width: 100vw;
+		height: 100vh;
+		border-radius: 0;
+		border: none;
+	}
+
+	&.panel--custom {
+		// Custom size is handled via inline styles
+		max-width: 100vw;
+		max-height: 100vh;
+	}
+
+	// Responsive adjustments
+	@media (max-width: 768px) {
+		&.panel--medium,
+		&.panel--large,
+		&.panel--xl {
+			width: 90vw;
+			max-height: 90vh;
+		}
+	}
+}
+
+// Overlay backdrop for modal panels
+.panel-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba($background-dark, 0.8);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+}

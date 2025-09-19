@@ -1,0 +1,263 @@
+// MainMenuPanel styles - modern, clean main menu design
+@import "../Styles/Colors.scss";
+@import "../Styles/Layout.scss";
+@import "../Styles/Text.scss";
+
+.main-menu-root {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 10000; // Ensure it's above everything else
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.main-menu-background {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		135deg,
+		rgba($background-dark, 0.95) 0%,
+		rgba($primary-dark, 0.9) 50%,
+		rgba($background-dark, 0.95) 100%
+	);
+	backdrop-filter: blur(10px);
+	z-index: -1;
+
+	// Optional: Add animated background pattern
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-image: 
+			radial-gradient(circle at 25% 25%, rgba($accent-gold, 0.1) 0%, transparent 50%),
+			radial-gradient(circle at 75% 75%, rgba($accent-gold, 0.05) 0%, transparent 50%);
+		animation: backgroundFloat 20s ease-in-out infinite;
+	}
+}
+
+@keyframes backgroundFloat {
+	0%, 100% { transform: translateY(0) rotate(0deg); }
+	33% { transform: translateY(-10px) rotate(1deg); }
+	66% { transform: translateY(5px) rotate(-0.5deg); }
+}
+
+.main-menu-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	max-width: 500px;
+	width: 90vw;
+	padding: $padding-base * 2;
+	background-color: rgba($background-transparent-medium, 0.8);
+	border: $border-width-base solid rgba($border-color, 0.6);
+	border-radius: $border-radius-medium;
+	box-shadow: 
+		0 0 30px rgba($shadow-color, 0.8),
+		0 0 60px rgba($accent-gold, 0.1);
+	backdrop-filter: blur(8px);
+
+	// Entrance animation
+	animation: menuEntrance 0.6s ease-out;
+}
+
+@keyframes menuEntrance {
+	from {
+		transform: scale(0.9) translateY(-20px);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1) translateY(0);
+		opacity: 1;
+	}
+}
+
+.main-menu-header {
+	text-align: center;
+	margin-bottom: $margin-base * 2;
+
+	.game-title {
+		font-size: $font-size-xl * 1.5;
+		font-weight: $font-weight-bold;
+		color: $accent-gold-light;
+		text-shadow: 
+			0 0 10px rgba($accent-gold, 0.6),
+			0 2px 4px rgba($shadow-color, 0.8);
+		margin: 0 0 $margin-small 0;
+		letter-spacing: 2px;
+		text-transform: uppercase;
+	}
+
+	.game-subtitle {
+		font-size: $font-size-base;
+		color: $text-secondary;
+		margin: 0;
+		font-weight: $font-weight-medium;
+		letter-spacing: 1px;
+		opacity: 0.9;
+	}
+}
+
+.main-menu-content {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: $gap-base;
+	margin-bottom: $margin-base * 2;
+}
+
+.main-menu-footer {
+	width: 100%;
+	text-align: center;
+	
+	.version-info {
+		.version-text {
+			color: $text-muted;
+			font-size: $font-size-small;
+			opacity: 0.7;
+		}
+	}
+}
+
+// Menu section styles
+.menu-section {
+	display: flex;
+	flex-direction: column;
+	gap: $gap-medium;
+	width: 100%;
+
+	.section-title {
+		font-size: $font-size-large;
+		font-weight: $font-weight-bold;
+		color: $text-primary;
+		text-align: center;
+		margin-bottom: $margin-medium;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+	}
+
+	.menu-buttons {
+		display: flex;
+		flex-direction: column;
+		gap: $gap-medium;
+	}
+
+	.button-group {
+		display: flex;
+		gap: $gap-medium;
+		
+		&.button-group--vertical {
+			flex-direction: column;
+		}
+		
+		&.button-group--horizontal {
+			flex-direction: row;
+		}
+	}
+}
+
+// Specific menu button styling
+.main-menu-container .button {
+	min-height: 50px;
+	font-size: $font-size-large;
+	font-weight: $font-weight-semibold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	transition: all 0.2s ease;
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow: 
+			0 0 15px rgba($shadow-color, 0.8),
+			0 0 25px rgba($accent-gold, 0.3);
+	}
+
+	&:active {
+		transform: translateY(0);
+	}
+
+	// Primary menu buttons (Play, Settings, etc.)
+	&.menu-primary {
+		background-image: linear-gradient(135deg, $accent-gold, rgba($accent-gold, 0.8));
+		border-color: $accent-gold-light;
+		color: $background-dark;
+		font-weight: $font-weight-bold;
+		text-shadow: none;
+
+		&:hover {
+			background-image: linear-gradient(135deg, $accent-gold-light, $accent-gold);
+			border-color: $accent-gold-light;
+			box-shadow: 
+				0 0 15px rgba($accent-gold, 0.8),
+				0 0 25px rgba($accent-gold, 0.4);
+		}
+	}
+
+	// Secondary buttons (Back, Cancel, etc.)
+	&.menu-secondary {
+		background-image: linear-gradient(135deg, $background-light, $background-medium);
+		border-color: $border-color;
+		color: $text-primary;
+
+		&:hover {
+			background-image: linear-gradient(135deg, $background-medium, $background-dark);
+			border-color: $text-secondary;
+		}
+	}
+
+	// Danger buttons (Exit, Delete, etc.)
+	&.menu-danger {
+		background-image: linear-gradient(135deg, $accent-danger, rgba($accent-danger, 0.8));
+		border-color: rgba($accent-danger, 0.8);
+		color: $text-primary;
+
+		&:hover {
+			background-image: linear-gradient(135deg, rgba($accent-danger, 0.9), $accent-danger);
+			box-shadow: 
+				0 0 15px rgba($accent-danger, 0.6),
+				0 0 25px rgba($accent-danger, 0.3);
+		}
+	}
+}
+
+// Responsive design
+@media (max-width: 768px) {
+	.main-menu-container {
+		width: 95vw;
+		padding: $padding-base;
+		
+		.game-title {
+			font-size: $font-size-xl;
+		}
+		
+		.button {
+			min-height: 45px;
+			font-size: $font-size-base;
+		}
+	}
+}
+
+@media (max-height: 600px) {
+	.main-menu-container {
+		.main-menu-header {
+			margin-bottom: $margin-base;
+		}
+		
+		.main-menu-content {
+			margin-bottom: $margin-base;
+		}
+		
+		.game-title {
+			font-size: $font-size-xl;
+		}
+	}
+}

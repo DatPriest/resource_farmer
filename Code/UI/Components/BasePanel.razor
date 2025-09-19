@@ -1,0 +1,95 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.Components
+
+<root class="base-panel @CssClass @GetSizeClass()" style=@GetCustomStyle()>
+	@if (ShowHeader && !string.IsNullOrEmpty(Title))
+	{
+		<div class="panel__header">
+			<h2 class="title">@Title</h2>
+			@if (ShowCloseButton)
+			{
+				<BaseButton 
+					Text="✕" 
+					CssClass="close-button" 
+					Variant="BaseButton.ButtonVariant.Secondary"
+					OnClick=@ClosePanel />
+			}
+		</div>
+	}
+	
+	<div class="panel__content">
+		@ChildContent
+	</div>
+	
+	@if (ShowFooter)
+	{
+		<div class="panel__footer">
+			@FooterContent
+		</div>
+	}
+</root>
+
+@code {
+	[Property] public string Title { get; set; } = "";
+	[Property] public string CssClass { get; set; } = "";
+	[Property] public bool ShowHeader { get; set; } = true;
+	[Property] public bool ShowFooter { get; set; } = false;
+	[Property] public bool ShowCloseButton { get; set; } = true;
+	[Property] public PanelSize Size { get; set; } = PanelSize.Medium;
+	[Property] public string Width { get; set; } = "";
+	[Property] public string Height { get; set; } = "";
+	[Property] public Action OnClose { get; set; }
+	
+	[Property] public RenderFragment ChildContent { get; set; }
+	[Property] public RenderFragment FooterContent { get; set; }
+
+	public enum PanelSize
+	{
+		Small,
+		Medium,
+		Large,
+		ExtraLarge,
+		FullScreen,
+		Custom
+	}
+
+	private string GetSizeClass()
+	{
+		return Size switch
+		{
+			PanelSize.Small => "panel--small",
+			PanelSize.Medium => "panel--medium",
+			PanelSize.Large => "panel--large",
+			PanelSize.ExtraLarge => "panel--xl",
+			PanelSize.FullScreen => "panel--fullscreen",
+			PanelSize.Custom => "panel--custom",
+			_ => "panel--medium"
+		};
+	}
+
+	private string GetCustomStyle()
+	{
+		var styles = new List<string>();
+		
+		if (!string.IsNullOrEmpty(Width))
+			styles.Add($"width: {Width}");
+			
+		if (!string.IsNullOrEmpty(Height))
+			styles.Add($"height: {Height}");
+			
+		return string.Join("; ", styles);
+	}
+
+	protected virtual void ClosePanel()
+	{
+		OnClose?.Invoke();
+		Destroy();
+	}
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine(Title, CssClass, ShowHeader, ShowFooter, ShowCloseButton, Size, Width, Height);
+	}
+}

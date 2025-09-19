@@ -1,0 +1,206 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using ResourceFarmer.UI.Components;
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.MainMenu
+
+<div class="menu-section">
+	<h3 class="section-title">Settings</h3>
+	
+	<div class="settings-content">
+		<div class="settings-group">
+			<h4 class="settings-group-title">Graphics</h4>
+			
+			<div class="setting-item">
+				<BaseSlider 
+					Label="Master Volume"
+					Value="@MasterVolume"
+					MinValue="0"
+					MaxValue="100"
+					Step="5"
+					ValueSuffix="%"
+					OnValueChanged="@OnMasterVolumeChanged"
+					CssClass="setting-slider" />
+			</div>
+			
+			<div class="setting-item">
+				<BaseSlider 
+					Label="Music Volume"
+					Value="@MusicVolume"
+					MinValue="0"
+					MaxValue="100"
+					Step="5"
+					ValueSuffix="%"
+					OnValueChanged="@OnMusicVolumeChanged"
+					CssClass="setting-slider" />
+			</div>
+			
+			<div class="setting-item">
+				<BaseSlider 
+					Label="SFX Volume"
+					Value="@SfxVolume"
+					MinValue="0"
+					MaxValue="100"
+					Step="5"
+					ValueSuffix="%"
+					OnValueChanged="@OnSfxVolumeChanged"
+					CssClass="setting-slider" />
+			</div>
+		</div>
+
+		<div class="settings-group">
+			<h4 class="settings-group-title">Gameplay</h4>
+			
+			<div class="setting-item">
+				<BaseSlider 
+					Label="Mouse Sensitivity"
+					Value="@MouseSensitivity"
+					MinValue="0.1f"
+					MaxValue="5.0f"
+					Step="0.1f"
+					ValueFormat="F1"
+					OnValueChanged="@OnMouseSensitivityChanged"
+					CssClass="setting-slider" />
+			</div>
+			
+			<div class="setting-item checkbox-item">
+				<label class="checkbox-label">
+					<input type="checkbox" 
+						   @bind="ShowTooltips" 
+						   @onchange="OnShowTooltipsChanged" />
+					<span class="checkmark"></span>
+					Show Tooltips
+				</label>
+			</div>
+			
+			<div class="setting-item checkbox-item">
+				<label class="checkbox-label">
+					<input type="checkbox" 
+						   @bind="AutoSave" 
+						   @onchange="OnAutoSaveChanged" />
+					<span class="checkmark"></span>
+					Auto Save (Every 5 minutes)
+				</label>
+			</div>
+		</div>
+	</div>
+	
+	<div class="settings-actions">
+		<div class="button-group button-group--horizontal">
+			<BaseButton 
+				Text="💾 Save Settings" 
+				CssClass="menu-primary"
+				OnClick="@SaveSettings" />
+				
+			<BaseButton 
+				Text="🔄 Reset to Default" 
+				CssClass="menu-secondary"
+				OnClick="@ResetSettings" />
+				
+			<BaseButton 
+				Text="↩️ Back" 
+				CssClass="menu-secondary"
+				OnClick="@(() => OnBack?.Invoke())" />
+		</div>
+	</div>
+</div>
+
+@code {
+	[Property] public Action OnBack { get; set; }
+
+	// Settings values - these would typically come from a settings service
+	private float MasterVolume { get; set; } = 80f;
+	private float MusicVolume { get; set; } = 60f;
+	private float SfxVolume { get; set; } = 80f;
+	private float MouseSensitivity { get; set; } = 1.0f;
+	private bool ShowTooltips { get; set; } = true;
+	private bool AutoSave { get; set; } = true;
+
+	protected override void OnStart()
+	{
+		base.OnStart();
+		LoadSettings();
+	}
+
+	private void OnMasterVolumeChanged(float value)
+	{
+		MasterVolume = value;
+		// Apply volume change immediately
+		ApplyVolumeSettings();
+	}
+
+	private void OnMusicVolumeChanged(float value)
+	{
+		MusicVolume = value;
+		ApplyVolumeSettings();
+	}
+
+	private void OnSfxVolumeChanged(float value)
+	{
+		SfxVolume = value;
+		ApplyVolumeSettings();
+	}
+
+	private void OnMouseSensitivityChanged(float value)
+	{
+		MouseSensitivity = value;
+		// Apply mouse sensitivity immediately if needed
+	}
+
+	private void OnShowTooltipsChanged(ChangeEventArgs e)
+	{
+		ShowTooltips = (bool)e.Value;
+		StateHasChanged();
+	}
+
+	private void OnAutoSaveChanged(ChangeEventArgs e)
+	{
+		AutoSave = (bool)e.Value;
+		StateHasChanged();
+	}
+
+	private void LoadSettings()
+	{
+		// Load settings from preferences or config file
+		// For now, use defaults
+		Log.Info("[MenuSettingsSection] Loading settings...");
+	}
+
+	private void SaveSettings()
+	{
+		// Save settings to preferences or config file
+		Log.Info("[MenuSettingsSection] Saving settings...");
+		
+		ApplyVolumeSettings();
+		// Save other settings...
+		
+		// Show confirmation or close settings
+	}
+
+	private void ResetSettings()
+	{
+		Log.Info("[MenuSettingsSection] Resetting to default settings...");
+		
+		MasterVolume = 80f;
+		MusicVolume = 60f;
+		SfxVolume = 80f;
+		MouseSensitivity = 1.0f;
+		ShowTooltips = true;
+		AutoSave = true;
+		
+		ApplyVolumeSettings();
+		StateHasChanged();
+	}
+
+	private void ApplyVolumeSettings()
+	{
+		// In S&box, you would apply volume settings to the audio system
+		// This is a placeholder for the actual implementation
+		Log.Info($"[MenuSettingsSection] Applying volume: Master={MasterVolume}%, Music={MusicVolume}%, SFX={SfxVolume}%");
+	}
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine("menu_settings", MasterVolume, MusicVolume, SfxVolume, MouseSensitivity, ShowTooltips, AutoSave);
+	}
+}

@@ -1,0 +1,45 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using ResourceFarmer.UI.Components;
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.MainMenu
+
+<div class="menu-section">
+	<h3 class="section-title">Single Player</h3>
+	
+	<div class="menu-buttons">
+		<BaseButton 
+			Text="🆕 New Game" 
+			CssClass="menu-primary"
+			OnClick="@(() => OnAction?.Invoke("start_game"))" />
+			
+		<BaseButton 
+			Text="💾 Load Game" 
+			CssClass="menu-secondary"
+			Disabled="true"
+			Tooltip="Coming Soon - Save system not yet implemented" />
+			
+		<BaseButton 
+			Text="🎯 Quick Start" 
+			CssClass="menu-primary"
+			OnClick="@(() => OnAction?.Invoke("start_game"))"
+			Tooltip="Start immediately with basic resources" />
+			
+		<div class="button-group button-group--horizontal">
+			<BaseButton 
+				Text="↩️ Back" 
+				CssClass="menu-secondary"
+				OnClick="@(() => OnBack?.Invoke())" />
+		</div>
+	</div>
+</div>
+
+@code {
+	[Property] public Action OnBack { get; set; }  
+	[Property] public Action<string> OnAction { get; set; }
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine("single_player_section");
+	}
+}
