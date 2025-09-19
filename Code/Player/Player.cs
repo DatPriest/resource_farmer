@@ -44,8 +44,19 @@ public sealed partial class Player : Component
 
 	[Sync] public ToolBase EquippedTool { get; set; } = null; // Use ToolBase for equipped tool
 
+	// NEW: Crafting progress tracking (not synced - managed server-side only)
+	public Dictionary<string, int> ItemsCraftedCount { get; set; } = new(); // Recipe name -> count
+	public Dictionary<string, int> MaterialsUsedCount { get; set; } = new(); // Material type -> count  
+	public HashSet<string> UnlockedRecipes { get; set; } = new(); // Recipe names unlocked by player
+	public DateTime LastCraftingActivity { get; set; } = DateTime.UtcNow;
+
 	[Property] public double CurrentTotalInventoryItems => Inventory.Sum(kvp => kvp.Value); // Total items in inventory
 	public float ExperienceToNextLevel => Level * 100; // Example formula
+
+	// NEW: Achievement summary properties for UI
+	public int TotalRecipesUnlocked => UnlockedRecipes?.Count ?? 0;
+	public int TotalItemsCrafted => ItemsCraftedCount?.Values.Sum() ?? 0;
+	public int TotalMaterialsUsed => MaterialsUsedCount?.Values.Sum() ?? 0;
 
 	// Add properties for new components
 	public PlayerInteractionComponent Interaction => Components.Get<PlayerInteractionComponent>();
@@ -79,10 +90,18 @@ public sealed partial class Player : Component
 		if (gatheringComp != null) gatheringComp.OwnerPlayer = this;
 		var interactionComp = Components.GetOrCreate<PlayerInteractionComponent>();
 		if (interactionComp != null) interactionComp.OwnerPlayer = this;
+
+		Inventory[ResourceType.Wood] = 20f; // Initialize with 20 wood
+
+		// Initialize crafting progress data if not loaded
+		if ( UnlockedRecipes == null ) UnlockedRecipes = new HashSet<string>();
+		if ( ItemsCraftedCount == null ) ItemsCraftedCount = new Dictionary<string, int>();
+		if ( MaterialsUsedCount == null ) MaterialsUsedCount = new Dictionary<string, int>();
+		if ( LastCraftingActivity == default ) LastCraftingActivity = DateTime.UtcNow;
+
 		var inventoryComp = Components.GetOrCreate<PlayerInventoryComponent>();
 		if (inventoryComp != null) inventoryComp.OwnerPlayer = this;
-		
-		Inventory[ResourceType.Wood] = 20f; // Initialize with 20 wood
+
 
 		if ( Body.IsValid() && BodyRenderer == null ) BodyRenderer = Body.Components.Get<SkinnedModelRenderer>();
 		if ( BodyRenderer != null && Body.IsValid() ) ClothingContainer.CreateFromLocalUser().Apply( BodyRenderer );

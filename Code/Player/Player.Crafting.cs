@@ -185,6 +185,9 @@ public sealed partial class Player : Component
 
 		Log.Info( $"[Player] Upgraded Tool to Lvl:{newLevel} Q:{newQuality:P1} Bonuses:[{string.Join( ",", finalBonuses.Select( b => b.Name ) )}]" );
 
+		// --- Track Upgrade Achievement (NEW) ---
+		TrackUpgradeAchievement( upgradedTool, costs );
+
 		// Grant XP for upgrading?
 		AddExperience( newLevel * 10 ); // Example XP
 
@@ -195,7 +198,44 @@ public sealed partial class Player : Component
 		// NotifyClientUpgradeResult(true, "Upgrade successful!");
 	}
 
+	/// <summary>
+	/// Tracks upgrade progress for achievements system.
+	/// </summary>
+	private void TrackUpgradeAchievement( ToolBase upgradedTool, Dictionary<ResourceType, float> costs )
+	{
+		if ( Networking.IsClient || upgradedTool == null || costs == null ) return; // Server-side only with null checks
 
+		// Ensure collections are initialized
+		UnlockedRecipes ??= new HashSet<string>();
+		ItemsCraftedCount ??= new Dictionary<string, int>();
+		MaterialsUsedCount ??= new Dictionary<string, int>();
+
+		// Track this as a "virtual recipe" for upgrade achievements
+		string upgradeRecipeName = $"Upgrade_{upgradedTool.Material}_{upgradedTool.ToolType}_to_Level_{upgradedTool.Level}";
+		UnlockedRecipes.Add( upgradeRecipeName );
+
+		// Increment upgrade count
+		if ( ItemsCraftedCount.ContainsKey( upgradeRecipeName ) )
+			ItemsCraftedCount[upgradeRecipeName]++;
+		else
+			ItemsCraftedCount[upgradeRecipeName] = 1;
+
+		// Track materials used for upgrade
+		foreach ( var cost in costs )
+		{
+			string materialKey = cost.Key.ToString();
+			if ( MaterialsUsedCount.ContainsKey( materialKey ) )
+				MaterialsUsedCount[materialKey] += (int)cost.Value;
+			else
+				MaterialsUsedCount[materialKey] = (int)cost.Value;
+		}
+
+		// Update last activity timestamp
+		LastCraftingActivity = DateTime.UtcNow;
+
+		Log.Info( $"[Player Upgrade] Achievement progress updated for upgrade to Level {upgradedTool.Level}" );
+
+	}
 	// --- Bonus Manipulation (Placeholder - High Cost) ---
 
 	public Dictionary<ResourceType, float> GetAddBonusCost()
@@ -382,7 +422,12 @@ public sealed partial class Player : Component
 			finalQuality, // Use calculated final quality
 			appliedBonuses // Assign list of AppliedBonusInstance
 		);
-		Log.Info( $"[Player] Created Tool: {craftedTool.Material} {craftedTool.ToolType} Lvl:{craftedTool.Level} Q:{craftedTool.Quality:P1} Bonuses:[{string.Join( ",", craftedTool.AppliedBonuses?.Select( b => b.Name ) ?? new List<ToolBonusName>() )}]" );
+
+		Log.Info( $"[Player Host] Created Tool: {craftedTool.Material} {craftedTool.ToolType} Lvl:{craftedTool.Level} Q:{craftedTool.Quality:P1} Bonuses:[{string.Join( ",", craftedTool.AppliedBonuses?.Select( b => b.Name ) ?? new List<ToolBonusName>() )}]" );
+		
+		// --- Track Crafting Progress (NEW) ---
+		TrackCraftingAchievement( recipe );
+
 		// --- Equip & Finalize ---
 		EquippedTool = craftedTool;
 		AddExperience( (double)recipe.ToolType * 5 + recipe.Level * 2 ); // Grant XP
@@ -390,6 +435,46 @@ public sealed partial class Player : Component
 		if ( _savingService != null ) _ = _savingService.SaveDataAsync( this ); // Save
 
 		// TODO: Notify client UI of success/update
+	}
+
+	/// <summary>
+	/// Tracks crafting progress for achievements system.
+	/// </summary>
+	private void TrackCraftingAchievement( CraftingRecipeResource recipe )
+	{
+		if ( Networking.IsClient || recipe == null ) return; // Server-side only with null check
+
+		// Ensure collections are initialized
+		UnlockedRecipes ??= new HashSet<string>();
+		ItemsCraftedCount ??= new Dictionary<string, int>();
+		MaterialsUsedCount ??= new Dictionary<string, int>();
+
+		// Track recipe as unlocked
+		UnlockedRecipes.Add( recipe.Name );
+
+		// Increment crafted count for this recipe
+		if ( ItemsCraftedCount.ContainsKey( recipe.Name ) )
+			ItemsCraftedCount[recipe.Name]++;
+		else
+			ItemsCraftedCount[recipe.Name] = 1;
+
+		// Track materials used
+		if ( recipe.Costs != null )
+		{
+			foreach ( var cost in recipe.Costs )
+			{
+				string materialKey = cost.Key.ToString();
+				if ( MaterialsUsedCount.ContainsKey( materialKey ) )
+					MaterialsUsedCount[materialKey] += (int)cost.Value;
+				else
+					MaterialsUsedCount[materialKey] = (int)cost.Value;
+			}
+		}
+
+		// Update last activity timestamp
+		LastCraftingActivity = DateTime.UtcNow;
+
+		Log.Info( $"[Player Crafting] Progress updated: {UnlockedRecipes.Count} recipes unlocked, {ItemsCraftedCount.Values.Sum()} total items crafted" );
 	}
 
 
