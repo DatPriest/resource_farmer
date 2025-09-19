@@ -44,6 +44,12 @@ public sealed partial class Player : Component
 
 	[Sync] public ToolBase EquippedTool { get; set; } = null; // Use ToolBase for equipped tool
 
+	// NEW: Crafting progress tracking (not synced - managed server-side only)
+	public Dictionary<string, int> ItemsCraftedCount { get; set; } = new(); // Recipe name -> count
+	public Dictionary<string, int> MaterialsUsedCount { get; set; } = new(); // Material type -> count  
+	public HashSet<string> UnlockedRecipes { get; set; } = new(); // Recipe names unlocked by player
+	public DateTime LastCraftingActivity { get; set; } = DateTime.UtcNow;
+
 	[Property] public double CurrentTotalInventoryItems => Inventory.Sum(kvp => kvp.Value); // Total items in inventory
 	public float ExperienceToNextLevel => Level * 100; // Example formula
 
@@ -78,7 +84,13 @@ public sealed partial class Player : Component
 		if (gatheringComp != null) gatheringComp.OwnerPlayer = this;
 		var interactionComp = Components.GetOrCreate<PlayerInteractionComponent>();
 		if (interactionComp != null) interactionComp.OwnerPlayer = this;
-		Inventory[ResourceType.Wood] = 20f; // Initialize with 0 wood
+		Inventory[ResourceType.Wood] = 20f; // Initialize with 20 wood
+
+		// Initialize crafting progress data if not loaded
+		if ( UnlockedRecipes == null ) UnlockedRecipes = new HashSet<string>();
+		if ( ItemsCraftedCount == null ) ItemsCraftedCount = new Dictionary<string, int>();
+		if ( MaterialsUsedCount == null ) MaterialsUsedCount = new Dictionary<string, int>();
+		if ( LastCraftingActivity == default ) LastCraftingActivity = DateTime.UtcNow;
 
 		if ( Body.IsValid() && BodyRenderer == null ) BodyRenderer = Body.Components.Get<SkinnedModelRenderer>();
 		if ( BodyRenderer != null && Body.IsValid() ) ClothingContainer.CreateFromLocalUser().Apply( BodyRenderer );

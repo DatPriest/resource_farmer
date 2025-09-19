@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Threading; // Required for CancellationTokenSource used in timeout
 using ResourceFarmer.Resources;
 using ResourceFarmer.PlayerBase; // Assuming your ResourceType enum is defined here
+using ResourceFarmer.Items; // For ToolBase, AppliedBonusInstance, ToolBonusName
 
 // Assuming your Player class and ResourceType enum are accessible
 // using MyGameNamespace;
@@ -18,6 +19,38 @@ namespace ResourceFarmer.SavingService
 {
 	// --- Data Transfer Objects (DTOs) ---
 	// Consider moving these to separate files
+
+	/// <summary>
+	/// DTO for serializing ToolBase data
+	/// </summary>
+	public class ToolDataDto
+	{
+		public string ToolType { get; set; } = string.Empty;
+		public string Material { get; set; } = string.Empty;
+		public int Level { get; set; }
+		public float Quality { get; set; }
+		public List<AppliedBonusDto> AppliedBonuses { get; set; } = new();
+	}
+
+	/// <summary>
+	/// DTO for serializing AppliedBonusInstance data
+	/// </summary>
+	public class AppliedBonusDto
+	{
+		public string Name { get; set; } = string.Empty;
+		public float ActualMagnitude { get; set; }
+	}
+
+	/// <summary>
+	/// DTO for tracking crafting progress and achievements
+	/// </summary>
+	public class CraftingProgressDto
+	{
+		public List<string> UnlockedRecipes { get; set; } = new();
+		public Dictionary<string, int> ItemsCraftedCount { get; set; } = new(); // Recipe name -> count
+		public Dictionary<string, int> MaterialsUsedCount { get; set; } = new(); // Material type -> count
+		public DateTime LastCraftingActivity { get; set; }
+	}
 
 	/// <summary>
 	/// DTO matching the structure expected/returned by the backend over WebSocket.
@@ -30,6 +63,8 @@ namespace ResourceFarmer.SavingService
 		public float Money { get; set; }
 		public int PrestigePoints { get; set; }
 		public string? ResourcesJson { get; set; }
+		public string? EquippedToolJson { get; set; } // NEW: Serialized equipped tool data
+		public string? CraftingProgressJson { get; set; } // NEW: Crafting achievements/progress
 		// public string? PlantDataJson { get; set; }
 		public DateTime LastSaved { get; set; }
 	}
@@ -302,11 +337,31 @@ namespace ResourceFarmer.SavingService
 		{
 			if ( player == null || loadedData == null ) { Log.Warning( "[SavingServiceComponent] ApplyLoadedData called with null player or data." ); return; }
 			Log.Info( $"[SavingServiceComponent] Applying loaded data to Player for SteamID: {loadedData.SteamId}" );
+			
+			// Apply basic stats
 			player.Level = loadedData.Level;
 			player.Experience = loadedData.Experience;
 			player.Money = loadedData.Money;
 			player.PrestigePoints = loadedData.PrestigePoints;
+			
+			// Apply inventory
 			player.Inventory = ConvertApiFormatToInventory( loadedData.ResourcesJson, loadedData.SteamId );
+			
+			// Apply equipped tool
+			var loadedTool = ConvertJsonToTool( loadedData.EquippedToolJson, loadedData.SteamId );
+			if ( loadedTool != null )
+			{
+				player.EquippedTool = loadedTool;
+				Log.Info( $"[SavingServiceComponent] Restored equipped tool: {loadedTool.Material} {loadedTool.ToolType} Level {loadedTool.Level}" );
+			}
+			else
+			{
+				Log.Info( $"[SavingServiceComponent] No equipped tool data found for {loadedData.SteamId}" );
+			}
+			
+			// Apply crafting progress
+			ApplyCraftingProgressFromJson( player, loadedData.CraftingProgressJson, loadedData.SteamId );
+			
 			Log.Info( $"[SavingServiceComponent] Finished applying data for SteamID: {loadedData.SteamId}" );
 		}
 
@@ -448,6 +503,9 @@ namespace ResourceFarmer.SavingService
 		{
 			long steamId = player.Network!.Owner!.SteamId;
 			var resourcesDict = ConvertInventoryToApiFormat( player.Inventory );
+			var equippedToolJson = ConvertToolToJson( player.EquippedTool );
+			var craftingProgressJson = ConvertCraftingProgressToJson( player );
+			
 			return new PlayerDataApiDto
 			{
 				SteamId = steamId.ToString(),
@@ -456,6 +514,8 @@ namespace ResourceFarmer.SavingService
 				Money = player.Money,
 				PrestigePoints = player.PrestigePoints,
 				ResourcesJson = JsonSerializer.Serialize( resourcesDict, GetJsonOptions() ),
+				EquippedToolJson = equippedToolJson,
+				CraftingProgressJson = craftingProgressJson,
 				LastSaved = DateTime.UtcNow
 			};
 		}
@@ -464,6 +524,52 @@ namespace ResourceFarmer.SavingService
 			if ( inventory == null ) return new Dictionary<string, float>();
 			try { return inventory.ToDictionary( kvp => kvp.Key.ToString(), kvp => kvp.Value ); }
 			catch ( Exception ex ) { Log.Error( $"[SavingServiceComponent] Error converting inventory keys: {ex.Message}" ); return new Dictionary<string, float>(); }
+		}
+
+		private static string? ConvertToolToJson( ToolBase? tool )
+		{
+			if ( tool == null ) return null;
+			try
+			{
+				var toolDto = new ToolDataDto
+				{
+					ToolType = tool.ToolType.ToString(),
+					Material = tool.Material ?? string.Empty,
+					Level = tool.Level,
+					Quality = tool.Quality,
+					AppliedBonuses = tool.AppliedBonuses?.Select( b => new AppliedBonusDto 
+					{ 
+						Name = b.Name.ToString(), 
+						ActualMagnitude = b.ActualMagnitude 
+					} ).ToList() ?? new List<AppliedBonusDto>()
+				};
+				return JsonSerializer.Serialize( toolDto, GetJsonOptions() );
+			}
+			catch ( Exception ex )
+			{
+				Log.Error( $"[SavingServiceComponent] Error serializing tool: {ex.Message}" );
+				return null;
+			}
+		}
+
+		private static string? ConvertCraftingProgressToJson( Player player )
+		{
+			try
+			{
+				var progressDto = new CraftingProgressDto
+				{
+					UnlockedRecipes = player.UnlockedRecipes?.ToList() ?? new List<string>(),
+					ItemsCraftedCount = player.ItemsCraftedCount ?? new Dictionary<string, int>(),
+					MaterialsUsedCount = player.MaterialsUsedCount ?? new Dictionary<string, int>(),
+					LastCraftingActivity = player.LastCraftingActivity
+				};
+				return JsonSerializer.Serialize( progressDto, GetJsonOptions() );
+			}
+			catch ( Exception ex )
+			{
+				Log.Error( $"[SavingServiceComponent] Error serializing crafting progress: {ex.Message}" );
+				return null;
+			}
 		}
 		private static IDictionary<ResourceType, float> ConvertApiFormatToInventory( string? resourcesJson, string steamIdForLogging )
 		{
@@ -480,6 +586,71 @@ namespace ResourceFarmer.SavingService
 			}
 			catch ( Exception ex ) { Log.Error( $"[SavingServiceComponent] Error applying ResourcesJson for {steamIdForLogging}: {ex.Message}" ); return new Dictionary<ResourceType, float>(); }
 			return inventory;
+		}
+
+		private static ToolBase? ConvertJsonToTool( string? toolJson, string steamIdForLogging )
+		{
+			if ( string.IsNullOrEmpty( toolJson ) ) return null;
+			try
+			{
+				var toolDto = JsonSerializer.Deserialize<ToolDataDto>( toolJson, GetJsonOptions() );
+				if ( toolDto == null ) return null;
+
+				// Convert tool type string back to enum
+				if ( !Enum.TryParse<ResourceType>( toolDto.ToolType, true, out var toolType ) )
+				{
+					Log.Warning( $"[SavingServiceComponent] Unknown tool type '{toolDto.ToolType}' for {steamIdForLogging}. Skipping tool." );
+					return null;
+				}
+
+				// Convert bonuses back to AppliedBonusInstance
+				var bonuses = toolDto.AppliedBonuses?.Select( b => 
+				{
+					if ( Enum.TryParse<ToolBonusName>( b.Name, true, out var bonusName ) )
+					{
+						return new AppliedBonusInstance
+						{
+							Name = bonusName,
+							ActualMagnitude = b.ActualMagnitude
+						};
+					}
+					Log.Warning( $"[SavingServiceComponent] Unknown bonus name '{b.Name}' for {steamIdForLogging}. Skipping bonus." );
+					return default( AppliedBonusInstance? );
+				} ).Where( b => b.HasValue ).Select( b => b!.Value ).ToList() ?? new List<AppliedBonusInstance>();
+
+				return new ToolBase( toolType, toolDto.Material, toolDto.Level, toolDto.Quality, bonuses );
+			}
+			catch ( Exception ex )
+			{
+				Log.Error( $"[SavingServiceComponent] Error deserializing tool for {steamIdForLogging}: {ex.Message}" );
+				return null;
+			}
+		}
+
+		private static void ApplyCraftingProgressFromJson( Player player, string? craftingProgressJson, string steamIdForLogging )
+		{
+			if ( string.IsNullOrEmpty( craftingProgressJson ) ) return;
+			try
+			{
+				var progressDto = JsonSerializer.Deserialize<CraftingProgressDto>( craftingProgressJson, GetJsonOptions() );
+				if ( progressDto != null )
+				{
+					player.UnlockedRecipes = progressDto.UnlockedRecipes?.ToHashSet() ?? new HashSet<string>();
+					player.ItemsCraftedCount = progressDto.ItemsCraftedCount ?? new Dictionary<string, int>();
+					player.MaterialsUsedCount = progressDto.MaterialsUsedCount ?? new Dictionary<string, int>();
+					player.LastCraftingActivity = progressDto.LastCraftingActivity;
+					Log.Info( $"[SavingServiceComponent] Applied crafting progress for {steamIdForLogging}: {player.UnlockedRecipes.Count} recipes, {player.ItemsCraftedCount.Count} crafted items tracked." );
+				}
+			}
+			catch ( Exception ex )
+			{
+				Log.Error( $"[SavingServiceComponent] Error applying crafting progress for {steamIdForLogging}: {ex.Message}" );
+				// Initialize with defaults on error
+				player.UnlockedRecipes = new HashSet<string>();
+				player.ItemsCraftedCount = new Dictionary<string, int>();
+				player.MaterialsUsedCount = new Dictionary<string, int>();
+				player.LastCraftingActivity = DateTime.UtcNow;
+			}
 		}
 	}
 }
