@@ -235,7 +235,7 @@ public sealed partial class Player : Component
 
 		Log.Info( $"[Player Upgrade] Achievement progress updated for upgrade to Level {upgradedTool.Level}" );
 
-
+	}
 	// --- Bonus Manipulation (Placeholder - High Cost) ---
 
 	public Dictionary<ResourceType, float> GetAddBonusCost()
