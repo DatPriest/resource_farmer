@@ -1,8 +1,8 @@
 {
   "Name": "Copper Axe",
-  "Category": "Axe",
-  "ToolType": "CopperOre",
-  "Material": "",
+  "Category": "Axes",
+  "ToolType": "Axe",
+  "Material": "Copper",
   "Level": 1,
   "OutputQuality": 1,
   "CanHaveBonuses": true,

@@ -170,6 +170,6 @@
 	{
 		if (Player == null || Recipe == null || !CanCraftRecipe()) return;
 		Log.Info($"[RecipeItem:{Recipe.ToolType}] Craft Requested");
-		Player.RequestCraftItem(Recipe); // Call the RPC on the Player component
+		ConsoleSystem.Run( "craft_item", Recipe.ToolType.ToString(), Recipe.Material, Recipe.Level.ToString() );
 	}
 }

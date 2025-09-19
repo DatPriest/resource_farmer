@@ -1,27 +1,22 @@
 {
-  "Name": "Wooden Axe",
+  "Name": "Stone Axe",
   "Category": "Axes",
   "ToolType": "Axe",
-  "Material": "Wood",
+  "Material": "Stone",
   "Level": 1,
-  "OutputQuality": 0.09,
+  "OutputQuality": 0.15,
   "CanHaveBonuses": true,
   "MinBonuses": 0,
-  "MaxBonuses": 10,
-  "BasePower": 1,
+  "MaxBonuses": 2,
+  "BasePower": 1.2,
   "PossibleBonuses": [
-    "MoonTouched",
     "Sturdy",
     "Efficient"
   ],
-  "PossibleEffects": [
-    "GatherCritMultiplier",
-    "DurabilityBonus",
-    "GatherSpeedMultiplier"
-  ],
   "RequiredProfessionLevel": 1,
   "Costs": {
-    "Wood": 1
+    "Stone": 5,
+    "Wood": 2
   },
   "__references": [],
   "__version": 0

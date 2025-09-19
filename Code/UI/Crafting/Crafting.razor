@@ -200,7 +200,16 @@
 		};
 	}
 
-	private void RequestUpgrade() { LocalPlayer?.RequestUpgradeEquippedTool(); }
-	private void RequestCraft(CraftingRecipeResource recipe) { LocalPlayer?.RequestCraftItem(recipe); }
+	private void RequestUpgrade() 
+	{ 
+		Log.Info( "[CraftingUI] Requesting tool upgrade" );
+		ConsoleSystem.Run( "upgrade_tool" );
+	}
+	private void RequestCraft(CraftingRecipeResource recipe) 
+	{ 
+		if ( recipe == null ) return;
+		Log.Info( $"[CraftingUI] Requesting craft for {recipe.Name}" );
+		ConsoleSystem.Run( "craft_item", recipe.ToolType.ToString(), recipe.Material, recipe.Level.ToString() );
+	}
 	private void ClosePanel() { UIManager?.NotifyPanelClosed(this); } // Assuming UIManager singleton or similar access
 }
