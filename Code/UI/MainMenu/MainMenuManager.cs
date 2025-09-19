@@ -105,7 +105,7 @@ public sealed class MainMenuManager : Component
 		
 		// In S&box, scene loading might be handled differently
 		// For now, we'll just transition to game mode
-		var gameManager = Game.ActiveScene?.GetAllComponents<GameManager>().FirstOrDefault();
+		var gameManager = Scene.Active?.GetAllComponents<GameManager>().FirstOrDefault();
 		gameManager?.EnterGameMode();
 	}
 
