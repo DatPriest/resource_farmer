@@ -1,6 +1,8 @@
 using ResourceFarmer.PlayerBase;
 using Sandbox; // Add Sandbox namespace for attributes
 
+namespace ResourceFarmer;
+
 public interface IInteractable
 {
 	void Interact( Player player, bool isPrimary );

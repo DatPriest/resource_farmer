@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ResourceFarmer.Resources; // Make sure this namespace is correct for ResourceType and ResourceNode
 
+namespace ResourceFarmer.Resources;
+
 /// <summary>
 /// This component randomly spawns specified resource prefabs onto a target terrain surface.
 /// It finds random locations within the terrain bounds and uses raycasting to place
