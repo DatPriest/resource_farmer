@@ -1,0 +1,66 @@
+@import "./Styles/Theme.scss";
+
+.inventory_notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 999;
+    pointer-events: none;
+    
+    .notification_content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-family: "Poppins", "Inter", sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        animation: slideInRight 0.3s ease-out;
+        
+        .notification_icon {
+            font-size: 18px;
+        }
+        
+        .notification_text {
+            white-space: nowrap;
+        }
+    }
+    
+    &.full .notification_content {
+        background: linear-gradient(145deg, rgba(244, 67, 54, 0.9), rgba(211, 47, 47, 0.9));
+        border: 1px solid rgba(244, 67, 54, 0.5);
+        color: #ffffff;
+    }
+    
+    &.warning .notification_content {
+        background: linear-gradient(145deg, rgba(255, 152, 0, 0.9), rgba(245, 124, 0, 0.9));
+        border: 1px solid rgba(255, 152, 0, 0.5);
+        color: #ffffff;
+    }
+    
+    &.success .notification_content {
+        background: linear-gradient(145deg, rgba(76, 175, 80, 0.9), rgba(67, 160, 71, 0.9));
+        border: 1px solid rgba(76, 175, 80, 0.5);
+        color: #ffffff;
+    }
+    
+    &.info .notification_content {
+        background: linear-gradient(145deg, rgba(33, 150, 243, 0.9), rgba(30, 136, 229, 0.9));
+        border: 1px solid rgba(33, 150, 243, 0.5);
+        color: #ffffff;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
