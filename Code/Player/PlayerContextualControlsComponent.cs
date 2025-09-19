@@ -2,6 +2,7 @@
 using Sandbox;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ResourceFarmer.Resources;
 
 namespace ResourceFarmer.PlayerBase;
@@ -137,13 +138,35 @@ public sealed class PlayerContextualControlsComponent : Component
 			}
 		}
 
+		string resourceName = node.ResourceType.ToString();
+		
 		if (canGather)
 		{
-			return $"Press [LMB] to gather {node.ResourceType}{toolRequirement}";
+			// Show different prompts based on tool efficiency
+			if (tool != null)
+			{
+				var efficiency = tool.GetGatherAmountMultiplier(node.ResourceType);
+				if (efficiency >= 1.5f)
+				{
+					return $"Press [LMB] to efficiently gather {resourceName}";
+				}
+				else if (efficiency >= 1.0f)
+				{
+					return $"Press [LMB] to gather {resourceName}";
+				}
+				else
+				{
+					return $"Press [LMB] to slowly gather {resourceName}";
+				}
+			}
+			else
+			{
+				return $"Press [LMB] to gather {resourceName} by hand";
+			}
 		}
 		else
 		{
-			return $"Cannot gather {node.ResourceType}{toolRequirement}";
+			return $"Cannot gather {resourceName}{toolRequirement}";
 		}
 	}
 
@@ -152,8 +175,15 @@ public sealed class PlayerContextualControlsComponent : Component
 	/// </summary>
 	private string GetInteractablePrompt(GameObject target)
 	{
-		// Default interaction prompt - could be enhanced based on specific interactable types
-		return $"Press [E] to interact with {target.Name}";
+		// Check for specific interactable types and provide appropriate prompts
+		var interactable = target.Components.Get<IInteractable>();
+		if (interactable is Interactable baseInteractable && !string.IsNullOrEmpty(baseInteractable.InteractionPrompt))
+		{
+			return $"Press [RMB] to {baseInteractable.InteractionPrompt}";
+		}
+
+		// Default interaction prompt
+		return $"Press [RMB] to interact with {target.Name}";
 	}
 
 	/// <summary>
@@ -164,24 +194,31 @@ public sealed class PlayerContextualControlsComponent : Component
 	{
 		var controls = new List<ContextualControl>();
 
+		// Primary contextual action
 		if (HasInteractable && !string.IsNullOrEmpty(CurrentPrompt))
 		{
 			controls.Add(new ContextualControl
 			{
 				Text = CurrentPrompt,
-				IsEnabled = true
+				IsEnabled = true,
+				Priority = 1
 			});
 		}
 
-		// Add other always-available controls
-		controls.Add(new ContextualControl
+		// Secondary always-available controls (only show most relevant ones)
+		if (controls.Count == 0) // Only show if no primary interaction
 		{
-			Text = "Press [I] to open inventory",
-			IsEnabled = true,
-			IsSecondary = true
-		});
+			controls.Add(new ContextualControl
+			{
+				Text = "Press [I] to open inventory",
+				IsEnabled = true,
+				IsSecondary = true,
+				Priority = 10
+			});
+		}
 
-		return controls;
+		// Sort by priority (lower numbers = higher priority)
+		return controls.OrderBy(c => c.Priority).ToList();
 	}
 }
 
@@ -193,4 +230,5 @@ public struct ContextualControl
 	public string Text { get; set; }
 	public bool IsEnabled { get; set; }
 	public bool IsSecondary { get; set; } // Less prominent display
+	public int Priority { get; set; } // Lower numbers = higher priority (1 = highest)
 }

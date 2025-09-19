@@ -277,17 +277,18 @@ HUD {
     // --- Contextual Controls (Bottom-Center) ---
     .contextual_controls {
         position: absolute;
-        bottom: 80px; // Above the tool panel
+        bottom: 100px; // Above the tool panel with more space
         left: 50%;
         transform: translateX(-50%);
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 8px;
-        // Initial state - hidden
+        gap: 6px;
+        max-width: 400px; // Prevent too wide controls
+        // Initial state - hidden with slight slide-up effect
         opacity: 0;
-        transform: translateX(-50%) translateY(20px); // Start slightly lower
-        transition: all 0.3s ease-out;
+        transform: translateX(-50%) translateY(15px); // Start slightly lower
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); // Smooth easing
         pointer-events: none;
         z-index: 50; // Above other HUD elements
 
@@ -298,56 +299,144 @@ HUD {
 
         .control_hint {
             // Base styles for control hints
-            background: linear-gradient(145deg, rgba(40, 45, 58, 0.95), rgba(30, 33, 42, 0.95));
+            background: linear-gradient(145deg, 
+                rgba(40, 45, 58, 0.95), 
+                rgba(30, 33, 42, 0.95)
+            );
             border: 1px solid rgba(110, 120, 140, 0.3);
-            border-radius: 20px; // Pill shape
-            padding: 8px 16px;
+            border-radius: 25px; // More rounded pill shape
+            padding: 10px 18px;
             font-size: 14px;
             font-weight: 500;
             color: #e0e5ec;
             text-align: center;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1); // Subtle inner highlight
             white-space: nowrap;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            
+            // Subtle animated background gradient
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(77, 157, 255, 0.1),
+                    transparent
+                );
+                transition: left 1.5s ease;
+            }
 
             &.enabled {
-                border-color: rgba(77, 157, 255, 0.5); // Accent blue
-                box-shadow: 0 2px 10px rgba(77, 157, 255, 0.2);
+                border-color: rgba(77, 157, 255, 0.6); // Accent blue
+                box-shadow: 
+                    0 4px 20px rgba(77, 157, 255, 0.25),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                
+                // Trigger the sweep animation
+                &:hover::before {
+                    left: 100%;
+                }
             }
 
             &.disabled {
                 color: #7a8290; // Muted text for disabled actions
                 border-color: rgba(110, 120, 140, 0.2);
+                background: linear-gradient(145deg, 
+                    rgba(30, 33, 42, 0.8), 
+                    rgba(20, 22, 30, 0.8)
+                );
             }
 
             &.secondary {
-                opacity: 0.7;
-                font-size: 12px;
-                padding: 6px 12px;
+                opacity: 0.8;
+                font-size: 13px;
+                padding: 8px 15px;
+                background: linear-gradient(145deg, 
+                    rgba(25, 28, 35, 0.9), 
+                    rgba(15, 17, 22, 0.9)
+                );
             }
 
             .keybind {
-                // Style keybind text differently
+                // Enhanced keybind styling
                 font-weight: 700;
                 color: #FFD700; // Gold accent for keys
-                background-color: rgba(10, 12, 18, 0.8);
-                padding: 2px 6px;
-                border-radius: 4px;
-                margin: 0 2px;
-                border: 1px solid rgba(255, 215, 0, 0.5);
+                background: linear-gradient(145deg, 
+                    rgba(20, 22, 30, 0.95), 
+                    rgba(10, 12, 18, 0.95)
+                );
+                padding: 3px 8px;
+                border-radius: 6px;
+                margin: 0 3px;
+                border: 1px solid rgba(255, 215, 0, 0.6);
                 display: inline-block;
-                min-width: 16px;
+                min-width: 20px;
                 text-align: center;
+                box-shadow: 
+                    0 2px 5px rgba(0, 0, 0, 0.3),
+                    inset 0 1px 0 rgba(255, 215, 0, 0.2);
+                text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+                transition: all 0.2s ease;
+                
+                // Key press effect
+                &:active {
+                    transform: translateY(1px);
+                    box-shadow: 
+                        0 1px 3px rgba(0, 0, 0, 0.3),
+                        inset 0 1px 0 rgba(255, 215, 0, 0.2);
+                }
             }
 
-            // Hover effect for interactive hints
+            // Enhanced hover effect for interactive hints
             &.enabled:hover {
-                background: linear-gradient(145deg, rgba(50, 55, 68, 0.95), rgba(40, 43, 52, 0.95));
-                border-color: rgba(77, 157, 255, 0.7);
-                box-shadow: 0 4px 15px rgba(77, 157, 255, 0.3);
-                transform: translateY(-1px);
+                background: linear-gradient(145deg, 
+                    rgba(50, 55, 68, 0.95), 
+                    rgba(40, 43, 52, 0.95)
+                );
+                border-color: rgba(77, 157, 255, 0.8);
+                box-shadow: 
+                    0 6px 25px rgba(77, 157, 255, 0.35),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                transform: translateY(-2px) scale(1.02);
+                
+                .keybind {
+                    color: #FFEA70; // Brighter gold on hover
+                    text-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+                    border-color: rgba(255, 215, 0, 0.8);
+                }
             }
+
+            // Stagger animation for multiple hints
+            &:nth-child(1) { animation-delay: 0ms; }
+            &:nth-child(2) { animation-delay: 100ms; }
+            &:nth-child(3) { animation-delay: 200ms; }
+        }
+
+        // Animation for hints appearing
+        &.visible .control_hint {
+            animation: slideInUp 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+    }
+
+    // Keyframes for smooth hint appearance
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
     }
 }
