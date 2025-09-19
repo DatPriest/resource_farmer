@@ -94,30 +94,27 @@ public static class MainMenuTestCommands
 	[ConCmd.Server("test_main_menu")]
 	public static void TestMainMenu()
 	{
-		var connection = Connection.Local;
-		if (connection?.Pawn == null) return;
+		// For test commands, we can use Game.ActiveScene to find components
+		var testComponents = Scene.Active?.GetAllComponents<MainMenuTest>();
+		if (testComponents?.Any() != true)
+		{
+			Log.Warning("[MainMenuTestCommands] No MainMenuTest components found in scene.");
+			return;
+		}
 
 		Log.Info("[MainMenuTestCommands] Running main menu test...");
-		
-		var testComponent = connection.Pawn.Components.Get<MainMenuTest>();
-		if (testComponent == null)
-		{
-			testComponent = connection.Pawn.Components.Create<MainMenuTest>();
-		}
-		
 		Log.Info("[MainMenuTestCommands] Test component ready.");
 	}
 	
 	[ConCmd.Server("show_main_menu")]
 	public static void ShowMainMenu()
 	{
-		var connection = Connection.Local;
-		if (connection?.Pawn == null) return;
-
-		var mainMenuManager = connection.Pawn.Components.Get<MainMenuManager>();
+		// For test commands, find any MainMenuManager in the scene
+		var mainMenuManager = Scene.Active?.GetAllComponents<MainMenuManager>().FirstOrDefault();
 		if (mainMenuManager == null)
 		{
-			mainMenuManager = connection.Pawn.Components.Create<MainMenuManager>();
+			Log.Warning("[MainMenuTestCommands] No MainMenuManager found in scene.");
+			return;
 		}
 		
 		mainMenuManager.ShowMainMenu();
