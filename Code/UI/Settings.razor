@@ -1,0 +1,89 @@
+@using ResourceFarmer.PlayerBase
+@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@inherits PanelComponent
+@namespace ResourceFarmer.UI
+
+<root class="settings_panel">
+	<button class="close_button" onclick=@ClosePanel>X</button>
+	<div class="header">Settings</div>
+
+	<div class="content">
+		<div class="section">
+			<div class="section_title">Reset Progress</div>
+			<div class="section_description">
+				Warning: This will permanently reset all your levels, experience, money, inventory, tools, and
+				profession progress. This action cannot be undone.
+			</div>
+
+			@if (_showConfirmation)
+			{
+				<div class="confirmation_section">
+					<div class="confirmation_text">Are you absolutely sure?</div>
+					<button class="confirm_button yes" onclick=@ConfirmReset>Yes, Reset Everything</button>
+					<button class="confirm_button no" onclick=@CancelReset>No, Keep My Progress</button>
+				</div>
+			}
+			else
+			{
+				<button class="reset_button" onclick=@RequestResetConfirmation>Reset My Progress</button>
+			}
+		</div>
+
+		@* Add other settings sections here later *@
+
+	</div>
+</root>
+
+@code
+{
+	private bool _showConfirmation = false;
+
+	void RequestResetConfirmation()
+	{
+		_showConfirmation = true;
+		StateHasChanged();
+	}
+
+	void CancelReset()
+	{
+		_showConfirmation = false;
+		StateHasChanged();
+	}
+
+	void ConfirmReset()
+	{
+		Log.Info("[Settings] Reset confirmed by user. Sending request to server...");
+
+		// Find the local player and call the existing server command logic
+		var localPlayer = Game.ActiveScene?.GetAllComponents<Player>()
+		.FirstOrDefault(p => p.Network.IsOwner);
+
+		if (localPlayer != null)
+		{
+			// We can directly call the static command method.
+			// The command itself handles finding the player component from the caller.
+			localPlayer.ResetStatsInMemory();
+		}
+		else
+		{
+			Log.Warning("[Settings] Could not find local player to send reset command.");
+		}
+
+		// Close the panel after confirming
+		ClosePanel();
+	}
+
+	void ClosePanel()
+	{
+		// Optional: Notify UIManager if needed
+		var uiManager = Game.ActiveScene?.GetAllComponents<UIManager>().FirstOrDefault();
+		uiManager?.NotifyPanelClosed(this);
+
+		Destroy(); // Destroy the panel component itself
+	}
+
+	// Minimal BuildHash as this panel is mostly static until confirmation
+	protected override int BuildHash() => HashCode.Combine(_showConfirmation);
+}

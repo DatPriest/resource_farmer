@@ -1,0 +1,155 @@
+# Windsurf AI Rules - Resource Farmer S&box Game
+
+## Project Overview
+
+Resource Farmer is a S&box multiplayer sandbox game focused on resource gathering, crafting, and procedural exploration. Built with S&box's component-based architecture using C# and Razor UI.
+
+## S&box Framework Essentials
+
+### Component System
+
+- Inherit from `Component` (not MonoBehaviour)
+- Use `[Property]` for inspector fields, `[Sync]` for network data
+- Component access: `Components.Get<T>()` or `Components.GetOrCreate<T>()`
+- Lifecycle: `OnStart()`, `OnUpdate()`, `OnDestroy()`
+
+### Networking Rules
+
+- `[Sync]` automatically replicates across clients
+- `Networking.IsHost` = server authority
+- `IsProxy` = client-side instance
+- Server handles spawning/persistence, clients handle UI/input
+
+## Core Game Systems
+
+### Resource Architecture
+
+**Central Registry**: `ResourceType` enum (Code/Resources/ResourceType.cs)
+**Inventory System**: `Dictionary<ResourceType, float>` with [Sync]
+**Gathering**: `IGatherable` interface + `ResourceNode` components
+**Spawning**: `ResourceSpawner` uses terrain raycasting for placement
+
+### Crafting Pipeline
+
+**Recipe Files**: `.recipe` GameResources in Assets/Crafting/
+**Loading**: `ResourceLibrary.GetAll<CraftingRecipeResource>()`
+**Management**: `RecipeManager` singleton pattern
+**Tools**: `ToolBase` with material/quality/bonus modifiers
+
+### Player Component Modules
+
+- `PlayerInteractionComponent` - object interaction
+- `PlayerGatheringComponent` - resource collection
+- `PlayerToolComponent` - equipment management
+- Each needs `OwnerPlayer` reference in Player.OnStart()
+
+## Development Quick Rules
+
+### File Organization
+
+- Game logic: Code/ directory
+- UI: .razor + .razor.scss pairs in Code/UI/
+- Assets: .recipe, .prefab files in Assets/
+- Config: .sbproj (not .csproj for game logic)
+
+### Code Patterns
+
+```csharp
+// Namespaces
+using ResourceFarmer.PlayerBase;
+using ResourceFarmer.Resources;
+using ResourceFarmer.Crafting;
+using ResourceFarmer.Items;
+
+// Properties
+[Property, Category("Display")] public string Name { get; set; }
+[Sync] public float Money { get; set; }
+[Property, Group("Interaction")] public bool Enabled { get; set; }
+
+// Component setup
+protected override void OnStart()
+{
+    if (Networking.IsHost) HandleServerLogic();
+    if (!IsProxy) SetupClientUI();
+
+    var component = Components.GetOrCreate<PlayerGatheringComponent>();
+    if (component != null) component.OwnerPlayer = this;
+}
+```
+
+### Asset Loading
+
+```csharp
+// ✅ Correct: Use ResourceLibrary
+var recipes = ResourceLibrary.GetAll<CraftingRecipeResource>();
+
+// ❌ Wrong: Don't use file I/O
+var data = File.ReadAllText("file.json");
+```
+
+## Windsurf-Specific Workflow Optimizations
+
+### Multi-File Refactoring
+
+When modifying game systems:
+
+1. Check ResourceType enum for new resource additions
+2. Update ResourceSpawner prefab lists
+3. Create/modify .recipe files for crafting
+4. Test multiplayer sync with IsProxy checks
+
+### UI Development Flow
+
+1. Create .razor component in Code/UI/
+2. Add corresponding .razor.scss for styling
+3. Register in UIManager for input handling
+4. Use Component.Create<T>() for dynamic instantiation
+5. Ensure proper disposal to prevent memory leaks
+
+### Component Development Pattern
+
+1. Create Component-derived class
+2. Add to Player via Components.GetOrCreate<T>()
+3. Set OwnerPlayer reference
+4. Add [Sync] properties for network data
+5. Implement server/client logic separation
+
+## Critical Gotchas
+
+- Always use `ResourceLibrary.GetAll<T>()` for GameResource loading
+- Check `IsProxy` before client-specific logic
+- Set `OwnerPlayer` on player components in OnStart()
+- Calculate terrain bounds before resource spawning
+- Dispose UI panels properly
+- Use .sbproj for S&box project config
+- Scene system requires scenes/minimal.scene startup
+
+## External Dependencies
+
+- **S&box Engine** - Modern game framework
+- **sturnus.terraingenerationtool** - Procedural terrain
+- **Razor UI** - Component-based UI system
+- **GameResource system** - Asset management
+
+## Testing Considerations
+
+- Multiplayer: Test both host and client scenarios
+- Networking: Verify [Sync] property replication
+- Performance: Monitor terrain generation and resource spawning
+- UI: Test panel lifecycle and memory management
+
+## Global Usings (Assembly.cs)
+
+```csharp
+global using Sandbox;
+global using System.Collections.Generic;
+global using System.Linq;
+```
+
+## Quick Reference Commands
+
+- Resource spawning: Server/host only with terrain bounds
+- Recipe loading: Automatic via RecipeManager singleton
+- Component access: Use Get/GetOrCreate patterns
+- UI management: UIManager handles input-based toggling
+- Network sync: [Sync] attribute on properties

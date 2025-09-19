@@ -1,0 +1,305 @@
+// --- HUD Styles ---
+@import "Colors.scss";
+@import "Layout.scss";
+@import "Text.scss";
+
+// Root HUD Container (positioning handled by game usually)
+.hud-root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; // HUD elements usually don't block interaction
+  font-family: $font-family-main;
+  color: $text-primary;
+}
+
+// --- Resource Bars (Health, Mana, etc.) ---
+.resource-bar {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px; // Example minimum width
+  margin-bottom: $margin-small; // Space between bars if stacked
+
+  &__label {
+    font-size: $font-size-small;
+    font-weight: $font-weight-medium;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+    padding-left: $padding-tiny;
+  }
+
+  &__track {
+    height: 10px; // Bar height
+    background-color: $bar-background;
+    border-radius: $border-radius-slight;
+    border: 1px solid $bar-border;
+    overflow: hidden; // Keep fill inside track
+    position: relative; // For value text positioning
+    box-shadow: 0 1px 3px rgba($primary-dark, 0.5); // Inner shadow
+  }
+
+  &__fill {
+    height: 100%;
+    width: 75%; // Example fill percentage (controlled by code)
+    background-color: $accent-blue; // Default fill color
+    border-radius: $border-radius-slight; // Match track radius
+    transition: width 0.2s ease-out; // Smooth fill animation
+    // Subtle gradient/shine effect
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.15),
+      rgba(0, 0, 0, 0.15)
+    );
+  }
+
+  &__value {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-tiny; // Very small text on bar
+    font-weight: $font-weight-semibold;
+    color: rgba($text-primary, 0.9);
+    text-shadow: 1px 1px 1px rgba($primary-dark, 0.7); // Shadow for readability
+    pointer-events: none; // Don't block track interaction if any
+    line-height: 10px; // Match track height
+  }
+  // Modifiers for different bar types
+  &--health &__fill {
+    background-color: $health-color;
+  }
+
+  &--mana &__fill {
+    background-color: $mana-color;
+  }
+
+  &--stamina &__fill {
+    background-color: $stamina-color;
+  }
+
+  &--exp &__fill {
+    background-color: $exp-color;
+  }
+  // Style for slim bars
+  &--slim {
+    min-width: 100px;
+
+    .resource-bar__track {
+      height: 6px;
+    }
+
+    .resource-bar__value {
+      display: none;
+    }
+    // Hide value text on slim bars
+    .resource-bar__label {
+      font-size: $font-size-tiny;
+    }
+  }
+}
+
+// --- Player Stats Panel Example (Top-Left) ---
+.player-stats-panel {
+  position: absolute;
+  top: $padding-base;
+  left: $padding-base;
+  background-color: $background-transparent-medium;
+  border: $border-width-base solid $border-color;
+  border-radius: $border-radius-slight;
+  box-shadow: 0 0 8px $shadow-color; // Use box-shadow for glow
+  backdrop-filter: blur($backdrop-blur-strength);
+
+  padding: $padding-medium; // Override padding
+  width: 200px; // Fixed width example
+  gap: $gap-tiny;
+  display: flex;
+  flex-direction: column;
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: $font-size-small;
+
+    .label {
+      color: $text-secondary;
+    }
+
+    .value {
+      color: $text-primary;
+      font-weight: $font-weight-semibold;
+    }
+  }
+  // Include EXP bar if desired
+  .exp-bar {
+    display: flex;
+    flex-direction: column;
+    min-width: 150px; // Overridden by --slim
+    margin-bottom: $margin-small;
+
+    min-width: 100px;
+
+    .resource-bar__track {
+      height: 6px;
+    }
+
+    .resource-bar__value {
+      display: none;
+    }
+
+    .resource-bar__label {
+      font-size: $font-size-tiny;
+    }
+
+    &__fill {
+      // Applied to the fill element inside .exp-bar
+      background-color: $exp-color;
+    }
+
+    margin-top: $margin-tiny;
+    margin-bottom: 0; // Remove default bottom margin if needed
+  }
+}
+
+// --- Buff/Debuff Icons ---
+.status-effects {
+  position: absolute;
+  top: $padding-base;
+  right: $padding-base; // Example position
+  display: flex;
+  gap: $gap-small;
+
+  .status-icon {
+    width: 32px;
+    height: 32px;
+    background-color: rgba($primary-medium, 0.7);
+    border: 1px solid $border-color;
+    border-radius: $border-radius-medium;
+    background-size: cover; // Note: 'cover' might not be fully supported, check in s&box
+    background-position: center; // Note: 'center' might not be fully supported, check in s&box
+    background-repeat: no-repeat;
+    box-shadow: 0 0 5px rgba($primary-dark, 0.5);
+    // Use background-image set from code
+    // Example: background-image: url( "/ui/icons/buff_strength.png" );
+    position: relative; // Added for absolute positioning of duration
+
+    .duration {
+      // Optional duration text overlay
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      font-size: $font-size-tiny;
+      font-weight: $font-weight-semibold;
+      color: $text-primary;
+      background-color: rgba($primary-dark, 0.8);
+      padding: 0 3px;
+      border-radius: $border-radius-slight;
+      text-shadow: 1px 1px 1px rgba($primary-dark, 0.7);
+    }
+
+    &.is-debuff {
+      border-color: rgba($text-danger, 0.5);
+      box-shadow: 0 0 5px rgba($text-danger, 0.4);
+    }
+
+    &.is-buff {
+      border-color: rgba($text-success, 0.5);
+      box-shadow: 0 0 5px rgba($text-success, 0.4);
+    }
+  }
+}
+
+// --- Crosshair ---
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  background-color: rgba($text-primary, 0.8);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  // Add more complex styles if needed (lines, dots) using ::before/::after if supported
+}
+
+// --- Interaction Prompt ---
+.interaction-prompt {
+  position: absolute;
+  bottom: 20%; // Position above center screen bottom
+  left: 50%;
+  background-color: $background-transparent-medium;
+  border: $border-width-base solid $border-color;
+  border-radius: $border-radius-slight;
+  box-shadow: 0 0 8px $shadow-color; // Use box-shadow for glow
+  backdrop-filter: blur($backdrop-blur-strength);
+
+  padding: $padding-small $padding-medium;
+  font-size: $font-size-base;
+  color: $text-primary;
+  text-align: center;
+  opacity: 0; // Hidden by default
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateX(-50%) translateY(10px); // Start slightly lower
+  pointer-events: none;
+  z-index: 50; // Ensure it's above most HUD elements
+
+  &.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0px); // Move to final position
+  }
+
+  .keybind {
+    // Style the keybind text differently
+    font-weight: $font-weight-bold;
+    color: $accent-gold-light;
+    background-color: rgba($primary-dark, 0.8);
+    padding: 2px 5px;
+    border-radius: $border-radius-slight;
+    margin: 0 $margin-tiny;
+    border: 1px solid rgba($accent-gold, 0.5);
+  }
+}
+
+// --- Scoreboard/Info Panel Example (Top Center) ---
+.info-panel {
+  position: absolute;
+  top: $padding-base;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: $background-transparent-medium;
+  border: $border-width-base solid $border-color;
+  border-radius: $border-radius-slight;
+  box-shadow: 0 0 8px $shadow-color; // Use box-shadow for glow
+  backdrop-filter: blur($backdrop-blur-strength);
+
+  padding: $padding-small $padding-base;
+  display: flex;
+  flex-direction: row; // Make info panel horizontal
+  align-items: center;
+  gap: $gap-base;
+
+  .info-item {
+    display: flex;
+    align-items: baseline; // Align label and value text
+    gap: $gap-tiny;
+    font-size: $font-size-base;
+
+    .label {
+      color: $text-secondary;
+    }
+
+    .value {
+      color: $text-primary;
+      font-weight: $font-weight-semibold;
+    }
+  }
+}

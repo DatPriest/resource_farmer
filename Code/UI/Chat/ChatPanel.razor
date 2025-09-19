@@ -1,0 +1,193 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using System;
+
+@inherits PanelComponent
+
+@attribute [StyleSheet]
+
+
+<root class="absolute inset-0">
+    <canvas>
+        <div class="chat-container hud flex column-reverse with-deadzone bottom-left with-px">
+            <div class="layout gap">
+                <div class="when-not-open flex align-center gap-sm shrink-0">
+                    <label>
+                        Chat
+                    </label>
+                </div>
+
+                <ChatBox class="input" @ref="InputBox" onsubmit="@ChatFinished"></ChatBox>
+            </div>
+
+            <div class="hud flex column justify-start">
+                @foreach (var entry in Entries)
+                {
+                    <div class="hud with-padding flex row gap-sm align-center">
+                        @if (entry.steamid > 0)
+                        {
+                            <div class="square rounded shrink-0" style="background-image: url( avatar:@entry.steamid )"></div>
+                        }
+                        <span class="flex row gap-sm w-full align-center">
+                            <label class="playername bold no-shadow" style="color: @entry.color.Hex">@entry.author</label>
+                            <label class="message no-shadow">@entry.message</label>
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+    </canvas>
+</root>
+
+@code
+{
+    public record Entry(ulong steamid, string author, string message, RealTimeSince timeSinceAdded, Color color);
+
+    private TextEntry InputBox { get; set; }
+    private List<Entry> Entries = new();
+    
+    // --- Activity Tracking ---
+    private RealTimeSince timeSinceLastActivity = 0f;
+    private bool IsInactive => !Open && timeSinceLastActivity > InactiveTimeout; 
+    private const float InactiveTimeout = 15.0f; // Seconds before fading out
+
+    // --- State Properties ---
+    private bool Open => InputBox?.HasFocus ?? false;
+
+    // --- Instance & Lifecycle ---
+    public static ChatPanel Instance { get; private set; } // Make setter private
+
+    public ChatPanel()
+    {
+        Instance = this;
+        timeSinceLastActivity = 0f; // Reset activity timer on creation
+    }
+    
+    // Note: PanelComponent uses OnEnabled/OnDisabled/OnStart/OnDestroy for lifecycle
+
+    protected override int BuildHash()
+    {
+        // Include IsInactive to trigger updates when fade state changes
+        return HashCode.Combine(Open, Entries.Count, IsInactive); 
+    }
+
+    protected override void OnUpdate()
+    {
+        if (InputBox is null)
+            return;
+
+        // Original focus logic
+        if (Input.Pressed("chat"))
+        {
+            InputBox.Focus();
+            // Reset activity timer when opening chat
+            timeSinceLastActivity = 0f; 
+        }
+
+        // Original message expiry logic
+        if (Entries.RemoveAll(x => x.timeSinceAdded > 20.0f) > 0)
+        {
+            StateHasChanged();
+        }
+        // Limit message count (consider doing this in AddText)
+        // Entries = Entries.TakeLast(5).ToList(); 
+
+        // Update CSS classes based on state
+        SetClass("open", Open);
+        SetClass("inactive", IsInactive); // Add/Remove inactive class
+        
+        // Reset timer if input gets focus (even without key press)
+        if (Open)
+        {
+            timeSinceLastActivity = 0f;
+        }
+    }
+
+    // Called when text is submitted via Enter in ChatBox
+    void ChatFinished()
+    {
+        var text = InputBox.Text;
+        InputBox.Text = "";
+
+        if (string.IsNullOrWhiteSpace(text))
+            return;
+
+        // Reset activity timer when sending a message
+        timeSinceLastActivity = 0f; 
+        
+        // Call the RPC to broadcast the message
+        // Ensure AddText RPC exists and is correctly implemented
+        AddText(text); 
+    }
+
+    // RPC called by all clients to add text to their local list
+    [Rpc.Broadcast]
+    public static void AddText(string message) // Made static to be callable via RPC without instance sometimes needed
+    {
+        // Find the instance (if static RPC)
+        if (Instance == null) 
+        {
+             Log.Warning("ChatPanel.AddText (RPC) called but Instance is null.");
+             return;
+        }
+
+        message = message.Truncate(300);
+
+        if (string.IsNullOrWhiteSpace(message))
+            return;
+
+        // Get caller info (works correctly in RPC context)
+        var author = Rpc.Caller.DisplayName;
+        var steamid = Rpc.Caller.SteamId;
+
+        if (string.IsNullOrEmpty(author))
+        {
+            author = $"User_{steamid.ToString().Substring(0, 4)}"; // Fallback name
+        }
+        
+        // Need to execute the UI update part on the specific instance
+        Instance.ReceiveMessage(steamid, author, message);
+    }
+    
+    // Method on the instance to handle adding message and updating UI state
+    private void ReceiveMessage(ulong steamid, string author, string message)
+    {
+        var color = Color.White; // Default color - can customize later
+
+        // Add to list
+        Entries.Add(new(steamid, author, message, 0.0f, color));
+        
+        // Limit message count here instead of OnUpdate potentially
+        const int MaxMessages = 10; // Example limit
+        if ( Entries.Count > MaxMessages )
+        {
+             Entries.RemoveRange( 0, Entries.Count - MaxMessages );
+        }
+
+        // Reset activity timer when a message is received
+        timeSinceLastActivity = 0f; 
+
+        // Update UI
+        StateHasChanged();
+    }
+
+	internal class ChatBox : TextEntry
+	{
+		public Action OnTabPressed { get; set; }
+
+		public override void OnButtonTyped(ButtonEvent e)
+		{
+			e.StopPropagation = true;
+
+			var button = e.Button;
+
+			if (button == "tab")
+			{
+				Log.Info("Tab");
+				OnTabPressed?.Invoke();
+			}
+
+			base.OnButtonTyped(e);
+		}
+	}
+}

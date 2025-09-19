@@ -1,0 +1,174 @@
+@using ResourceFarmer.PlayerBase
+@using Sandbox;
+@using Sandbox.UI;
+@using System.Linq;
+@using System;
+@using System.Collections.Generic;
+@using ResourceFarmer.Resources;
+@using ResourceFarmer.Items; 
+@inherits PanelComponent
+@namespace ResourceFarmer.UI
+
+@* Root element for the HUD *@
+<root class="hud_root">
+
+	@* Top-Left Stats Panel *@
+	<div class="stats_panel">
+		<div class="stat_row"><label>Money:</label> <value>@MoneyValue.ToString("C0")</value></div>
+		<div class="stat_row"><label>Level:</label> <value>@LevelValue</value></div>
+		<div class="stat_row">
+			<label>EXP:</label> <value>@ExpValue.ToString("N0") / @ExpToLevelValue.ToString("N0")</value>
+			@* Optional EXP Bar - uncomment and style if desired *@
+			@* <div class="exp_bar"><div class="exp_fill" style="width: @(ExpValue / ExpToLevelValue * 100.0)%;"></div></div> *@
+		</div>
+		<div class="stat_row"><label>Prestige:</label> <value>@PrestigeValue</value></div>
+	</div>
+
+	@* Top-Center Resources Panel *@
+	<div class="resources_panel">
+		<div class="resource_grid">
+			@if (_resourceCache?.Any() == true)
+			{
+				@foreach (var resource in _resourceCache.OrderBy(kvp => kvp.Key.ToString()))
+				{
+					<div class="resource_item">
+						@* Optional: Add Icon based on resource.Key *@
+						<span class="res_name">@resource.Key:</span>
+						<span class="res_value">@resource.Value.ToString("F1")</span>
+					</div>
+				}
+			}
+			else
+			{
+				<div class="resource_item empty">Inventory Empty</div>
+			}
+		</div>
+	</div>
+
+	@* Bottom-Right Equipped Tool Panel *@
+	<div class="tool_panel @GetToolStyleClass()">
+		@if (LocalPlayer?.EquippedTool != null)
+		{
+			var tool = LocalPlayer.EquippedTool;
+			<div class="tool_header">@tool.Material @tool.ToolType</div>
+			<div class="tool_info_grid">
+				<div class="tool_stat"><label>Level:</label> <value>@tool.Level</value></div>
+				<div class="tool_stat"><label>Quality:</label> <value>@tool.Quality.ToString("P0")</value></div>
+				@* Add more base stats if needed *@
+			</div>
+
+			@if (tool.AppliedBonuses?.Any() == true)
+			{
+				<div class="tool_bonuses">
+					<div class="bonus_header">Enhancements:</div>
+					@foreach(var bonusInstance in tool.AppliedBonuses.OrderBy(b => b.Name.ToString()))
+					{
+						var tier = bonusInstance.GetPowerTier(); // Assumes this extension method exists
+						var tierClass = $"tier-{tier.ToString().ToLowerInvariant().Replace("_","-")}";
+						<div class="bonus_item @tierClass">
+							<label class="bonus_item @tierClass">
+								@bonusInstance.GetFormattedDisplayName()
+							</label>
+							@* Assumes this extension method exists *@
+						</div>
+					}
+				</div>
+			}
+		}
+		else
+		{
+			<div class="no_tool">No Tool Equipped</div>
+		}
+	</div>
+
+</root>
+
+@code
+{
+	// --- C# Code-behind ---
+	public Player LocalPlayer { get; set; }
+
+	// --- Bound Properties ---
+	public float MoneyValue => LocalPlayer?.Money ?? 0;
+	public int LevelValue => LocalPlayer?.Level ?? 1;
+	public double ExpValue => LocalPlayer?.Experience ?? 0;
+	public float ExpToLevelValue => LocalPlayer?.ExperienceToNextLevel ?? 100f;
+	public int PrestigeValue => LocalPlayer?.PrestigePoints ?? 0;
+	private IDictionary<ResourceType, float> _resourceCache = new Dictionary<ResourceType, float>();
+
+	// --- Lifecycle & Logic ---
+	protected override void OnStart()
+	{
+		base.OnStart();
+		FindLocalPlayer();
+		UpdateInventoryCache();
+		// TODO: Subscribe to Player Inventory Changed events for efficiency
+	}
+
+	protected override void OnUpdate()
+	{
+		base.OnUpdate();
+		if (LocalPlayer == null || !LocalPlayer.IsValid)
+		{
+			FindLocalPlayer();
+		}
+		// TODO: Remove this polling if event system is implemented
+		UpdateInventoryCache();
+
+		StateHasChanged(); // Updates bound properties like Money, Level, Tool etc.
+	}
+
+	void FindLocalPlayer()
+	{
+		LocalPlayer = Game.ActiveScene?.GetAllComponents<Player>()
+			.FirstOrDefault(p => p.IsValid && p.Network.IsOwner);
+	}
+
+	// Helper to update local cache (replace with event later)
+	private bool InventoryNeedsUpdate()
+	{
+		if (LocalPlayer == null) return _resourceCache.Any(); // Clear if player lost
+		if (_resourceCache.Count != LocalPlayer.Inventory.Count) return true;
+		return _resourceCache.Any(kv => !LocalPlayer.Inventory.ContainsKey(kv.Key) || !LocalPlayer.Inventory[kv.Key].Equals(kv.Value));
+	}
+
+	private void UpdateInventoryCache()
+	{
+		if (InventoryNeedsUpdate())
+		{
+			_resourceCache = (LocalPlayer != null)
+				? new Dictionary<ResourceType, float>(LocalPlayer.Inventory)
+				: new Dictionary<ResourceType, float>();
+			StateHasChanged();
+		}
+	}
+
+	// --- Dynamic Class for Tool Panel ---
+	string GetToolStyleClass()
+	{
+		var tool = LocalPlayer?.EquippedTool;
+		if (tool == null) return "";
+		var materialClass = $"tool-material-{tool.Material?.ToLowerInvariant().Replace(" ", "-") ?? "unknown"}";
+		var typeClass = $"tool-type-{tool.ToolType.ToString().ToLowerInvariant()}";
+		return $"{materialClass} {typeClass}";
+	}
+
+	// --- BuildHash (Important for updates) ---
+	protected override int BuildHash()
+	{
+		if (!Network.IsOwner || LocalPlayer == null || !LocalPlayer.IsValid) return 0;
+		var hash = new HashCode();
+		// --- Add ALL data that affects the UI ---
+		// Stats
+		hash.Add(MoneyValue); hash.Add(LevelValue); hash.Add(ExpValue); hash.Add(ExpToLevelValue); hash.Add(PrestigeValue);
+		// Inventory (cache)
+		if (_resourceCache != null) { hash.Add(_resourceCache.Count); foreach (var kvp in _resourceCache.OrderBy(x => x.Key)) { hash.Add(kvp.Key); hash.Add(kvp.Value); } } else { hash.Add(0); }
+		// Tool
+		var tool = LocalPlayer.EquippedTool;
+		hash.Add(tool?.ToolType ?? ResourceType.None); hash.Add(tool?.Material ?? string.Empty); hash.Add(tool?.Level ?? 0); hash.Add(tool?.Quality ?? 0f);
+		// Bonuses (Crucial: Hash name AND value)
+		if (tool?.AppliedBonuses != null) { hash.Add(tool.AppliedBonuses.Count); foreach (var bonus in tool.AppliedBonuses.OrderBy(b => b.Name).ThenBy(b => b.ActualMagnitude)) { hash.Add(bonus.Name); hash.Add(bonus.ActualMagnitude); } } else { hash.Add(0); }
+
+		return hash.ToHashCode();
+	}
+}

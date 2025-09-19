@@ -1,0 +1,175 @@
+@* File: resource_farmer/Code/UI/Crafting/RecipeItem.razor *@
+@using Sandbox.UI;
+@using Sandbox;
+@using System.Linq;
+@using System;
+@using ResourceFarmer.Crafting;
+@using ResourceFarmer.Items;
+@using ResourceFarmer.PlayerBase;
+@using ResourceFarmer.Resources;
+
+@inherits Panel
+<root>
+	<div class="recipe-item @(CanCraftRecipe() ? "" : "recipe-item--cannot-craft")">
+		<div class="details">
+			<div class="name">@Recipe?.ToolType</div>
+
+			@* Requirements Section *@
+			<div class="reqs">
+				@* Profession Level Req *@
+				@if (Recipe.RequiredProfessionLevel > 0 && Recipe.ToolType != null)
+				{
+					<span class="req-tag req-tag--prof @(HasRequiredProfessionLevel() ? "req-tag--met" : "req-tag--not-met")">
+						Profession-Level required: @Recipe.RequiredProfessionLevel 
+					</span>
+
+
+				}
+				@* Resource Costs *@
+				@if (Recipe.Costs?.Any() == true)
+				{
+					@foreach (var cost in Recipe.Costs)
+					{
+						if (cost.Key == null) continue; @* Safety check *@
+						<span class="req-tag @(PlayerHasResource(cost.Key, cost.Value) ? "req-tag--met" : "req-tag--not-met")">
+							@cost.Value.ToString("0.#") @cost.Key
+						</span>
+					}
+				}
+
+				@if (Recipe.CanHaveBonuses)
+				{
+					<span class="req-tag">
+						Max: <p>@Recipe.MaxBonuses</p>
+						Min: <p>@Recipe.MinBonuses</p>
+					</span>
+				}
+
+				// We want to create a onhover method to show stats to the craft
+				// and show the bonus type
+				@* Bonus Requirements *@
+
+
+				@* Add other requirements if needed (e.g., required workbench) *@
+			</div>
+
+
+		</div>
+
+		<div class="button-container">
+			<button class="button button--craft @(CanCraftRecipe() ? "" : "disabled")" @onclick=@RequestCraft>
+				Craft
+			</button>
+		</div>
+		<div class="recipe-tooltip">
+			@* Header: Item Name & Level *@
+			<div class="tooltip-header">
+				<label class="item-name">@Recipe.ToolType</label>
+				<label class="item-level">Lvl @Recipe.Level</label>
+			</div>
+
+			@* Separator *@
+			<div class="separator"></div>
+
+			@* Properties/Stats Section *@
+			<div class="tooltip-section">
+				<label class="section-title">Properties</label>
+				<div class="property-list">
+					<div class="property-item">
+						<label class="prop-name">Material:</label>
+						<label class="prop-value">@Recipe.Material</label>
+					</div>
+					<div class="property-item">
+						<label class="prop-name">Quality:</label>
+						<label class="prop-value">@(Recipe.OutputQuality.ToString("P0"))</label>
+					</div>
+					@* Add other key stats from Recipe if they exist *@
+				</div>
+			</div>
+
+			@* Possible Bonuses Section *@
+			@if(Recipe.CanHaveBonuses)
+			{
+				<div class="separator"></div>
+            <div class="tooltip-section">
+                <label class="section-title">Possible Bonuses (@Recipe.MinBonuses-@Recipe.MaxBonuses)</label>
+                @if (Recipe.PossibleBonuses.Any()) {
+						Log.Info("abc");
+
+                     <div class="bonus-list">
+                        @foreach(var bonusDef in Recipe.PossibleBonuses.Take(5)) @* Limit displayed bonuses for space *@
+                        {
+                            <label class="bonus-name">@bonusDef</label>
+                        }
+
+                        @if(Recipe.PossibleBonuses.Count > 5) {
+                            <label class="bonus-more">... and more</label>
+                        }
+                     </div>
+                } else {
+                     <label class="info-text-small">Standard Bonus Pool</label>
+                }
+            </div>
+        }
+    </div>
+    @* --- End Tooltip --- *@
+	</div>
+</root>
+@code {
+	[Property] public CraftingRecipeResource Recipe { get; set; } = null!;
+	[Parameter] public Player Player { get; set; } = null!;
+
+
+	// --- Helper Methods ---
+
+	private bool PlayerHasResource(ResourceType type, float amount)
+	{
+		if (Player == null || type == null) return false;
+		return Player.Inventory?.TryGetValue(type, out var currentAmount) == true && currentAmount >= amount;
+	}
+
+	private bool HasRequiredProfessionLevel()
+	{
+		if (Player == null || Recipe == null || Recipe.ToolType == null || Recipe.RequiredProfessionLevel <= 0) return true; // No requirement or invalid data
+		return Player.GetProfessionLevel(Recipe.ToolType) >= Recipe.RequiredProfessionLevel;
+	}
+
+	private bool CheckOtherRequirements()
+	{
+		// Add checks for workbench, etc. if Recipe resource has those fields
+		// e.g., return Player.IsNearWorkbench(Recipe.RequiredWorkbench);
+		return true;
+	}
+
+	private bool CanCraftRecipe()
+	{
+		if (Player == null || Recipe == null) return false;
+
+		// Check profession level
+		if (!HasRequiredProfessionLevel()) return false;
+
+		// Check other requirements (like workbench)
+		if (!CheckOtherRequirements()) return false;
+
+		// Check resource costs
+		if (Recipe.Costs != null)
+		{
+			foreach (var cost in Recipe.Costs)
+			{
+				if (cost.Key == null) return false; // Invalid cost entry
+				if (!PlayerHasResource(cost.Key, cost.Value)) return false;
+			}
+		}
+		return true;
+	}
+
+
+	// --- Event Handlers ---
+
+	private void RequestCraft()
+	{
+		if (Player == null || Recipe == null || !CanCraftRecipe()) return;
+		Log.Info($"[RecipeItem:{Recipe.ToolType}] Craft Requested");
+		Player.RequestCraftItem(Recipe); // Call the RPC on the Player component
+	}
+}

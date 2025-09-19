@@ -1,0 +1,158 @@
+@* File: resource_farmer/Code/UI/Crafting/ModifyPanel.razor *@
+@using Sandbox.UI;
+@using Sandbox.UI.Construct;
+@using System.Collections.Generic;
+@using System.Linq;
+@using ResourceFarmer.PlayerBase;
+@using ResourceFarmer.Items;
+@using ResourceFarmer.Resources;
+@using ResourceFarmer.Crafting;
+
+@inherits Panel // Inherit from Panel, it's hosted by CraftingRootPanel
+<root>
+	<div class="modify-panel">
+		<label class="section-header">Modify Equipped Item</label>
+
+		@if (EquippedTool != null && Player != null)
+		{
+			<div class="tool-info">
+				<div class="name">Material:  @(EquippedTool.ToolType)</div>
+				<div class="stats">
+					<span>Level: <value>@EquippedTool.Level</value></span>
+					<span>Quality: <value>@(EquippedTool.Quality.ToString("P0"))</value></span>
+					@* Add other stats like Damage, Speed if ToolBase has them *@
+				</div>
+				@if (EquippedTool.AppliedBonuses?.Any() == true)
+				{
+					<div class="bonuses">
+						@foreach (var bonus in EquippedTool.AppliedBonuses)
+						{
+							<span class="bonus-tag @("bonus-tag" + @GetBonusTierClass(bonus))">@bonus.GetFormattedDisplayName()</span>
+						}
+					</div>
+				}
+				else
+				{
+					<div class="info-text">No Bonuses Applied</div>
+				}
+			</div>
+
+			<div class="upgrade-info">
+				@if (CanShowUpgradeInfo())
+				{
+					<label class="costs-label">Upgrade Cost:</label>
+					@if (UpgradeCosts?.Any() == true)
+					{
+						<div class="costs-list">
+							@foreach (var cost in UpgradeCosts)
+							{
+								<span class="cost-item @(PlayerHasResource(cost.Key, cost.Value) ? "cost-item--met" : "cost-item--not-met")">
+									@cost.Value.ToString("0.#") @cost.Key?
+								</span>
+							}
+						</div>
+						<button class="button button--special button--craft @(CanAffordUpgrade() ? "" : "disabled")" @onclick=@RequestUpgrade>
+							Upgrade Item
+						</button>
+					}
+					else
+					{
+						@* Check if it's max level based on ToolBase logic if available *@
+						<div class="info-text">Cannot be upgraded further</div>
+					}
+				}
+				@* Placeholder for future buttons *@
+				@*
+            <button class="button button--secondary button--craft disabled">Add Bonus (NYI)</button>
+            <button class="button button--secondary button--craft disabled">Remove Bonus (NYI)</button>
+            *@
+			</div>
+		}
+		else
+		{
+			<div class="info-text">No tool equipped</div>
+		}
+	</div>
+</root>
+@code {
+	[Parameter] public ToolBase? EquippedTool { get; set; }
+	[Parameter] public Player? Player { get; set; }
+
+	public Dictionary<ResourceType, float>? UpgradeCosts { get; set; }
+
+	/// <summary>
+	/// Recalculate state when parameters change (e.g., tool equipped/unequipped).
+	/// </summary>
+	protected override void OnParametersSet()
+	{
+		base.OnParametersSet();
+		CalculateUpgradeCosts();
+	}
+
+	/// <summary>
+	/// Fetches the upgrade costs for the current tool from the Player.
+	/// </summary>
+	private void CalculateUpgradeCosts()
+	{
+		if (Player != null && EquippedTool != null)
+		{
+			UpgradeCosts = Player.GetCurrentToolUpgradeCost();
+		}
+		else
+		{
+			UpgradeCosts = null;
+		}
+		// Log.Info( $"ModifyPanel: UpgradeCosts calculated: {UpgradeCosts?.Count ?? 0} items" );
+		StateHasChanged(); // Ensure UI updates if costs change
+	}
+
+
+	// --- Helper Methods ---
+
+	private bool CanShowUpgradeInfo()
+	{
+		// Add logic if needed, e.g., check if tool is max level already
+		return EquippedTool != null;
+	}
+
+	private bool CanAffordUpgrade()
+	{
+		return Player?.CanAffordUpgrade() ?? false;
+	}
+
+	private bool PlayerHasResource(ResourceType type, float amount)
+	{
+		if (type == ResourceType.None) return false;
+		return Player?.Inventory?.TryGetValue(type, out var currentAmount) == true && currentAmount >= amount;
+	}
+
+	private string GetBonusTierClass(AppliedBonusInstance bonus)
+	{
+		// Use the extension method from ToolBonusExtensions.cs
+		var tier = bonus.GetPowerTier(); // Assumes GetPowerTier() exists
+		return tier switch
+		{
+			BonusTier.Positive_High => "bonus-tag--positive-high",
+			BonusTier.Positive_Medium => "bonus-tag--positive-medium",
+			BonusTier.Positive_Low => "bonus-tag--positive-low",
+			BonusTier.Negative_High => "bonus-tag--negative-high",
+			BonusTier.Negative_Medium => "bonus-tag--negative-medium",
+			BonusTier.Negative_Low => "bonus-tag--negative-low",
+			_ => "bonus-tag--neutral",
+		};
+	}
+
+
+	// --- Event Handlers ---
+
+	private void RequestUpgrade()
+	{
+		if (Player == null || EquippedTool == null) return;
+		Log.Info("[ModifyPanel] Upgrade Requested");
+		Player.RequestUpgradeEquippedTool();
+		// Optional: Add optimistic UI update or feedback
+		CalculateUpgradeCosts(); // Recalculate costs immediately after request
+	}
+
+
+}

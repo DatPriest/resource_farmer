@@ -1,0 +1,46 @@
+// File: resource_farmer/Code/UI/ResourceNodes/ResourceNodePanel.razor.scss (Refactored)
+@import "../Styles/Theme.scss"; // Import the main theme file
+    // Using a more specific name based on the file
+    .resource-node-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        // Apply base panel styling using theme variables
+        background-color: $background-transparent-dark; // Use theme variable
+        padding: $padding-medium $padding-base; // Adjusted padding using theme variables
+        border-radius: $border-radius-slight; // Use theme variable
+        border: $border-width-base solid rgba($accent-blue, 0.8); // Use theme variables (bright border)
+        box-shadow: 0 0 12px rgba($shadow-color, 0.5); // Use theme variables (glow)
+
+        font-family: $font-family-main; // Use theme variable
+        color: $text-primary; // Use theme variable
+        min-width: 140px;
+        text-align: center;
+        overflow: hidden;
+        // --- Resource Type Styling (Header/Title) ---
+        .resource-type {
+            font-size: $font-size-large; // Use theme variable
+            font-weight: $font-weight-medium; // Use theme variable
+            margin-bottom: $margin-tiny; // Use theme variable
+            text-transform: uppercase; // from Text.scss
+            letter-spacing: 1.5px; // Keep specific style
+            color: #ffffff; // Keep white for high contrast
+            text-shadow: 0 0 5px rgba($shadow-color, 0.8); // Use theme variable
+        }
+        // --- Resource Amount Styling (Main Data) ---
+        .resource-amount {
+            font-size: $font-size-xl; // Use theme variable
+            font-weight: $font-weight-semibold; // Use theme variable
+            color: $accent-blue-light; // Use theme variable
+            text-shadow: 0 0 10px rgba($shadow-color, 0.9); // Use theme variable
+        }
+        // --- Difficulty Text ---
+        .resource-difficulty {
+            font-size: $font-size-small; // Use theme variable
+            font-weight: $font-weight-normal; // Use theme variable
+            color: $text-secondary; // Use theme variable
+            margin-top: $margin-tiny; // Use theme variable
+            text-shadow: 0 0 5px rgba($shadow-color, 0.5); // Use theme variable
+        }
+    }

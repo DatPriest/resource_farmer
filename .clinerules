@@ -1,0 +1,216 @@
+# Cline AI Instructions - Resource Farmer (S&box Game)
+
+## Project Overview
+
+Resource Farmer is a S&box multiplayer sandbox game. Key directories: Code/ (C# game logic), Assets/ (prefabs/recipes), scenes/ (game scenes). Uses S&box component system, not Unity.
+
+## Terminal & File Operations
+
+### Build & Run Commands
+
+```powershell
+# S&box uses .sbproj files, not traditional .csproj builds
+# Build/run handled through S&box Editor, not CLI
+
+# Check project structure
+Get-ChildItem -Recurse -Include "*.cs", "*.recipe", "*.prefab" | Select-Object FullName
+
+# Find specific resource types
+Select-String -Path "Code\Resources\ResourceType.cs" -Pattern "enum ResourceType" -Context 5,10
+
+# Search for component usage
+Select-String -Path "Code\**\*.cs" -Pattern "Components\.Get|Components\.GetOrCreate" -Include "*.cs"
+```
+
+### File Structure Commands
+
+```powershell
+# List all recipe files
+Get-ChildItem -Path "Assets\Crafting\" -Filter "*.recipe"
+
+# Find UI components
+Get-ChildItem -Path "Code\UI\" -Include "*.razor", "*.razor.scss" -Recurse
+
+# Locate player components
+Get-ChildItem -Path "Code\Player\" -Filter "*.cs"
+
+# Check asset compilation
+Get-ChildItem -Path "Assets\" -Filter "*_c" -Recurse
+```
+
+## S&box Development Context
+
+### Component Architecture (NOT Unity)
+
+- Inherit from `Component` class
+- Use `[Property]` for editor fields, `[Sync]` for network replication
+- Access components: `Components.Get<T>()` or `Components.GetOrCreate<T>()`
+- Lifecycle: OnStart(), OnUpdate(), OnDestroy()
+
+### Key File Patterns
+
+- **Code/**: C# game logic
+- **Assets/**: GameResource files (.recipe, .prefab, .scene)
+- **scenes/minimal.scene**: Startup scene
+- **.sbproj**: S&box project config (not .csproj)
+
+### Network Architecture
+
+- `[Sync]` properties auto-replicate across clients
+- `Networking.IsHost` = server authority
+- `IsProxy` = client-side instance
+- Server handles spawning/persistence, clients handle UI
+
+## File Management Workflows
+
+### Adding New Resources
+
+1. **Edit Code/Resources/ResourceType.cs** - Add enum entry
+2. **Create Assets/Prefabs/** - ResourceNode prefab with component
+3. **Update ResourceSpawner** - Add to ResourcePrefabs list
+4. **Create Assets/Crafting/\*.recipe** - Define crafting recipes
+
+### Creating Player Components
+
+1. **Create Code/Player/PlayerXComponent.cs** - New component class
+2. **Edit Code/Player/Player.cs** - Add component in OnStart()
+3. **Set OwnerPlayer reference** - Component needs player context
+4. **Add [Sync] properties** - For network replication
+
+### UI Development
+
+1. **Create Code/UI/ComponentName.razor** - Razor component
+2. **Create Code/UI/ComponentName.razor.scss** - Styling
+3. **Update Code/UI/UIManager.cs** - Add input handling
+4. **Use Component.Create<T>()** - For dynamic instantiation
+
+## Critical File Operations
+
+### Resource System Files
+
+- `Code/Resources/ResourceType.cs` - Central resource registry
+- `Code/Resources/ResourceNode.cs` - Gatherable object implementation
+- `Code/Resources/ResourceSpawner.cs` - Procedural placement logic
+- `Assets/Crafting/*.recipe` - Crafting recipe definitions
+
+### Player System Files
+
+- `Code/Player/Player.cs` - Main player controller
+- `Code/Player/PlayerInteractionComponent.cs` - Object interaction
+- `Code/Player/PlayerGatheringComponent.cs` - Resource collection
+- `Code/Player/PlayerToolComponent.cs` - Equipment management
+
+### Crafting System Files
+
+- `Code/Crafting/CraftingRecipeResource.cs` - Recipe data structure
+- `Code/Crafting/RecipeManager.cs` - Recipe loading singleton
+- `Code/Items/ToolBase.cs` - Tool system with bonuses
+
+## Terminal Debugging Commands
+
+### Log Searching
+
+```powershell
+# Find S&box log patterns
+Select-String -Path "Code\**\*.cs" -Pattern "Log\.(Info|Warning|Error)" -Include "*.cs"
+
+# Search for networking issues
+Select-String -Path "Code\**\*.cs" -Pattern "IsProxy|Networking\.IsHost|\[Sync\]" -Include "*.cs"
+
+# Find component initialization
+Select-String -Path "Code\**\*.cs" -Pattern "OnStart|GetOrCreate|OwnerPlayer" -Include "*.cs"
+```
+
+### Asset Validation
+
+```powershell
+# Check for missing recipe files
+$recipeRefs = Select-String -Path "Code\**\*.cs" -Pattern "CraftingRecipeResource" -Include "*.cs"
+$recipeFiles = Get-ChildItem -Path "Assets\Crafting\" -Filter "*.recipe"
+# Compare references vs files
+
+# Validate ResourceType usage
+$resourceTypes = Select-String -Path "Code\Resources\ResourceType.cs" -Pattern "^\s*\w+,"
+$resourceUsage = Select-String -Path "Code\**\*.cs" -Pattern "ResourceType\.\w+" -Include "*.cs"
+```
+
+## Common File Patterns to Avoid
+
+### Incorrect Asset Loading
+
+```csharp
+// ❌ Wrong: Don't use file I/O for GameResources
+var json = File.ReadAllText("Assets/Crafting/recipe.json");
+
+// ✅ Correct: Use ResourceLibrary
+var recipes = ResourceLibrary.GetAll<CraftingRecipeResource>();
+```
+
+### Missing Network Checks
+
+```csharp
+// ❌ Wrong: Missing proxy check
+SpawnResources(); // Runs on all clients
+
+// ✅ Correct: Server-only logic
+if (Networking.IsHost) SpawnResources();
+```
+
+## File Template Commands
+
+### Create New Component
+
+```powershell
+# Template for new player component
+@"
+using ResourceFarmer.PlayerBase;
+
+namespace ResourceFarmer.PlayerBase
+{
+    public class PlayerNewComponent : Component
+    {
+        public Player OwnerPlayer { get; set; }
+
+        protected override void OnStart()
+        {
+            if (OwnerPlayer == null)
+            {
+                Log.Warning("OwnerPlayer not set on PlayerNewComponent");
+                return;
+            }
+        }
+    }
+}
+"@ | Out-File -FilePath "Code\Player\PlayerNewComponent.cs" -Encoding UTF8
+```
+
+### Create New Resource Type
+
+```powershell
+# Add to ResourceType.cs (manual edit required)
+# Then create spawnable prefab and update ResourceSpawner
+```
+
+## S&box Specific Operations
+
+- **No traditional build commands** - S&box Editor handles compilation
+- **Scene loading** - scenes/minimal.scene is startup scene
+- **Asset compilation** - .recipe_c, .prefab_c are compiled versions
+- **Networking** - Built-in multiplayer with [Sync] attributes
+- **External deps** - sturnus.terraingenerationtool for terrain
+
+## Quick File Checks
+
+```powershell
+# Verify key files exist
+Test-Path "Code\Resources\ResourceType.cs"
+Test-Path "Code\Player\Player.cs"
+Test-Path "scenes\minimal.scene"
+Test-Path "resource_farmer.sbproj"
+
+# Count components by type
+(Select-String -Path "Code\**\*.cs" -Pattern ": Component" -Include "*.cs").Count
+(Select-String -Path "Code\**\*.cs" -Pattern "\[Sync\]" -Include "*.cs").Count
+```
+
+Remember: S&box uses Component-based architecture with built-in networking. Focus on component composition, network replication with [Sync], and server/client logic separation with IsProxy checks.

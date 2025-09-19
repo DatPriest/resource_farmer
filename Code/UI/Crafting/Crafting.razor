@@ -1,0 +1,206 @@
+@* File: Code/UI/Crafting.razor (Complete Code) *@
+@using ResourceFarmer.Crafting
+@using ResourceFarmer.Resources
+@using ResourceFarmer.Items
+@using ResourceFarmer.PlayerBase
+
+@inherits PanelComponent
+
+<root class="crafting-panel">
+	@* Root element with base block class *@
+
+	@* Header Section *@
+	<div class="header">
+		@* Simple element class name *@
+		<label class="title">Crafting & Modification</label>
+		<button class="button close-button" @onclick=@ClosePanel>X</button>
+	</div>
+
+	@* Main Content Area *@
+	<div class="content">
+		@* Simple element class name *@
+
+		@* Modify Equipped Item Section *@
+		<div class="modify-section">
+			@* Block class reused *@
+			<label class="section-header">Modify Equipped Item</label> @* Reusable class *@
+
+			@if (EquippedTool != null)
+			{
+				<div class="tool-info">
+					@* Simple element class name (within .modify-section) *@
+					<div class="name">@(EquippedTool.Material) @(EquippedTool.ToolType)</div>
+					<div class="stats">
+						<span>Level: @EquippedTool.Level</span>
+						<span>Quality: @(EquippedTool.Quality.ToString("P0"))</span>
+						@* Add other relevant base stats here if needed *@
+					</div>
+					@if (EquippedTool.AppliedBonuses?.Any() == true)
+					{
+						<div class="bonuses">
+							@foreach (var bonus in EquippedTool.AppliedBonuses)
+							{
+								<span class="bonus-tag @GetBonusTierClass(bonus)">@bonus.GetFormattedDisplayName()</span>
+							}
+						</div>
+					}
+					else
+					{
+						<div class="info-text">No Bonuses</div> @* Reusable class *@
+					}
+				</div>
+
+				<div class="upgrade-info">
+					@* Simple element class name (within .modify-section) *@
+					@if (CanShowUpgradeInfo())
+					{
+						<label class="costs-label">Upgrade Cost:</label>
+						@if (UpgradeCosts?.Any() == true)
+						{
+							<div class="costs-list">
+								@foreach (var cost in UpgradeCosts)
+								{
+									<span class="cost-item @(PlayerHasResource(cost.Key, cost.Value) ? "cost-item--met" : "cost-item--not-met")">
+										@cost.Value.ToString("0.#") @cost.Key
+									</span>
+								}
+							</div>
+							@* Apply multiple classes: base 'button', modifier '--special', modifier '--craft', conditional 'disabled' *@
+							<button class="button button--special button--craft @(CanAffordUpgrade() ? "" : "disabled")" @onclick=@RequestUpgrade>
+								Upgrade Item
+							</button>
+						}
+						else
+						{
+							<div class="info-text">Cannot be upgraded further</div> @* Reusable class *@
+						}
+					}
+					@* Future: Add Reforge/Remove Bonus buttons here *@
+				</div>
+			}
+			else
+			{
+				<div class="info-text">No tool equipped</div> @* Reusable class *@
+			}
+		</div>
+
+		@* Crafting List Section *@
+		<div class="crafting-section">
+			@* Block class reused *@
+			<label class="section-header">Available Recipes</label> @* Reusable class *@
+
+			<div class="list-container">
+				@* Simple element class name (within .crafting-section) *@
+				@if (GroupedRecipes != null && GroupedRecipes.Any())
+				{
+					@foreach (var group in GroupedRecipes)
+					{
+						<label class="category-header">@group.Key</label> @* Simple element class name (within .list-container) *@
+						@foreach (var recipe in group.Value)
+						{
+							@* Log statement can be kept for debugging if needed *@
+							@* Log.Info($"Rendering recipe: {recipe?.Name ?? "NULL RECIPE"}"); *@
+							bool canCraft = CanCraftRecipe(recipe);
+							<div class="recipe-item @(canCraft ? "" : "recipe-item--cannot-craft")">
+								@* Base class + modifier *@
+								@* Restored Internal Content *@
+								<div class="details">
+									@* Simple element class name (within .recipe-item) *@
+									<div class="name">@recipe.Name</div> @* Simple element class name *@
+									<div class="reqs">
+										@* Simple element class name *@
+										@* Profession Level Req *@
+										@if (recipe.RequiredProfessionLevel > 0)
+										{
+											<span class="req-tag req-tag--prof @(HasRequiredProfessionLevel(recipe) ? "req-tag--met" : "req-tag--not-met")">
+												Lvl @recipe.RequiredProfessionLevel @recipe.ToolType Prof.
+											</span>
+										}
+										@* Resource Costs *@
+										@if (recipe.Costs?.Any() == true)
+										{
+											@foreach (var cost in recipe.Costs)
+											{
+												<span class="req-tag @(PlayerHasResource(cost.Key, cost.Value) ? "req-tag--met" : "req-tag--not-met")">
+													@cost.Value.ToString("0.#") @cost.Key
+												</span>
+											}
+										}
+									</div>
+								</div>
+								<div class="button-container">
+									@* Simple element class name *@
+									<button class="button button--craft @(canCraft ? "" : "disabled")" @onclick=@(() => RequestCraft(recipe))>
+										Craft
+									</button>
+								</div>
+							</div>
+						}
+					}
+				}
+				else
+				{
+					<div class="info-text">No recipes available</div> @* Reusable class *@
+				}
+			</div>
+		</div>
+	</div>
+</root>
+
+@code {
+	// --- C# Code (Assumed unchanged from previous versions) ---
+	public Player? LocalPlayer => Game.ActiveScene?.Components.Get<Player>(FindMode.EverythingInDescendants);
+	public ToolBase? EquippedTool => LocalPlayer?.EquippedTool;
+	public UIManager UIManager => GameObject.GetComponent<UIManager>();
+	public List<CraftingRecipeResource>? AllRecipes => RecipeManager.Instance?.Recipes.ToList();
+	public Dictionary<string, List<CraftingRecipeResource>>? GroupedRecipes { get; set; }
+	public Dictionary<ResourceType, float>? UpgradeCosts { get; set; }
+
+	protected override void OnUpdate()
+	{
+		base.OnUpdate();
+		if (LocalPlayer == null || AllRecipes == null) return;
+		GroupedRecipes = AllRecipes
+			.OrderBy(r => r.Category ?? "Misc")
+			.ThenBy(r => r.RequiredProfessionLevel)
+			.ThenBy(r => r.Level)
+			.GroupBy(r => r.Category ?? "Misc")
+			.ToDictionary(g => g.Key, g => g.ToList());
+		UpgradeCosts = LocalPlayer.GetCurrentToolUpgradeCost();
+		StateHasChanged();
+	}
+
+	private bool CanShowUpgradeInfo() => EquippedTool != null;
+	private bool CanAffordUpgrade() => LocalPlayer?.CanAffordUpgrade() ?? false;
+	private bool PlayerHasResource(ResourceType type, float amount) => LocalPlayer?.Inventory?.TryGetValue(type, out var currentAmount) == true && currentAmount >= amount;
+	private bool HasRequiredProfessionLevel(CraftingRecipeResource recipe) => (LocalPlayer?.GetProfessionLevel(recipe.ToolType) ?? 0) >= recipe.RequiredProfessionLevel;
+
+	private bool CanCraftRecipe(CraftingRecipeResource recipe)
+	{
+		if (!HasRequiredProfessionLevel(recipe)) return false;
+		if (recipe.Costs != null)
+		{
+			foreach (var cost in recipe.Costs) { if (!PlayerHasResource(cost.Key, cost.Value)) return false; }
+		}
+		return true;
+	}
+
+	private string GetBonusTierClass(AppliedBonusInstance bonus)
+	{
+		var tier = bonus.GetPowerTier();
+		return tier switch
+		{
+			BonusTier.Positive_High => "bonus-tag--positive-high",
+			BonusTier.Positive_Medium => "bonus-tag--positive-medium",
+			BonusTier.Positive_Low => "bonus-tag--positive-low",
+			BonusTier.Negative_High => "bonus-tag--negative-high",
+			BonusTier.Negative_Medium => "bonus-tag--negative-medium",
+			BonusTier.Negative_Low => "bonus-tag--negative-low",
+			_ => "bonus-tag--neutral",
+		};
+	}
+
+	private void RequestUpgrade() { LocalPlayer?.RequestUpgradeEquippedTool(); }
+	private void RequestCraft(CraftingRecipeResource recipe) { LocalPlayer?.RequestCraftItem(recipe); }
+	private void ClosePanel() { UIManager?.NotifyPanelClosed(this); } // Assuming UIManager singleton or similar access
+}

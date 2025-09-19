@@ -1,0 +1,30 @@
+﻿@import "Buttons.scss";
+// --- Main Theme File ---
+// Imports all other SCSS partials
+
+@import "Colors.scss";
+@import "Layout.scss";
+@import "Text.scss";
+@import "Containers.scss";
+@import "Buttons.scss";
+@import "Controls.scss";
+@import "Hud.scss";
+@import "MenuSystem.scss";
+
+// Import optional components if they exist and are used
+// @import "DamageIndicator.scss";
+// @import "Hints.scss";
+// @import "InputHints.scss";
+// @import "MarkerSystem.scss";
+
+// Apply any truly global styles here if needed,
+// but most styling should be within the partials
+// or applied to specific root panels in your UI structure.
+
+// Example: Ensure root panel fills screen (adjust selector if needed)
+.rootpanel,
+RootPanel {
+  width: 100%;
+  height: 100%;
+  position: absolute; // Or relative, depending on context
+}

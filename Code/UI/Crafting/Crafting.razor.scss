@@ -1,0 +1,588 @@
+// File: Code/UI/Crafting.razor.scss (Final Attempt with align-items: stretch)
+@import "/UI/Styles/Theme.scss";
+
+// --- Base Panel Style ---
+.crafting-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75vw;
+    height: 75vh;
+    max-width: 1100px;
+    max-height: 800px;
+    display: flex;
+    flex-direction: column;
+    background-color: $background-transparent-medium;
+    border: $border-width-base solid $border-color;
+    border-radius: $border-radius-medium;
+    padding: $padding-base;
+    box-shadow: 0 0 10px 2px rgba($shadow-color, 0.7);
+    backdrop-filter: blur($backdrop-blur-strength);
+    color: $text-primary;
+    font-family: $font-family-main;
+    font-size: $font-size-base;
+    pointer-events: all;
+    z-index: 100;
+    overflow: hidden;
+    transition: all 0.3s ease-out;
+    opacity: 1;
+
+    &:intro {
+        transform: translate(-50%, -50%) scale(0.9) translateY(10px);
+        opacity: 0;
+    }
+
+    &:outro {
+        transform: translate(-50%, -50%) scale(1.05) translateY(-5px);
+        opacity: 0;
+    }
+    // --- Header ---
+    .header {
+        padding: $padding-medium 0;
+        margin-bottom: $margin-base;
+        border-bottom: $border-width-base solid $border-color;
+        background-color: rgba($primary-light, 0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+        margin-left: -$padding-base;
+        margin-right: -$padding-base;
+        margin-top: -$padding-base;
+        padding-left: $padding-base;
+        padding-right: $padding-base;
+
+        .title {
+            font-size: $font-size-large;
+            font-weight: $font-weight-semibold;
+            color: $text-primary;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 4px $shadow-color;
+        }
+
+        .close-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: $font-family-main;
+            font-weight: $font-weight-semibold;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            border: $border-width-base solid transparent;
+            background-image: none;
+            background-color: transparent;
+            border-color: rgba($button-border, 0.6);
+            color: $text-secondary;
+            box-shadow: none;
+            min-width: 26px;
+            min-height: 26px;
+            width: 26px;
+            height: 26px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: $font-size-medium;
+            line-height: 26px;
+
+            &:hover {
+                background-color: rgba($text-danger, 0.4);
+                border-color: $text-danger;
+                color: #ffffff;
+                transform: none;
+                box-shadow: none;
+            }
+
+            &:active {
+                background-color: rgba($text-danger, 0.6);
+                border-color: $text-danger;
+                transform: none;
+                box-shadow: none;
+            }
+
+            &.disabled {
+                background-image: none;
+                background-color: $button-disabled-bg;
+                border-color: $button-disabled-border;
+                color: $button-disabled-text;
+                cursor: not-allowed;
+                box-shadow: none;
+                transform: none;
+
+                &:hover, &:active {
+                    background-color: $button-disabled-bg;
+                    border-color: $button-disabled-border;
+                    color: $button-disabled-text;
+                    box-shadow: none;
+                    transform: none;
+                }
+            }
+        }
+    }
+    // --- Content Area ---
+    .content {
+        flex-grow: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        gap: $gap-base;
+        min-height: 0;
+        align-items: stretch; // Use stretch to give children height
+    }
+}
+
+// --- Section Header ---
+.section-header {
+    font-size: $font-size-medium;
+    font-weight: $font-weight-semibold;
+    color: $text-secondary;
+    margin-bottom: $margin-tiny;
+    padding-bottom: $padding-tiny;
+    border-bottom: $border-width-base solid $border-color;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+// --- Shared Info Text ---
+.info-text {
+    font-size: $font-size-small;
+    color: $text-disabled;
+    font-style: italic;
+    text-align: center;
+    padding: $padding-small 0;
+    flex-shrink: 0;
+}
+
+// --- Modify Section ---
+.modify-section {
+    padding: $padding-medium;
+    background-color: rgba($primary-light, 0.1);
+    border: $border-width-base solid rgba($border-color, 0.5);
+    border-radius: $border-radius-medium;
+    display: flex;
+    flex-direction: column;
+    gap: $gap-medium;
+    flex-basis: 350px;
+    flex-shrink: 0;
+    min-width: 300px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    // No height: 100%, rely on align-items: stretch
+
+    .tool-info {
+        background-color: rgba($primary-dark, 0.6);
+        border: $border-width-base solid rgba($border-color, 0.5);
+        border-radius: $border-radius-slight;
+        flex-shrink: 0;
+
+        .name {
+            padding: $padding-medium $padding-medium 0 $padding-medium;
+            margin-bottom: $margin-tiny;
+            font-size: $font-size-base;
+            font-weight: $font-weight-semibold;
+            color: $text-primary;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: $gap-tiny $gap-base;
+            font-size: $font-size-small;
+            color: $text-secondary;
+            margin-bottom: $margin-medium;
+            padding: 0 $padding-medium;
+
+            span {
+                font-weight: $font-weight-medium;
+                white-space: nowrap;
+            }
+        }
+
+        .bonuses {
+            display: flex;
+            flex-wrap: wrap;
+            gap: $gap-tiny $gap-small;
+            margin-top: $margin-tiny;
+            padding: 0 $padding-medium $padding-medium $padding-medium;
+            align-items: flex-start;
+
+            .bonus-tag {
+                font-size: $font-size-tiny;
+                padding: 1px 5px;
+                border-radius: $border-radius-slight;
+                background-color: rgba($primary-dark, 0.8);
+                font-style: italic;
+                white-space: nowrap;
+
+                &--neutral {
+                    color: #7A8290;
+                }
+
+                &--positive-low {
+                    color: #8FBC8F;
+                }
+
+                &--positive-medium {
+                    color: #66cc91;
+                }
+
+                &--positive-high {
+                    color: #81e0aa;
+                    font-weight: $font-weight-semibold;
+                }
+
+                &--negative-low {
+                    color: #F08080;
+                }
+
+                &--negative-medium {
+                    color: #e57373;
+                }
+
+                &--negative-high {
+                    color: #d32f2f;
+                    font-weight: $font-weight-semibold;
+                }
+            }
+        }
+    }
+
+    .upgrade-info {
+        margin-top: auto;
+        padding-top: $padding-medium;
+        border-top: $border-width-base solid rgba($border-color, 0.5);
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: $gap-small;
+
+        .costs-label {
+            font-size: $font-size-tiny;
+            color: $text-muted;
+            font-weight: $font-weight-medium;
+        }
+
+        .costs-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: $gap-tiny $gap-small;
+        }
+
+        .cost-item {
+            font-size: $font-size-tiny;
+            background-color: rgba($primary-dark, 0.7);
+            padding: 2px 5px;
+            border-radius: $border-radius-slight;
+            border: $border-width-base solid transparent;
+            white-space: nowrap;
+
+            &--met {
+                color: #b3d1ff;
+                border-color: rgba($accent-blue, 0.3);
+            }
+
+            &--not-met {
+                color: #ff9aa2;
+                text-decoration-line: line-through;
+                opacity: 0.7;
+            }
+        }
+
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: $padding-small $padding-base;
+            border-radius: $border-radius-slight;
+            border: $border-width-base solid $button-border;
+            background-image: linear-gradient(180deg, $button-bg-start, $button-bg-end);
+            color: $button-text;
+            font-family: $font-family-main;
+            font-size: $font-size-base;
+            font-weight: $font-weight-semibold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 0 6px rgba($shadow-color, 0.6);
+            min-height: 32px;
+            white-space: nowrap;
+
+            &:hover {
+                background-image: linear-gradient(180deg, $button-hover-bg-start, $button-hover-bg-end);
+                border-color: $button-hover-border;
+                color: $button-hover-text;
+                box-shadow: 0 0 10px rgba($shadow-color, 0.8);
+                transform: translateY(-1px);
+            }
+
+            &:active {
+                background-image: none;
+                background-color: $button-active-bg;
+                border-color: $button-active-border;
+                transform: translateY(0px);
+                box-shadow: 0 0 4px rgba($shadow-color, 0.5);
+            }
+
+            &.button--special {
+                background-image: linear-gradient(180deg, rgba($accent-gold, 0.15), rgba($accent-gold, 0.25));
+                border-color: rgba($accent-gold, 0.8);
+                color: $accent-gold-light;
+                box-shadow: 0 0 6px rgba($shadow-gold, 0.6);
+                text-shadow: 0 0 3px rgba($accent-gold, 0.4);
+
+                &:hover {
+                    background-image: linear-gradient(180deg, rgba($accent-gold, 0.25), rgba($accent-gold, 0.35));
+                    border-color: $accent-gold-light;
+                    color: #ffffff;
+                    box-shadow: 0 0 10px rgba($shadow-gold, 0.8);
+                }
+
+                &:active {
+                    background-color: rgba($accent-gold, 0.4);
+                    border-color: $accent-gold-light;
+                    box-shadow: 0 0 4px rgba($shadow-gold, 0.5);
+                }
+            }
+
+            &.button--craft {
+                width: auto;
+                padding: $padding-tiny $padding-medium;
+                min-width: 70px;
+                font-size: $font-size-small;
+                text-transform: none;
+                letter-spacing: 0.2px;
+            }
+
+            &.disabled {
+                background-image: none;
+                background-color: $button-disabled-bg;
+                border-color: $button-disabled-border;
+                color: $button-disabled-text;
+                cursor: not-allowed;
+                box-shadow: none;
+                transform: none;
+
+                &:hover, &:active {
+                    background-color: $button-disabled-bg;
+                    border-color: $button-disabled-border;
+                    color: $button-disabled-text;
+                    box-shadow: none;
+                    transform: none;
+                }
+            }
+        }
+    }
+}
+
+// --- Crafting Section ---
+.crafting-section {
+    padding: $padding-medium;
+    background-color: rgba($primary-light, 0.1);
+    border: $border-width-base solid rgba($border-color, 0.5);
+    border-radius: $border-radius-medium;
+    display: flex;
+    flex-direction: column; // Stacks header/list vertically
+    flex-grow: 1; // Takes remaining horizontal space
+    min-width: 0;
+    min-height: 0; // Needed for parent flex (align-items: stretch gives height, min-height ensures it can shrink)
+    overflow: hidden;
+
+    .list-container { // Select .list-container inside .crafting-section
+        flex-grow: 1; // Should take available vertical space from stretched parent
+        min-height: 0; // Essential for flex scrolling child
+        overflow-y: scroll;
+        overflow-x: hidden;
+        padding-right: $padding-small;
+        margin-right: -$padding-small;
+        display: flex;
+        flex-direction: column;
+        gap: $gap-small;
+
+        .category-header {
+            font-size: $font-size-small;
+            font-weight: $font-weight-semibold;
+            color: $text-muted;
+            border-bottom: $border-width-base solid rgba($border-color, 0.5);
+            padding-bottom: $padding-tiny;
+            margin-bottom: $margin-tiny;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            flex-shrink: 0;
+            padding-left: $padding-tiny;
+
+            &:not(:first-child) {
+                margin-top: $margin-small;
+            }
+        }
+
+        .recipe-item {
+            background-color: rgba($primary-dark, 0.3);
+            border: $border-width-base solid rgba($border-color, 0.5);
+            border-left-width: 3px;
+            border-left-color: $text-muted;
+            border-radius: $border-radius-slight;
+            padding: $padding-small $padding-medium;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: $gap-base;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            min-height: 50px;
+
+            &:hover {
+                background-color: rgba($accent-blue, 0.1);
+                border-color: rgba($accent-blue, 0.3);
+                border-left-color: $accent-blue;
+            }
+
+            &--cannot-craft {
+                border-left-color: $text-disabled;
+                opacity: 0.7;
+
+                &:hover {
+                    border-left-color: $text-secondary;
+                    background-color: rgba($primary-light, 0.1);
+                    border-color: rgba($border-color, 0.5);
+                }
+
+                .name {
+                    color: $text-secondary;
+                }
+
+                .button {
+                    background-image: none;
+                    background-color: $button-disabled-bg;
+                    border-color: $button-disabled-border;
+                    color: $button-disabled-text;
+                    cursor: not-allowed;
+                    box-shadow: none;
+                    transform: none;
+
+                    &:hover, &:active {
+                        background-color: $button-disabled-bg;
+                        border-color: $button-disabled-border;
+                        color: $button-disabled-text;
+                        box-shadow: none;
+                        transform: none;
+                    }
+                }
+            }
+
+            .details {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+                gap: $gap-tiny;
+                min-width: 0;
+            }
+
+            .name {
+                font-size: $font-size-base;
+                font-weight: $font-weight-semibold;
+                color: $text-primary;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .reqs {
+                font-size: $font-size-tiny;
+                color: $text-secondary;
+                display: flex;
+                flex-wrap: wrap;
+                gap: $gap-tiny $gap-small;
+
+                .req-tag {
+                    padding: 2px 5px;
+                    border-radius: $border-radius-slight;
+                    font-weight: $font-weight-medium;
+                    border: $border-width-base solid transparent;
+
+                    &--met {
+                        color: #b3d1ff;
+                        background-color: rgba($accent-blue, 0.1);
+                        border-color: rgba($accent-blue, 0.2);
+                    }
+
+                    &--not-met {
+                        color: #ff9aa2;
+                        background-color: rgba($text-danger, 0.1);
+                        text-decoration-line: line-through;
+                        opacity: 0.8;
+                    }
+
+                    &--prof {
+                        color: #d8bfd8;
+                        background-color: rgba($accent-purple, 0.1);
+                        border-color: rgba($accent-purple, 0.2);
+
+                        &.req-tag--not-met {
+                            color: #ffb0b0;
+                            background-color: rgba($text-danger, 0.1);
+                            border-color: transparent;
+                        }
+                    }
+                }
+            }
+
+            .button-container {
+                flex-shrink: 0;
+
+                .button {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: $padding-small $padding-base;
+                    border-radius: $border-radius-slight;
+                    border: $border-width-base solid $button-border;
+                    background-image: linear-gradient(180deg, $button-bg-start, $button-bg-end);
+                    color: $button-text;
+                    font-family: $font-family-main;
+                    font-size: $font-size-base;
+                    font-weight: $font-weight-semibold;
+                    text-align: center;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    cursor: pointer;
+                    transition: all 0.15s ease-in-out;
+                    box-shadow: 0 0 6px rgba($shadow-color, 0.6);
+                    min-height: 32px;
+                    white-space: nowrap;
+
+                    &:hover {
+                        background-image: linear-gradient(180deg, $button-hover-bg-start, $button-hover-bg-end);
+                        border-color: $button-hover-border;
+                        color: $button-hover-text;
+                        box-shadow: 0 0 10px rgba($shadow-color, 0.8);
+                        transform: translateY(-1px);
+                    }
+
+                    &:active {
+                        background-image: none;
+                        background-color: $button-active-bg;
+                        border-color: $button-active-border;
+                        transform: translateY(0px);
+                        box-shadow: 0 0 4px rgba($shadow-color, 0.5);
+                    }
+
+                    &.button--craft {
+                        width: auto;
+                        padding: $padding-tiny $padding-medium;
+                        min-width: 70px;
+                        font-size: $font-size-small;
+                        text-transform: none;
+                        letter-spacing: 0.2px;
+                    }
+                }
+            }
+        }
+    }
+}

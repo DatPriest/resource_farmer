@@ -1,0 +1,60 @@
+// File: resource_farmer/Code/UI/Crafting/RecipeListPanel.razor.scss
+@import "/UI/Styles/Theme.scss";
+
+.recipe-list-panel {
+    // Base section styles copied from Containers.scss theme file
+    background-color: rgba($primary-light, 0.1);
+    border: $border-width-base solid rgba($border-color, 0.5);
+    border-radius: $border-radius-medium;
+    padding: $padding-medium;
+    // Layout & Sizing
+    // flex-basis/grow should be set by parent CraftingRootPanel
+    display: flex;
+    flex-direction: column; // Stacks internal elements vertically
+    height: 100%; // Fill height provided by parent's align-items: stretch
+    min-height: 0; // Allow shrinking within flex context
+    overflow: hidden; // Clip the list-container
+    min-width: 70%;
+
+    .list-container {
+        flex-grow: 1; // Takes available vertical space
+        min-height: 0; // Essential for scrolling child
+        overflow-y: scroll;
+        overflow-x: hidden;
+        // Negative margins to make scrollbar sit nicer with padding (optional)
+        // Inner layout for category headers and items
+        display: flex;
+        flex-direction: column;
+        gap: $gap-small; // Gap between headers and items
+    }
+
+    .category-header {
+        // Copy styles from .section-header or theme
+        font-size: $font-size-small; // Use smaller size for category
+        font-weight: $font-weight-semibold;
+        color: $text-muted; // Use muted color
+        border-bottom: $border-width-base solid rgba($border-color, 0.5);
+        padding-bottom: $padding-tiny;
+        margin-bottom: $margin-tiny; // Reduce margin after header
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        flex-shrink: 0; // Prevent shrinking
+        padding-left: $padding-tiny; // Indent slightly
+        top: 0;
+        background-color: rgba($primary-light, 0.6); // Background to cover scrolling items
+        z-index: 1; // Ensure header is above items
+        margin-top: $margin-small; // Space between categories
+
+        &:first-child {
+            margin-top: 0; // No top margin for the very first header
+        }
+    }
+
+    .info-text {
+        // Use shared styles
+        flex-grow: 1; // Allow "No recipes" message to center vertically
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

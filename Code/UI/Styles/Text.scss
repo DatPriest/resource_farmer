@@ -1,0 +1,171 @@
+// --- Text Styles ---
+@import "Colors.scss"; // Import color definitions
+
+// Font Families (Replace 'Poppins' with your actual S&box font name)
+$font-family-main: Poppins;
+$font-family-accent: Poppins; // Use same or another available font for titles/accents
+
+// Font Sizes
+$font-size-root: 15px; // Base size for UI
+$font-size-xl: 24px; // Large Titles
+$font-size-large: 20px; // Headers
+$font-size-lg: 20px; // Sub-headers, important text
+$font-size-medium: 16px; // Sub-headers, important text
+$font-size-base: $font-size-root; // Standard text
+$font-size-small: 13px; // Secondary info, tooltips
+$font-size-tiny: 11px; // Fine print, details
+
+// Font Weights (Use keywords or numbers supported by S&box)
+$font-weight-light: 300;
+$font-weight-normal: 400; // 'normal' keyword might work
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700; // 'bold' keyword might work
+
+// Base Text Styling
+label,
+.text {
+  // Apply to Label elements and elements with .text class
+  font-family: $font-family-main;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  color: $text-primary;
+  text-shadow: 0 0 2px rgba($primary-dark, 0.5); // Subtle shadow for readability
+  letter-spacing: 0.2px;
+  white-space: normal; // Default text wrapping
+}
+
+// Header Styles
+h1,
+.text-h1 {
+  font-family: $font-family-accent;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 0 5px $shadow-color; // Header glow
+  margin-bottom: 10px; // Add spacing after headers
+}
+
+h2,
+.text-h2 {
+  font-family: $font-family-accent;
+  font-size: $font-size-large;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-shadow: 0 0 4px $shadow-color;
+  margin-bottom: 8px;
+}
+
+h3,
+.text-h3 {
+  font-family: $font-family-accent;
+  font-size: $font-size-medium;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+// Link Style
+a,
+.text-link {
+  color: $text-accent;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $text-accent-hover;
+    text-decoration: underline;
+  }
+}
+
+// Muted/Secondary Text
+.text-muted {
+  color: $text-muted;
+  font-size: $font-size-small;
+}
+
+.text-secondary {
+  color: $text-secondary;
+}
+
+// Functional Text Colors
+.text-danger {
+  color: $text-danger;
+  font-weight: $font-weight-medium;
+}
+
+.text-warning {
+  color: $text-warning;
+  font-weight: $font-weight-medium;
+}
+
+.text-success {
+  color: $text-success;
+  font-weight: $font-weight-medium;
+}
+
+.text-disabled {
+  color: $text-disabled;
+  font-style: italic;
+}
+
+// Text Alignment
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+// Text Transform
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.text-lowercase {
+  text-transform: lowercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+// Text Overflow
+.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Text Stroke (S&box specific)
+.text-outline-blue {
+  text-stroke-width: 1px;
+  text-stroke-color: $accent-blue;
+}
+
+.text-outline-dark {
+  text-stroke-width: 1px;
+  text-stroke-color: rgba($primary-dark, 0.8);
+}
+
+// Specific Use Cases
+.tooltip-text {
+  font-size: $font-size-small;
+  color: $text-secondary;
+}
+
+.debug-text {
+  font-family: monospace;
+  font-size: $font-size-tiny;
+  color: $text-muted;
+}

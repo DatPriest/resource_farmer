@@ -1,0 +1,160 @@
+// --- Button Styles ---
+
+@import "Colors.scss";
+@import "Layout.scss";
+@import "Text.scss"; // Import Text for font variables
+
+// Base Button Style
+.button {
+  display: flex; // Use flex for alignment within button
+  align-items: center;
+  justify-content: center;
+  padding: $padding-small $padding-base; // Vertical, Horizontal padding
+  border-radius: $border-radius-slight;
+  border: $border-width-base solid $button-border;
+  background-image: linear-gradient(180deg, $button-bg-start, $button-bg-end);
+  color: $button-text;
+  font-family: $font-family-main; // Use variable directly
+  font-size: $font-size-base; // Use variable directly
+  font-weight: $font-weight-semibold; // Use variable directly
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 0 6px rgba($shadow-color, 0.6); // Subtle glow
+  min-height: 32px; // Ensure minimum clickable height
+  white-space: nowrap; // Prevent text wrapping
+
+  &:hover {
+    background-image: linear-gradient(
+      180deg,
+      $button-hover-bg-start,
+      $button-hover-bg-end
+    );
+    border-color: $button-hover-border;
+    color: $button-hover-text;
+    box-shadow: 0 0 10px rgba($shadow-color, 0.8); // Brighter glow
+    transform: translateY(-1px); // Slight lift
+  }
+
+  &:active {
+    background-image: none; // Remove gradient
+    background-color: $button-active-bg;
+    border-color: $button-active-border;
+    transform: translateY(0px); // Press down effect
+    box-shadow: 0 0 4px rgba($shadow-color, 0.5); // Dimmer glow when pressed
+  }
+
+  &.disabled {
+    background-image: none;
+    background-color: $button-disabled-bg;
+    border-color: $button-disabled-border;
+    color: $button-disabled-text;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+
+    &:hover,
+    &:active {
+      // Prevent visual changes when disabled
+      background-color: $button-disabled-bg;
+      border-color: $button-disabled-border;
+      color: $button-disabled-text;
+      box-shadow: none;
+      transform: none;
+    }
+  }
+  // Button with Icon
+  &.has-icon {
+    gap: $gap-small;
+
+    i,
+    .icon {
+      // Assuming icon element uses <i> or .icon
+      font-size: 1.2em; // Make icon slightly larger than text
+    }
+  }
+  // Modifier for Secondary/Alternative Style
+  &.button--secondary {
+    background-image: none;
+    background-color: transparent;
+    border-color: rgba($button-border, 0.6);
+    color: $text-secondary;
+    box-shadow: none;
+
+    &:hover {
+      background-color: rgba($button-hover-bg-end, 0.5);
+      border-color: $button-hover-border;
+      color: $button-hover-text;
+      box-shadow: 0 0 6px rgba($shadow-color, 0.6);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      background-color: rgba($button-active-bg, 0.8);
+      border-color: $button-active-border;
+      transform: translateY(0px);
+      box-shadow: none;
+    }
+  }
+  // Modifier for Danger/Remove Style
+  &.button--danger {
+    background-image: linear-gradient(
+      180deg,
+      rgba($text-danger, 0.15),
+      rgba($text-danger, 0.25)
+    );
+    border-color: rgba($text-danger, 0.8);
+    color: $text-danger;
+    box-shadow: 0 0 6px rgba($text-danger, 0.4);
+
+    &:hover {
+      background-image: linear-gradient(
+        180deg,
+        rgba($text-danger, 0.25),
+        rgba($text-danger, 0.35)
+      );
+      border-color: lighten($text-danger, 10%);
+      color: lighten($text-danger, 15%);
+      box-shadow: 0 0 10px rgba($text-danger, 0.6);
+    }
+
+    &:active {
+      background-color: rgba($text-danger, 0.4);
+      border-color: lighten($text-danger, 10%);
+      box-shadow: 0 0 4px rgba($text-danger, 0.3);
+    }
+  }
+  // Modifier for Gold/Special Style
+  &.button--special {
+    background-image: linear-gradient(
+      180deg,
+      rgba($accent-gold, 0.15),
+      rgba($accent-gold, 0.25)
+    );
+    border-color: rgba($accent-gold, 0.8);
+    color: $accent-gold-light;
+    box-shadow: 0 0 6px rgba($shadow-gold, 0.6);
+    text-shadow: 0 0 3px rgba($accent-gold, 0.4);
+
+    &:hover {
+      background-image: linear-gradient(
+        180deg,
+        rgba($accent-gold, 0.25),
+        rgba($accent-gold, 0.35)
+      );
+      border-color: $accent-gold-light;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba($shadow-gold, 0.8);
+    }
+
+    &:active {
+      background-color: rgba($accent-gold, 0.4);
+      border-color: $accent-gold-light;
+      box-shadow: 0 0 4px rgba($shadow-gold, 0.5);
+    }
+  }
+}
+
+// Example Usage: <Button class="button button--danger has-icon"><i>delete</i> Remove</Button>

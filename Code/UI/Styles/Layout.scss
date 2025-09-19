@@ -1,0 +1,134 @@
+// --- Base Layout & Spacing ---
+@import "Colors.scss";
+
+// Spacing Units
+$padding-base: 15px;
+$padding-medium: 10px;
+$padding-small: 8px;
+$padding-tiny: 5px;
+
+$margin-base: 15px;
+$margin-medium: 10px;
+$margin-small: 8px;
+$margin-tiny: 5px;
+
+$gap-base: 15px;
+$gap-medium: 10px;
+$gap-small: 8px;
+$gap-tiny: 5px;
+
+// Borders & Radii (Solo Leveling often uses sharp edges)
+$border-radius-sharp: 0px; // Sharp corners
+$border-radius-slight: 2px; // Very slight rounding
+$border-radius-medium: 4px;
+$border-width-base: 1px;
+$border-width-thick: 2px;
+
+// Base Panel/Container Style Mixin (Example)
+.base-panel {
+  background-color: $background-transparent-medium;
+  border: $border-width-base solid $border-color;
+  border-radius: $border-radius-slight;
+  padding: $padding-base;
+  box-shadow: 0 0 8px $shadow-color; // Use box-shadow for glow
+  backdrop-filter: blur($backdrop-blur-strength);
+}
+
+// Global Styles (Apply to Root or Body if applicable in S&box context)
+// Note: S&box might handle root styles differently. Apply these to your top-level panel.
+.root-panel,
+body {
+  // Adjust selector as needed
+  font-family: Poppins; // IMPORTANT: Use a font name available in S&box
+  font-size: 15px;
+  color: $text-primary;
+  overflow: hidden; // Prevent accidental scrollbars on root
+  width: 100%;
+  height: 100%;
+  // Default Flexbox settings (already default in S&box, but good practice)
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; // Default
+  justify-content: flex-start; // Default
+}
+
+// Common Layout Classes
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.flex-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.spacer {
+  flex-grow: 1; // Fills available space
+}
+
+.padding-base {
+  padding: $padding-base;
+}
+
+.padding-medium {
+  padding: $padding-medium;
+}
+
+.padding-small {
+  padding: $padding-small;
+}
+
+.padding-tiny {
+  padding: $padding-tiny;
+}
+
+.margin-base {
+  margin: $margin-base;
+}
+
+.margin-medium {
+  margin: $margin-medium;
+}
+
+.margin-small {
+  margin: $margin-small;
+}
+
+.margin-tiny {
+  margin: $margin-tiny;
+}
+
+.gap-base {
+  gap: $gap-base;
+}
+
+.gap-medium {
+  gap: $gap-medium;
+}
+
+.gap-small {
+  gap: $gap-small;
+}
+
+.gap-tiny {
+  gap: $gap-tiny;
+}
+
+// Hide scrollbar if needed (applied to specific elements)
+.hide-scrollbar {
+  // scrollbar-width: none; // Firefox - Not listed in s&box rules
+  // &::-webkit-scrollbar {
+  //   display: none; // Chrome, Safari, Edge - Not listed in s&box rules
+  // }
+  // Note: s&box might require different approach for hiding scrollbars if overflow is 'scroll' or 'auto'
+}

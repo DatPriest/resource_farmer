@@ -1,0 +1,83 @@
+# Cursor AI Rules for Resource Farmer (S&box Game)
+
+## S&box Development Context
+
+You are working on Resource Farmer, a multiplayer sandbox game built with S&box (not Unity/Unreal). S&box uses Component-based architecture with C# and Razor UI.
+
+## Critical S&box Patterns
+
+### Components & Networking
+
+- Classes inherit from `Component` (not MonoBehaviour)
+- `[Property]` for editor-exposed fields, `[Sync]` for network replication
+- Access components: `Components.Get<T>()` or `Components.GetOrCreate<T>()`
+- Check `Networking.IsHost` for server logic, `IsProxy` for client instances
+
+### Resource System Architecture
+
+- `ResourceType` enum is the central registry (Code/Resources/ResourceType.cs)
+- Inventory: `Dictionary<ResourceType, float>` with [Sync] attribute
+- ResourceNode implements IGatherable interface for gathering
+- ResourceSpawner places nodes procedurally using terrain raycasting
+
+### Crafting System
+
+- `.recipe` files in Assets/Crafting/ define GameResource items
+- RecipeManager singleton loads via `ResourceLibrary.GetAll<CraftingRecipeResource>()`
+- ToolBase has material/quality/bonus system affecting gathering efficiency
+
+## Code Generation Rules
+
+### Namespace Usage
+
+```csharp
+using ResourceFarmer.PlayerBase;    // Player systems
+using ResourceFarmer.Resources;     // Resource/inventory
+using ResourceFarmer.Crafting;      // Recipe system
+using ResourceFarmer.Items;         // Tools/equipment
+```
+
+### Property Patterns
+
+```csharp
+[Property, Category("Display")] public string Name { get; set; }
+[Sync] public float Money { get; set; }                    // Network replicated
+[Property, Group("Interaction")] public bool Enabled { get; set; }
+```
+
+### Component Initialization
+
+```csharp
+protected override void OnStart()
+{
+    var component = Components.GetOrCreate<PlayerGatheringComponent>();
+    if (component != null) component.OwnerPlayer = this;
+}
+```
+
+## File Organization Patterns
+
+- Game logic in Code/ directory
+- UI components as .razor + .razor.scss pairs in Code/UI/
+- GameResource assets (.recipe, .prefab) in Assets/
+- Use .sbproj not .csproj for main project config
+
+## Common Anti-Patterns to Avoid
+
+- Don't use file I/O for GameResources (use ResourceLibrary.GetAll<T>())
+- Don't forget IsProxy checks for client/server separation
+- Don't skip OwnerPlayer assignment in player component setup
+- Don't forget terrain bounds calculation before resource spawning
+
+## UI Development
+
+- Razor components in Code/UI/ with Component.Create<T>() instantiation
+- UIManager handles input-based panel toggling
+- Properly dispose UI panels to prevent memory leaks
+
+## Multiplayer Considerations
+
+- [Sync] properties replicate automatically
+- Server/host handles resource spawning and persistence
+- Client-side should check IsProxy before executing server logic
+- Use SavingServiceComponent for player data persistence (host-only)

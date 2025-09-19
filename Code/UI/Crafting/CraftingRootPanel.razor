@@ -1,0 +1,99 @@
+﻿@* File: resource_farmer/Code/UI/Crafting/CraftingRootPanel.razor *@
+@using Sandbox;
+@using Sandbox.UI;
+@using ResourceFarmer.PlayerBase;
+@using ResourceFarmer.Items;
+@using ResourceFarmer.Crafting;
+@using System.Collections.Generic;
+@using System.Linq;
+
+@inherits PanelComponent // Inherit from PanelComponent to be added to Screen/World Panels
+
+<root>
+	<div class="crafting-container">
+
+		<div class="crafting-root-panel">
+			@* Header Section *@
+			<div class="header">
+				<label class="title">Crafting & Modification</label>
+				<button class="button close-button" @onclick=@ClosePanel>close</button> @* Use 'close' icon/text *@
+			</div>
+
+			@* Main Content Area (Side-by-side Panels) *@
+			<div class="content">
+				@* Modify Panel (Left - 30%) *@
+				<ModifyPanel class="modify-panel-container" EquippedTool=@EquippedTool Player=@LocalPlayer />
+
+				@* Recipe List Panel (Right - 70%) *@
+				<RecipeListPanel class="recipe-list-panel-container" AllRecipes=@AllRecipes Player=@LocalPlayer />
+			</div>
+		</div>
+	</div>
+
+
+
+</root>
+
+@code {
+	// --- Data Properties ---
+	public Player? LocalPlayer => Game.ActiveScene?.Components.Get<Player>(FindMode.EverythingInDescendants);
+	public ToolBase? EquippedTool => LocalPlayer?.EquippedTool;
+	public List<CraftingRecipeResource>? AllRecipes => RecipeManager.Instance?.Recipes.ToList();
+
+	// We might not need direct refs (@ref) if we pass data down via parameters
+
+	// --- Lifecycle & Updates ---
+
+	// Using OnUpdate for simplicity, but event-driven updates are better for performance
+	protected override void OnUpdate()
+	{
+		base.OnUpdate();
+		// Check if data potentially changed to trigger StateHasChanged
+		// A simple check like this isn't robust, needs proper event handling
+		// For example, trigger StateHasChanged when inventory changes or tool is equipped/unequipped
+		SetClass("no-tool", EquippedTool == null); // Example dynamic class
+
+		// Force update less frequently
+		if (_timeSinceLastUpdate > 0.1f)
+		{
+			StateHasChanged();
+			_timeSinceLastUpdate = 0;
+		}
+	}
+	private TimeSince _timeSinceLastUpdate = 0;
+
+
+	// --- Event Handlers ---
+
+	/// <summary>
+	/// Closes the crafting panel by notifying the UIManager or deleting itself.
+	/// </summary>
+	private void ClosePanel()
+	{
+		// Try finding UIManager on the root UI panel this component is attached to.
+		var rootPanel = this;
+		if (rootPanel != null)
+		{
+			var uiManager = GameObject.GetComponent<UIManager>();
+			if (uiManager != null)
+			{
+				Log.Info("[CraftingRootPanel] Closing via UIManager.");
+				uiManager.NotifyPanelClosed(this); // Assuming NotifyPanelClosed exists
+				return; // Manager handled it
+			}
+		}
+
+		// Fallback: Try searching the whole scene
+		var sceneUIManager = Scene.Components.Get<UIManager>(FindMode.EverythingInDescendants);
+		if (sceneUIManager != null)
+		{
+			Log.Info("[CraftingRootPanel] Closing via Scene UIManager.");
+			sceneUIManager.NotifyPanelClosed(this);
+			return; // Manager handled it
+		}
+
+		// Final Fallback: Delete self if no manager found
+		Log.Warning($"[CraftingRootPanel] No UIManager found, deleting self.");
+		Panel.Delete();
+	}
+}

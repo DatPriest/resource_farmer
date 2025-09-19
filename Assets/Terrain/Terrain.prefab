@@ -1,0 +1,46 @@
+{
+  "RootObject": {
+    "__guid": "e12011ef-c536-4719-b872-1ad1666d7e36",
+    "Flags": 0,
+    "Name": "Terrain",
+    "Position": "0,1.9,-1743.401",
+    "Enabled": true,
+    "Components": [
+      {
+        "__type": "Sandbox.Terrain",
+        "__guid": "09c06b00-03d4-431f-a076-2290dc60f973",
+        "__version": 1,
+        "ClipMapLodExtentTexels": 256,
+        "ClipMapLodLevels": 6,
+        "EnableCollision": true,
+        "Friction": null,
+        "IsTrigger": false,
+        "MaterialOverride": null,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "OnObjectTriggerEnter": null,
+        "OnObjectTriggerExit": null,
+        "OnTriggerEnter": null,
+        "OnTriggerExit": null,
+        "RenderType": "Off",
+        "Static": true,
+        "Storage": "terrain/start.terrain",
+        "Surface": null,
+        "SurfaceVelocity": "0,0,0",
+        "TerrainHeight": 10000,
+        "TerrainSize": 39936
+      }
+    ]
+  },
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "ResourceVersion": 1,
+  "__references": [],
+  "__version": 1
+}

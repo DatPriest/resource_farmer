@@ -1,0 +1,398 @@
+// --- Control Styles (Inputs, Sliders, Checkboxes) ---
+@import "Colors.scss";
+@import "Layout.scss";
+@import "Text.scss"; // Use text styles
+
+// --- Text Input ---
+// Define base styles directly or use a mixin if preferred and supported
+// Base styles for textentry-like elements
+
+textentry,
+input[type="text"],
+input[type="number"],
+input[type="password"] {
+  min-height: 32px;
+  padding: $padding-tiny $padding-small;
+  background-color: rgba($primary-dark, 0.6);
+  border: $border-width-base solid $border-color;
+  border-radius: $border-radius-slight;
+  color: $text-primary;
+  font-family: $font-family-main;
+  font-size: $font-size-base;
+  transition: border-color 0.2s ease, background-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba($border-highlight, 0.6);
+    background-color: rgba($primary-dark, 0.7);
+  }
+
+  &:focus {
+    background-color: rgba($primary-dark, 0.8);
+    border-color: $border-highlight;
+    box-shadow: 0 0 5px rgba($shadow-color, 0.5); // Glow on focus
+  }
+
+  &.disabled {
+    background-color: $button-disabled-bg;
+    border-color: $button-disabled-border;
+    color: $text-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+
+    &:hover {
+      border-color: $button-disabled-border;
+    }
+    // Prevent hover styles
+  }
+}
+
+// --- Checkbox ---
+// Note: S&box checkbox styling might be limited. This uses basic background/border.
+checkbox {
+  cursor: pointer;
+  min-height: 18px; // Consistent clickable size
+  min-width: 18px;
+  margin: $margin-tiny;
+
+  .track {
+    // The background/box of the checkbox
+    width: 18px;
+    height: 18px;
+    background-color: rgba($primary-dark, 0.6);
+    border: $border-width-base solid $border-color;
+    border-radius: $border-radius-slight; // Changed from $border-radius-tiny
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .thumb {
+    // The checkmark itself
+    // Position inside track
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px; // Smaller than track
+    height: 12px;
+    background-color: $accent-blue;
+    opacity: 0; // Hidden by default
+    border-radius: 1px; // Keep this small radius for the checkmark itself
+    transition: opacity 0.15s ease;
+  }
+
+  &:hover .track {
+    border-color: rgba($border-highlight, 0.6);
+  }
+
+  &.checked {
+    .track {
+      background-color: rgba($accent-blue, 0.2);
+      border-color: $border-highlight;
+    }
+
+    .thumb {
+      opacity: 1; // Show checkmark when checked
+    }
+  }
+
+  &.disabled {
+    // Use .disabled class
+    cursor: not-allowed;
+
+    .track {
+      background-color: $button-disabled-bg;
+      border-color: $button-disabled-border;
+    }
+
+    .thumb {
+      background-color: $text-disabled;
+      opacity: 0.5;
+    }
+
+    &.checked .thumb {
+      opacity: 0.5;
+    }
+    // Dim checkmark when disabled but checked
+  }
+  // Label associated with checkbox
+  label {
+    margin-left: $margin-small;
+    color: $text-secondary;
+    cursor: pointer;
+
+    &:hover {
+      color: $text-primary;
+    }
+  }
+
+  &.disabled + label {
+    // Use .disabled class
+    // Style label when checkbox is disabled
+    color: $text-disabled;
+    cursor: not-allowed;
+
+    &:hover {
+      color: $text-disabled;
+    }
+  }
+}
+
+// --- Slider ---
+// Note: S&box slider styling might be limited.
+Slider {
+  min-height: 24px; // Ensure interactive height
+  cursor: pointer;
+
+  .track {
+    // Background track
+    height: 4px;
+    background-color: rgba($primary-dark, 0.8);
+    border-radius: $border-radius-slight; // Changed from $border-radius-tiny
+    margin: 10px 0; // Center the track vertically
+    border: 1px solid $border-color;
+    overflow: hidden; // Ensure fill stays within bounds
+
+    .track-lower {
+      // Filled part of the track
+      background-color: $accent-blue;
+      height: 100%;
+    }
+  }
+
+  .thumb {
+    // The draggable handle
+    width: 14px;
+    height: 14px;
+    background-color: $text-secondary;
+    border: 1px solid rgba($primary-dark, 0.5);
+    border-radius: 50%; // Make it round
+    transform: scale(1);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    box-shadow: 0 0 4px rgba($primary-dark, 0.6);
+
+    &:hover {
+      background-color: $text-primary;
+      transform: scale(1.1);
+    }
+  }
+  // Value Label (if S&box provides one)
+  .value-label {
+    font-size: $font-size-small;
+    color: $text-muted;
+    margin-left: $margin-small;
+  }
+
+  &.disabled {
+    // Use .disabled class
+    cursor: not-allowed;
+
+    .track {
+      background-color: $button-disabled-bg;
+      border-color: $button-disabled-border;
+
+      .track-lower {
+        background-color: $text-disabled;
+      }
+    }
+
+    .thumb {
+      background-color: $button-disabled-border;
+      border-color: $button-disabled-bg;
+      transform: scale(0.9);
+      box-shadow: none;
+
+      &:hover {
+        background-color: $button-disabled-border;
+        transform: scale(0.9);
+      }
+    }
+  }
+}
+
+// --- Dropdown/Select ---
+// Note: S&box dropdown styling might be very limited.
+dropdown,
+select {
+  min-height: 32px;
+  padding: $padding-tiny $padding-small;
+  background-color: rgba($primary-dark, 0.6);
+  border: $border-width-base solid $border-color;
+  border-radius: $border-radius-slight;
+  color: $text-primary;
+  font-family: $font-family-main;
+  font-size: $font-size-base;
+  transition: border-color 0.2s ease, background-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba($border-highlight, 0.6);
+    background-color: rgba($primary-dark, 0.7);
+  }
+
+  &:focus {
+    background-color: rgba($primary-dark, 0.8);
+    border-color: $border-highlight;
+    box-shadow: 0 0 5px rgba($shadow-color, 0.5); // Glow on focus
+  }
+
+  &.disabled {
+    background-color: $button-disabled-bg;
+    border-color: $button-disabled-border;
+    color: $text-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+
+    &:hover {
+      border-color: $button-disabled-border;
+    }
+    // Prevent hover styles
+  }
+
+  padding-right: 30px; // Space for dropdown arrow
+  cursor: pointer;
+}
+
+// Style for the dropdown options panel if possible (might be system default)
+.dropdown_popup {
+  display: flex;
+  flex-direction: column;
+  background-color: $background-transparent-medium;
+  border: $border-width-base solid $border-color;
+  border-radius: $border-radius-slight;
+  box-shadow: 0 0 10px 2px rgba($shadow-color, 0.7); // Defined glow
+  backdrop-filter: blur($backdrop-blur-strength);
+  color: $text-primary;
+  overflow: hidden; // Prevent content spillover by default
+  transition: all 0.3s ease-out;
+  transform: scale(1);
+  opacity: 1;
+
+  &:intro {
+    transform: scale(0.9) translateY(10px);
+    opacity: 0;
+  }
+
+  &:outro {
+    transform: scale(1.05) translateY(-5px);
+    opacity: 0;
+  }
+
+  padding: $padding-tiny 0;
+  max-height: 200px;
+  overflow-y: scroll; // Changed from auto
+
+  .button {
+    display: flex;
+    align-items: center;
+    justify-content: center; // Overridden below
+    padding: $padding-small $padding-base; // Overridden below
+    border-radius: $border-radius-slight; // Overridden below
+    border: $border-width-base solid $button-border; // Overridden below
+    background-image: linear-gradient(
+      180deg,
+      $button-bg-start,
+      $button-bg-end
+    ); // Overridden below
+    color: $button-text; // Overridden below
+    font-family: $font-family-main;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold; // Overridden below
+    text-align: center; // Overridden below
+    text-transform: uppercase; // Overridden below
+    letter-spacing: 0.5px; // Overridden below
+    cursor: pointer;
+    transition: all 0.15s ease-in-out; // Overridden below
+    box-shadow: 0 0 6px rgba($shadow-color, 0.6); // Overridden below
+    min-height: 32px;
+    white-space: nowrap;
+
+    &:hover {
+      background-image: linear-gradient(
+        180deg,
+        $button-hover-bg-start,
+        $button-hover-bg-end
+      ); // Overridden below
+      border-color: $button-hover-border; // Overridden below
+      color: $button-hover-text; // Overridden below
+      box-shadow: 0 0 10px rgba($shadow-color, 0.8); // Overridden below
+      transform: translateY(-1px); // Overridden below
+    }
+
+    &:active {
+      background-image: none; // Remove gradient // Overridden below
+      background-color: $button-active-bg; // Overridden below
+      border-color: $button-active-border; // Overridden below
+      transform: translateY(0px); // Overridden below
+      box-shadow: 0 0 4px rgba($shadow-color, 0.5); // Overridden below
+    }
+
+    &.disabled {
+      // Use .disabled class
+      background-image: none;
+      background-color: $button-disabled-bg;
+      border-color: $button-disabled-border;
+      color: $button-disabled-text;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+
+      &:hover,
+      &:active {
+        background-color: $button-disabled-bg;
+        border-color: $button-disabled-border;
+        color: $button-disabled-text;
+        box-shadow: none;
+        transform: none;
+      }
+    }
+
+    background-image: none;
+    background-color: transparent; // Overridden below
+    border-color: rgba($button-border, 0.6); // Overridden below
+    color: $text-secondary; // Overridden below
+    box-shadow: none; // Overridden below
+
+    &:hover {
+      background-color: rgba($button-hover-bg-end, 0.5); // Overridden below
+      border-color: $button-hover-border; // Overridden below
+      color: $button-hover-text; // Overridden below
+      box-shadow: 0 0 6px rgba($shadow-color, 0.6); // Overridden below
+      transform: translateY(-1px); // Overridden below
+    }
+
+    &:active {
+      background-color: rgba($button-active-bg, 0.8); // Overridden below
+      border-color: $button-active-border; // Overridden below
+      transform: translateY(0px); // Overridden below
+      box-shadow: none; // Overridden below
+    }
+
+    text-align: left;
+    width: 100%;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid $border-color;
+    padding: $padding-small $padding-medium;
+    text-transform: none;
+    letter-spacing: 0px; // Changed from normal
+    box-shadow: none;
+    transition: none; // Remove transition for dropdown items
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: rgba($accent-blue, 0.2);
+      color: $text-primary;
+      transform: none;
+      box-shadow: none;
+    }
+
+    &.active {
+      // Style selected option
+      background-color: rgba($accent-blue, 0.3);
+      font-weight: $font-weight-bold;
+      color: #ffffff;
+    }
+  }
+}

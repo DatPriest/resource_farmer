@@ -1,0 +1,303 @@
+// File: resource_farmer/Code/UI/Crafting/ModifyPanel.razor.scss
+@import "../Styles/Theme.scss";
+
+root {
+  height: 100%;
+  width: 100%;
+}
+.modify-panel {
+  // Base section styles copied from Containers.scss theme file
+  background-color: rgba($primary-light, 0.1);
+  border: $border-width-base solid rgba($border-color, 0.5);
+  border-radius: $border-radius-medium;
+  padding: $padding-medium;
+  // Layout & Sizing (flex-basis should be set by parent CraftingRootPanel)
+  display: flex;
+  flex-direction: column;
+  gap: $gap-medium; // Gap between header, tool-info, upgrade-info
+  overflow-y: scroll; // Allow vertical scrolling for content
+  overflow-x: hidden;
+  // Ensure it fills height given by parent's align-items: stretch
+  height: 100%;
+  min-height: 0; // Allow shrinking if needed within flex context
+  min-width: 30%;
+  .section-header {
+    // Uses shared styles defined elsewhere (e.g., in CraftingRootPanel.scss or globally)
+    // Or copy styles if needed:
+    // font-size: $font-size-medium; font-weight: $font-weight-semibold; color: $text-secondary; margin-bottom: $margin-tiny; padding-bottom: $padding-tiny; border-bottom: $border-width-base solid $border-color; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
+    margin-bottom: 0; // Remove bottom margin if gap is used below
+  }
+
+  .info-text {
+    // Uses shared styles
+    // Or copy styles:
+    // font-size: $font-size-small; color: $text-disabled; font-style: italic; text-align: center; padding: $padding-base 0; flex-grow: 1; display: flex; align-items: center; justify-content: center;
+    flex-grow: 1; // Allow "No tool" message to center vertically
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tool-info {
+    background-color: rgba($primary-dark, 0.6);
+    border: $border-width-base solid rgba($border-color, 0.5);
+    border-radius: $border-radius-slight;
+    padding: $padding-medium; // Padding inside the tool info box
+    flex-shrink: 0; // Prevent shrinking
+    display: flex;
+    flex-direction: column; // Stack elements vertically
+
+    .name {
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      color: $text-primary;
+      margin-bottom: $margin-small; // More space after name
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stats {
+      display: flex;
+      flex-direction: column; // Stack elements vertically
+      flex-wrap: wrap; // Allow stats to wrap
+      font-size: $font-size-small;
+      color: $text-secondary;
+      margin-bottom: $margin-medium;
+
+      span {
+        // Each stat label+value pair
+        font-weight: $font-weight-medium;
+        white-space: nowrap;
+        color: $text-secondary; // Label color
+        value {
+          // Assuming <value> tag or similar is used in Razor
+          font-weight: $font-weight-semibold;
+          color: $text-primary; // Value color
+          margin-left: $margin-tiny;
+        }
+      }
+    }
+  }
+
+  .bonuses {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: $gap-tiny $gap-small;
+    margin: $margin-tiny;
+    align-items: flex-start;
+
+    .bonus-tag {
+      font-size: $font-size-tiny;
+      padding: 1px 5px;
+      border-radius: $border-radius-slight;
+      background-color: rgba($primary-dark, 0.8);
+      font-style: italic;
+      white-space: nowrap;
+      // Tier coloring modifiers
+      &--neutral {
+        color: $text-muted;
+      }
+      // Use theme variable
+      &--positive-low {
+        color: #8fbc8f;
+      }
+
+      &--positive-medium {
+        color: #66cc91;
+      }
+
+      &--positive-high {
+        color: #81e0aa;
+        font-weight: $font-weight-semibold;
+      }
+
+      &--negative-low {
+        color: #f08080;
+      }
+
+      &--negative-medium {
+        color: #e57373;
+      }
+
+      &--negative-high {
+        color: $text-danger;
+        font-weight: $font-weight-semibold;
+      }
+      // Use theme variable
+    }
+  }
+
+  .upgrade-info {
+    margin-top: auto; // Push upgrade info to bottom
+    padding-top: $padding-medium;
+    border-top: $border-width-base solid rgba($border-color, 0.5);
+    flex-shrink: 0; // Prevent shrinking
+    display: flex;
+    flex-direction: column;
+    gap: $gap-small;
+
+    .costs-label {
+      font-size: $font-size-tiny;
+      color: $text-muted;
+      font-weight: $font-weight-medium;
+    }
+
+    .costs-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $gap-tiny $gap-small;
+    }
+
+    .cost-item {
+      font-size: $font-size-tiny;
+      background-color: rgba($primary-dark, 0.7);
+      padding: 2px 5px;
+      border-radius: $border-radius-slight;
+      border: $border-width-base solid transparent;
+      white-space: nowrap;
+
+      &--met {
+        color: $accent-blue-light;
+        border-color: rgba($accent-blue, 0.3);
+      }
+      // Use theme variables
+      &--not-met {
+        color: $text-danger;
+        text-decoration-line: line-through;
+        opacity: 0.7;
+        background-color: rgba($text-danger, 0.1);
+      }
+      // Use theme variables
+    }
+
+    .button {
+      // Styles for buttons within upgrade section
+      // Base styles copied from Buttons.scss
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: $padding-small $padding-base;
+      border-radius: $border-radius-slight;
+      border: $border-width-base solid $button-border;
+      background-image: linear-gradient(
+        180deg,
+        $button-bg-start,
+        $button-bg-end
+      );
+      color: $button-text;
+      font-family: $font-family-main;
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+      box-shadow: 0 0 6px rgba($shadow-color, 0.6);
+      min-height: 32px;
+      white-space: nowrap;
+
+      &:hover {
+        background-image: linear-gradient(
+          180deg,
+          $button-hover-bg-start,
+          $button-hover-bg-end
+        );
+        border-color: $button-hover-border;
+        color: $button-hover-text;
+        box-shadow: 0 0 10px rgba($shadow-color, 0.8);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        background-image: none;
+        background-color: $button-active-bg;
+        border-color: $button-active-border;
+        transform: translateY(0px);
+        box-shadow: 0 0 4px rgba($shadow-color, 0.5);
+      }
+      // Modifier styles copied from Buttons.scss
+      &.button--special {
+        background-image: linear-gradient(
+          180deg,
+          rgba($accent-gold, 0.15),
+          rgba($accent-gold, 0.25)
+        );
+        border-color: rgba($accent-gold, 0.8);
+        color: $accent-gold-light;
+        box-shadow: 0 0 6px rgba($shadow-gold, 0.6);
+        text-shadow: 0 0 3px rgba($accent-gold, 0.4);
+
+        &:hover {
+          background-image: linear-gradient(
+            180deg,
+            rgba($accent-gold, 0.25),
+            rgba($accent-gold, 0.35)
+          );
+          border-color: $accent-gold-light;
+          color: #ffffff;
+          box-shadow: 0 0 10px rgba($shadow-gold, 0.8);
+        }
+
+        &:active {
+          background-color: rgba($accent-gold, 0.4);
+          border-color: $accent-gold-light;
+          box-shadow: 0 0 4px rgba($shadow-gold, 0.5);
+        }
+      }
+
+      &.button--craft {
+        width: auto;
+        padding: $padding-tiny $padding-medium;
+        min-width: 70px;
+        font-size: $font-size-small;
+        text-transform: none;
+        letter-spacing: 0.2px;
+      }
+      // Copied from Buttons.scss if defined there, or local
+      &.button--secondary {
+        background-image: none;
+        background-color: transparent;
+        border-color: rgba($button-border, 0.6);
+        color: $text-secondary;
+        box-shadow: none;
+
+        &:hover {
+          background-color: rgba($button-hover-bg-end, 0.5);
+          border-color: $button-hover-border;
+          color: $button-hover-text;
+          box-shadow: 0 0 6px rgba($shadow-color, 0.6);
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          background-color: rgba($button-active-bg, 0.8);
+          border-color: $button-active-border;
+          transform: translateY(0px);
+          box-shadow: none;
+        }
+      }
+      // Example for future Add/Remove buttons
+      &.disabled {
+        background-image: none;
+        background-color: $button-disabled-bg;
+        border-color: $button-disabled-border;
+        color: $button-disabled-text;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+
+        &:hover,
+        &:active {
+          background-color: $button-disabled-bg;
+          border-color: $button-disabled-border;
+          color: $button-disabled-text;
+          box-shadow: none;
+          transform: none;
+        }
+      }
+    }
+  }
+}

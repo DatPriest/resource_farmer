@@ -1,0 +1,147 @@
+// File: resource_farmer/Code/UI/Chat/ChatPanel.razor.scss (Refactored)
+@import "../Styles/Theme.scss"; // Import the main theme
+
+.chat-container {
+    // Positioning & Base (Assuming parent handles some positioning)
+    position: absolute;
+    bottom: $margin-base; // Use theme variable
+    left: $margin-base; // Use theme variable
+    width: 480px; // Keep specific width for now
+    max-height: 300px; // Keep specific max-height
+    display: flex;
+    flex-direction: column-reverse; // Input below message history
+    z-index: 100; // Ensure chat is above other elements if needed
+    // Fade-out Transition
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    // --- Input Area Container ---
+    .layout {
+        background-color: $background-transparent-dark; // Use theme variable
+        border: $border-width-base solid rgba($accent-blue, 0.6); // Use theme variables
+        border-top-left-radius: $border-radius-slight; // Use theme variable
+        border-top-right-radius: $border-radius-slight; // Use theme variable
+        padding: $padding-tiny $padding-small; // Use theme variables
+        box-shadow: 0 -2px 10px rgba($shadow-color, 0.5); // Use theme variable
+        gap: $gap-small; // Use theme variable
+        display: flex;
+        align-items: center;
+        z-index: 2;
+        // Styles for placeholder text and input field (assuming they use standard S&box elements)
+        .when-not-open {
+            flex-grow: 1;
+            color: $text-muted; // Use theme variable
+            font-size: $font-size-small; // Use theme variable
+            padding: $padding-tiny 0; // Align vertically with input
+            label {
+                color: $text-muted; // Ensure label inherits color
+            }
+        }
+
+        ChatBox.input {
+            flex-grow: 1;
+            background-color: transparent;
+            border: none;
+            color: $text-primary; // Use theme variable
+            font-size: $font-size-base; // Use theme variable
+            font-family: $font-family-main; // Use theme variable
+            // Remove box-shadow/outline, rely on parent container styling
+            // caret-color: $accent-blue; // Check if supported
+        }
+    }
+    // --- Message History Area ---
+    // Target the message canvas specifically if possible, otherwise use general selectors
+    .chat-canvas, // Try specific class first
+    .hud.flex.column {
+        // Fallback selector (adjust if template structure differs)
+        background-color: $background-transparent-medium; // Use theme variable
+        border: $border-width-base solid rgba($accent-blue, 0.4); // Use theme variables
+        border-bottom: none;
+        border-top-left-radius: $border-radius-slight; // Use theme variable
+        border-top-right-radius: $border-radius-slight; // Use theme variable
+        max-height: 250px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        padding-bottom: $padding-tiny; // Use theme variable
+        box-shadow: 0 0 10px rgba($shadow-color, 0.3); // Use theme variable
+        display: flex;
+        flex-direction: column; // Stack messages vertically
+        z-index: 1; // Below input area
+        // --- Individual Message Row ---
+        // Target specific message row element if possible
+        .chat-entry, // Try specific class first
+        .hud.with-padding {
+            // Fallback selector
+            padding: $padding-tiny $padding-small; // Use theme variables
+            gap: $gap-small; // Use theme variable
+            transition: background-color 0.2s ease;
+            border-bottom: $border-width-base solid rgba($border-color, 0.5); // Use theme variables
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &:hover {
+                background-color: rgba($accent-blue, 0.1); // Use theme variable
+            }
+            // Avatar (Assuming 'square' class is used)
+            .square {
+                width: 32px;
+                height: 32px;
+                border-radius: $border-radius-medium; // Use theme variable
+                flex-shrink: 0;
+                // background-image set by code
+                background-size: cover;
+                background-position: center;
+            }
+            // Text container (Name + Message)
+            > span {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: baseline;
+                flex-grow: 1; // Allow text to take remaining space
+
+                label.playername {
+                    font-weight: $font-weight-semibold; // Use theme variable
+                    color: $text-accent; // Use theme variable (or a specific chat name color if defined)
+                    margin-right: $margin-tiny; // Use theme variable
+                    cursor: pointer; // Indicate clickable
+                    &:hover {
+                        color: $text-accent-hover; // Use theme variable
+                    }
+                }
+
+                label.message {
+                    color: $text-primary; // Use theme variable
+                    font-size: $font-size-base; // Use theme variable
+                    white-space: normal; // Allow message wrapping
+                }
+            }
+        }
+    }
+    // --- Styling for the 'open' class (Input Focused) ---
+    &.open {
+        opacity: 1;
+        transform: translateY(0);
+
+        .layout {
+            border-color: $accent-blue; // Highlight border when open
+            box-shadow: 0 -2px 15px rgba($shadow-color, 0.7); // Enhance shadow when open
+        }
+
+        .chat-canvas,
+        .hud.flex.column {
+            border-color: rgba($accent-blue, 0.6); // Slightly enhance history border
+        }
+    }
+    // --- Styling for the 'inactive' class (Faded Out) ---
+    &.inactive {
+        opacity: 0;
+        transform: translateY(20px);
+        pointer-events: none;
+    }
+}

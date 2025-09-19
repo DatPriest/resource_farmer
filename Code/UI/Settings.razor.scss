@@ -1,0 +1,406 @@
+// File: resource_farmer/Code/UI/Settings.razor.scss (Refactored without @extend)
+@import "./Styles/Theme.scss";
+
+.settings-panel {
+    // --- Copied from .panel in Containers.scss ---
+    display: flex;
+    flex-direction: column;
+    background-color: $background-transparent-medium;
+    border: $border-width-base solid $border-color;
+    border-radius: $border-radius-slight;
+    padding: $padding-base; // Base padding
+    box-shadow: 0 0 10px 2px rgba($shadow-color, 0.7);
+    backdrop-filter: blur($backdrop-blur-strength);
+    color: $text-primary;
+    overflow: hidden;
+    transition: all 0.3s ease-out;
+    transform: scale(1);
+    opacity: 1;
+
+    &:intro {
+        transform: scale(0.9) translateY(10px);
+        opacity: 0;
+    }
+
+    &:outro {
+        transform: scale(1.05) translateY(-5px);
+        opacity: 0;
+    }
+    // --- End Copied from .panel ---
+    // Specific overrides/additions for settings-panel
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); // Overrides transform from .panel
+    width: 450px;
+    max-height: 70vh;
+    padding-top: 50px; // Keep top padding for close button placement
+    // Intro/Outro adjusted for translate
+    &:intro {
+        transform: translate(-50%, -50%) scale(0.9) translateY(10px);
+        opacity: 0;
+    }
+
+    &:outro {
+        transform: translate(-50%, -50%) scale(1.05) translateY(-5px);
+        opacity: 0;
+    }
+
+    .close-button {
+        // --- Copied from .button in Buttons.scss ---
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: $padding-small $padding-base; // Base padding
+        border-radius: $border-radius-slight; // Base radius
+        border: $border-width-base solid $button-border; // Base border
+        background-image: linear-gradient(180deg, $button-bg-start, $button-bg-end); // Base background
+        color: $button-text; // Base color
+        font-family: $font-family-main;
+        font-size: $font-size-base; // Base font size
+        font-weight: $font-weight-semibold;
+        text-align: center;
+        text-transform: uppercase; // Base text transform
+        letter-spacing: 0.5px; // Base letter spacing
+        cursor: pointer;
+        transition: all 0.15s ease-in-out; // Base transition
+        box-shadow: 0 0 6px rgba($shadow-color, 0.6); // Base shadow
+        min-height: 32px; // Base min height
+        white-space: nowrap;
+        // --- End Copied from .button ---
+        // --- Copied from .panel__header .close-button in Containers.scss ---
+        // Overrides for the close button appearance within a header context
+        background-image: none;
+        background-color: transparent;
+        border-color: rgba($button-border, 0.6);
+        color: $text-secondary;
+        box-shadow: none;
+        padding: $padding-tiny; // Smaller padding
+        min-height: 24px;
+        min-width: 24px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%; // Make it round
+        font-size: 14px;
+        line-height: 1;
+        // --- End Copied from .panel__header .close-button ---
+        // Specific overrides for *this* close button
+        position: absolute;
+        top: $padding-small;
+        right: $padding-small;
+        border: none; // Further override
+        z-index: 51;
+
+        &:hover {
+            // Copied from .panel__header .close-button:hover
+            background-color: rgba($text-danger, 0.4);
+            border-color: $text-danger; // Note: border was set to none above, maybe remove this line?
+            color: #ffffff;
+            transform: none;
+            box-shadow: none;
+        }
+
+        &:active {
+            // Define active state if needed, inherit from .button base?
+            background-color: rgba($text-danger, 0.6); // Darker red
+            transform: translateY(0px);
+            box-shadow: none;
+        }
+        // Disabled state (copied from .button.disabled)
+        &.disabled {
+            background-image: none;
+            background-color: $button-disabled-bg;
+            border-color: $button-disabled-border;
+            color: $button-disabled-text;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+
+            &:hover, &:active {
+                background-color: $button-disabled-bg;
+                border-color: $button-disabled-border;
+                color: $button-disabled-text;
+                box-shadow: none;
+                transform: none;
+            }
+        }
+    }
+
+    .header {
+        // --- Copied from .text-h1 in Text.scss ---
+        font-family: $font-family-accent;
+        font-size: $font-size-xl; // Base H1 size
+        font-weight: $font-weight-bold;
+        color: $text-primary; // Base H1 color
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        text-shadow: 0 0 5px $shadow-color;
+        margin-bottom: 10px; // Base H1 margin
+        // --- End Copied from .text-h1 ---
+
+        text-align: center;
+        margin-bottom: $margin-base; // Override margin
+        flex-shrink: 0;
+        // font-size: $font-size-xl; // Already set
+        // color: $text-primary; // Already set
+    }
+
+    .content {
+        // --- Copied from .panel__content in Containers.scss ---
+        flex-grow: 1;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        padding: $padding-tiny $padding-small; // Base content padding
+        margin: 0 -$padding-small; // Base content margin adjustment
+        display: flex;
+        flex-direction: column; // Base content direction
+        gap: $gap-medium; // Base content gap
+        // --- End Copied from .panel__content ---
+        // Specific overrides for settings content
+        gap: $gap-large; // Larger gap between sections
+        padding-right: $padding-small;
+        margin: 0; // Override margin adjustment if not needed
+    }
+
+    .section {
+        // --- Copied from .section in Containers.scss ---
+        padding: $padding-medium; // Base section padding
+        background-color: rgba($primary-light, 0.1); // Base section background
+        border: $border-width-base solid rgba($border-color, 0.5); // Base section border
+        border-radius: $border-radius-medium; // Base section radius
+        display: flex;
+        flex-direction: column; // Base section direction
+        gap: $gap-small; // Base section gap
+        // --- End Copied from .section ---
+
+        .section_title {
+            // --- Copied from .section__title in Containers.scss ---
+            font-size: $font-size-medium;
+            font-weight: $font-weight-semibold;
+            color: $text-secondary;
+            margin-bottom: $margin-tiny;
+            padding-bottom: $padding-tiny;
+            border-bottom: 1px solid rgba($border-color, 0.5);
+            // --- End Copied from .section__title ---
+        }
+
+        .section_description {
+            // --- Copied from .text-muted in Text.scss ---
+            color: $text-muted; // Base muted color
+            font-size: $font-size-small; // Base muted size
+            // --- End Copied from .text-muted ---
+            line-height: 1.4;
+        }
+
+        .reset-button {
+            // --- Copied from .button in Buttons.scss ---
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: $padding-small $padding-base;
+            border-radius: $border-radius-slight;
+            border: $border-width-base solid $button-border;
+            background-image: linear-gradient(180deg, $button-bg-start, $button-bg-end);
+            color: $button-text;
+            font-family: $font-family-main;
+            font-size: $font-size-base;
+            font-weight: $font-weight-semibold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 0 6px rgba($shadow-color, 0.6);
+            min-height: 32px;
+            white-space: nowrap;
+
+            &:hover {
+                background-image: linear-gradient(180deg, $button-hover-bg-start, $button-hover-bg-end);
+                border-color: $button-hover-border;
+                color: $button-hover-text;
+                box-shadow: 0 0 10px rgba($shadow-color, 0.8);
+                transform: translateY(-1px);
+            }
+
+            &:active {
+                background-image: none;
+                background-color: $button-active-bg;
+                border-color: $button-active-border;
+                transform: translateY(0px);
+                box-shadow: 0 0 4px rgba($shadow-color, 0.5);
+            }
+
+            &.disabled {
+                background-image: none;
+                background-color: $button-disabled-bg;
+                border-color: $button-disabled-border;
+                color: $button-disabled-text;
+                cursor: not-allowed;
+                box-shadow: none;
+                transform: none;
+
+                &:hover, &:active {
+                    background-color: $button-disabled-bg;
+                    border-color: $button-disabled-border;
+                    color: $button-disabled-text;
+                    box-shadow: none;
+                    transform: none;
+                }
+            }
+            // --- End Copied from .button ---
+            // --- Copied from .button--danger in Buttons.scss ---
+            background-image: linear-gradient(180deg, rgba($text-danger, 0.15), rgba($text-danger, 0.25));
+            border-color: rgba($text-danger, 0.8);
+            color: $text-danger;
+            box-shadow: 0 0 6px rgba($text-danger, 0.4);
+
+            &:hover {
+                background-image: linear-gradient(180deg, rgba($text-danger, 0.25), rgba($text-danger, 0.35));
+                border-color: lighten($text-danger, 10%);
+                color: lighten($text-danger, 15%);
+                box-shadow: 0 0 10px rgba($text-danger, 0.6);
+            }
+
+            &:active {
+                background-color: rgba($text-danger, 0.4);
+                border-color: lighten($text-danger, 10%);
+                box-shadow: 0 0 4px rgba($text-danger, 0.3);
+            }
+            // --- End Copied from .button--danger ---
+
+            align-self: flex-start;
+            margin-top: $margin-small;
+        }
+
+        .confirmation-section {
+            margin-top: $margin-base;
+            padding: $padding-medium;
+            background-color: rgba($text-danger, 0.1);
+            border: $border-width-base solid rgba($text-danger, 0.5);
+            border-radius: $border-radius-medium;
+            display: flex;
+            flex-direction: column;
+            gap: $gap-medium;
+            align-items: center;
+
+            .confirmation-text {
+                font-size: $font-size-medium;
+                font-weight: $font-weight-bold;
+                color: $text-danger;
+                text-align: center;
+            }
+
+            .confirm-button-container {
+                display: flex;
+                gap: $gap-base;
+            }
+
+            .confirm-button {
+                // --- Copied from .button in Buttons.scss ---
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: $padding-small $padding-base;
+                border-radius: $border-radius-slight;
+                border: $border-width-base solid $button-border;
+                background-image: linear-gradient(180deg, $button-bg-start, $button-bg-end);
+                color: $button-text;
+                font-family: $font-family-main;
+                font-size: $font-size-base;
+                font-weight: $font-weight-semibold;
+                text-align: center;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                cursor: pointer;
+                transition: all 0.15s ease-in-out;
+                box-shadow: 0 0 6px rgba($shadow-color, 0.6);
+                min-height: 32px;
+                white-space: nowrap;
+
+                &:hover {
+                    background-image: linear-gradient(180deg, $button-hover-bg-start, $button-hover-bg-end);
+                    border-color: $button-hover-border;
+                    color: $button-hover-text;
+                    box-shadow: 0 0 10px rgba($shadow-color, 0.8);
+                    transform: translateY(-1px);
+                }
+
+                &:active {
+                    background-image: none;
+                    background-color: $button-active-bg;
+                    border-color: $button-active-border;
+                    transform: translateY(0px);
+                    box-shadow: 0 0 4px rgba($shadow-color, 0.5);
+                }
+
+                &.disabled {
+                    background-image: none;
+                    background-color: $button-disabled-bg;
+                    border-color: $button-disabled-border;
+                    color: $button-disabled-text;
+                    cursor: not-allowed;
+                    box-shadow: none;
+                    transform: none;
+
+                    &:hover, &:active {
+                        background-color: $button-disabled-bg;
+                        border-color: $button-disabled-border;
+                        color: $button-disabled-text;
+                        box-shadow: none;
+                        transform: none;
+                    }
+                }
+                // --- End Copied from .button ---
+
+                min-width: 120px;
+
+                &.yes {
+                    // --- Copied from .button--danger in Buttons.scss ---
+                    background-image: linear-gradient(180deg, rgba($text-danger, 0.15), rgba($text-danger, 0.25));
+                    border-color: rgba($text-danger, 0.8);
+                    color: $text-danger;
+                    box-shadow: 0 0 6px rgba($text-danger, 0.4);
+
+                    &:hover {
+                        background-image: linear-gradient(180deg, rgba($text-danger, 0.25), rgba($text-danger, 0.35));
+                        border-color: lighten($text-danger, 10%);
+                        color: lighten($text-danger, 15%);
+                        box-shadow: 0 0 10px rgba($text-danger, 0.6);
+                    }
+
+                    &:active {
+                        background-color: rgba($text-danger, 0.4);
+                        border-color: lighten($text-danger, 10%);
+                        box-shadow: 0 0 4px rgba($text-danger, 0.3);
+                    }
+                    // --- End Copied from .button--danger ---
+                }
+
+                &.no {
+                    // --- Copied from .button--secondary in Buttons.scss ---
+                    background-image: none;
+                    background-color: transparent;
+                    border-color: rgba($button-border, 0.6);
+                    color: $text-secondary;
+                    box-shadow: none;
+
+                    &:hover {
+                        background-color: rgba($button-hover-bg-end, 0.5);
+                        border-color: $button-hover-border;
+                        color: $button-hover-text;
+                        box-shadow: 0 0 6px rgba($shadow-color, 0.6);
+                        transform: translateY(-1px);
+                    }
+
+                    &:active {
+                        background-color: rgba($button-active-bg, 0.8);
+                        border-color: $button-active-border;
+                        transform: translateY(0px);
+                        box-shadow: none;
+                    }
+                    // --- End Copied from .button--secondary ---
+                }
+            }
+        }
+    }
+}

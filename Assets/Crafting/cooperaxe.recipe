@@ -1,0 +1,17 @@
+{
+  "Name": "Copper Axe",
+  "Category": "Axe",
+  "ToolType": "CopperOre",
+  "Material": "",
+  "Level": 1,
+  "OutputQuality": 1,
+  "CanHaveBonuses": true,
+  "MinBonuses": 0,
+  "MaxBonuses": 1,
+  "RequiredProfessionLevel": 1,
+  "Costs": {
+    "CopperOre": 10
+  },
+  "__references": [],
+  "__version": 0
+}

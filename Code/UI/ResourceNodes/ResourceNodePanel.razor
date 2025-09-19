@@ -1,0 +1,59 @@
+@using Sandbox;
+@using System;
+@using ResourceFarmer.Resources; 
+@using Sandbox.UI
+@attribute [StyleSheet]
+
+@inherits PanelComponent
+
+<root class="resource-node-panel">
+	<div class="resource-type">@ResourceTypeDisplay </div>
+    <div class="resource-amount">@ResourceAmountDisplay</div>
+    <div class="resource-difficulty">@ResourceDifficulty</div>
+	<div class="resource-req-tooltype">@ResourceRequiredTooltype</div>
+</root>
+
+@code {
+	// Removed [Property] as these are derived
+	public string ResourceTypeDisplay { get; set; } = "Unknown";
+	public string ResourceAmountDisplay { get; set; } = "IDK";
+	public string ResourceDifficulty { get; set; } = "0.0"; // Default difficulty
+	public string ResourceRequiredTooltype { get; set; } = "None"; // Default tool type
+
+	// Keep reference to the node to get data
+	[Property] public ResourceNode Node { get; set; }
+
+	// Removed worldPanel and resourceNode properties as Node is sufficient
+
+
+	protected override void OnUpdate()
+	{
+		// Continuously update the amount display
+		UpdateDisplay();
+	}
+
+	private void UpdateDisplay()
+	{
+		if (Node != null)
+		{
+			ResourceTypeDisplay = Node.ResourceType.ToString();
+			// Format the amount to one decimal place
+			ResourceAmountDisplay = (Node.Amount).ToString("F2");
+			ResourceDifficulty = Node.Difficulty.ToString("F2"); // Assuming ResourceNode has a Difficulty property
+			ResourceRequiredTooltype = Node.RequiredToolType.ToString(); // Assuming ResourceNode has a RequiredToolType property
+		}
+		else
+		{
+			ResourceTypeDisplay = "Error";
+			ResourceAmountDisplay = "N/A";
+			ResourceDifficulty = "0.0"; // Default difficulty if Node is null
+			ResourceRequiredTooltype = "None"; // Default tool type if Node is null
+		}
+	}
+
+	protected override int BuildHash()
+	{
+		// Hash based on the actual displayed values
+		return System.HashCode.Combine(ResourceTypeDisplay, ResourceAmountDisplay, ResourceDifficulty, ResourceRequiredTooltype, DateTime.Now);	
+	}
+}

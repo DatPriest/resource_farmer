@@ -1,0 +1,80 @@
+@* File: resource_farmer/Code/UI/Crafting/RecipeListPanel.razor *@
+@using Sandbox.UI;
+@using System.Collections.Generic;
+@using System.Linq;
+@using ResourceFarmer.PlayerBase;
+@using ResourceFarmer.Crafting;
+@using ResourceFarmer.Items; 
+
+@inherits Panel
+
+<div class="recipe-list-panel">
+	<div class="list-container">
+		@if (GroupedAndSortedRecipes != null && GroupedAndSortedRecipes.Any())
+		{
+			@foreach (var group in GroupedAndSortedRecipes)
+			{
+				<label class="category-header">@group.Key</label>
+				@foreach (var recipe in group.Value)
+				{
+					<RecipeItem Recipe=@recipe Player=@Player />
+				}
+			}
+		}
+		else
+		{
+			<div class="info-text">No Recipes Available</div>
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter, EditorRequired] public List<CraftingRecipeResource>? AllRecipes { get; set; }
+	[Parameter, EditorRequired] public Player? Player { get; set; }
+
+	// Stores the processed recipes for display
+	public Dictionary<string, List<CraftingRecipeResource>>? GroupedAndSortedRecipes { get; private set; }
+
+	protected override void OnParametersSet()
+	{
+        // Process recipes whenever parameters change
+        // Log.Info($"RecipeListPanel: OnParametersSet called. Got {AllRecipes?.Count ?? 0} recipes.");
+		ProcessRecipes();
+		base.OnParametersSet();
+	}
+
+    /// <summary>
+    /// Groups recipes by category and sorts them within each category by material, then level.
+    /// </summary>
+	private void ProcessRecipes()
+	{
+		if (AllRecipes == null || !AllRecipes.Any())
+		{
+			GroupedAndSortedRecipes = null;
+            StateHasChanged();
+			return;
+		}
+
+		try
+		{
+			// Group by Category, then Sort within group by Material, then Level
+            // Need to handle potential nulls carefully during sorting
+			GroupedAndSortedRecipes = AllRecipes
+                .OrderBy(r => r.Category ?? "Misc") // Primary sort by Category
+                .GroupBy(r => r.Category ?? "Misc")
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.OrderBy(r => r.Material) // Secondary sort by Material name
+                          .ThenBy(r => r.Level) // Tertiary sort by Level
+                          .ToList()
+                );
+            // Log.Info($"RecipeListPanel: Processed {GroupedAndSortedRecipes?.Sum(kvp => kvp.Value.Count) ?? 0} recipes into {GroupedAndSortedRecipes?.Count ?? 0} groups.");
+		}
+		catch (System.Exception ex)
+		{
+			Log.Error($"Error processing recipes: {ex.Message}");
+			GroupedAndSortedRecipes = null;
+		}
+        StateHasChanged(); // Update the UI
+	}
+}

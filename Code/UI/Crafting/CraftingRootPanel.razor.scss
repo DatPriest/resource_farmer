@@ -1,0 +1,149 @@
+// File: resource_farmer/Code/UI/Crafting/CraftingRootPanel.razor.scss
+@import "../Styles/Theme.scss";
+
+// --- Base Panel Style ---
+.crafting-container {
+    display: flex;
+    width: 75%;
+    height: 75%;
+
+}
+.crafting-root-panel {
+    // Base panel appearance copied from theme's .panel
+    background-color: $background-transparent-medium;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 2px rgba($shadow-color, 0.7);
+    backdrop-filter: blur($backdrop-blur-strength);
+    color: $text-primary;
+    font-family: $font-family-main;
+    font-size: $font-size-base;
+    // Positioning & Sizing
+    width: 100%;
+    height: 100%; // Responsive size
+    top: 50%;
+    left: 50%;
+    position: relative;
+    // Layout
+    display: flex;
+    flex-direction: column; // Stacks header and content vertically
+    padding: $padding-base; // Overall padding (applied here, not header/content)
+    // Interaction & Transitions
+    pointer-events: all;
+    z-index: 100;
+    transition: all 0.3s ease-out;
+    opacity: 1;
+
+    &:intro {
+        transform: translate(-50%, -50%) scale(0.9) translateY(10px);
+        opacity: 0;
+    }
+
+    &:outro {
+        transform: translate(-50%, -50%) scale(1.05) translateY(-5px);
+        opacity: 0;
+    }
+    // --- Header ---
+    .header {
+        // Copied from theme's .panel__header, adjusted for padding on root
+        padding: $padding-medium 0; // Only vertical padding here
+        margin: 0 0 $margin-base 0; // Only bottom margin needed
+        border-bottom: $border-width-base solid $border-color;
+        background-color: rgba($primary-light, 0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0; // Prevent header shrinking
+
+        .title { // Copied from theme's .panel__header .title
+            font-size: $font-size-large;
+            font-weight: $font-weight-semibold;
+            color: $text-primary;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 4px $shadow-color;
+        }
+
+        .close-button { // Copied from theme's header close button style
+            // Base button copied styles
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: $font-family-main;
+            font-weight: $font-weight-semibold;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            border: $border-width-base solid transparent;
+            // Specific look (round, transparent, danger hover)
+            background-image: none;
+            background-color: transparent;
+            border-color: rgba($button-border, 0.6);
+            color: $text-secondary;
+            box-shadow: none;
+            min-width: 26px;
+            min-height: 26px;
+            width: 26px;
+            height: 26px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: $font-size-base; // Use base font size for icon/text
+            font-family: MaterialIcons; // Assuming 'close' icon font
+            line-height: 26px; // Center icon
+            width: 5%;
+
+            &:hover {
+                background-color: rgba($text-danger, 0.4);
+                border-color: $text-danger;
+                color: #ffffff;
+                transform: none;
+                box-shadow: none;
+            }
+
+            &:active {
+                background-color: rgba($text-danger, 0.6);
+                border-color: $text-danger;
+                transform: none;
+                box-shadow: none;
+            }
+
+            &.disabled {
+                background-image: none;
+                background-color: $button-disabled-bg;
+                border-color: $button-disabled-border;
+                color: $button-disabled-text;
+                cursor: not-allowed;
+                box-shadow: none;
+                transform: none;
+
+                &:hover, &:active {
+                    background-color: $button-disabled-bg;
+                    border-color: $button-disabled-border;
+                    color: $button-disabled-text;
+                    box-shadow: none;
+                    transform: none;
+                }
+            }
+        }
+    }
+    // --- Content Area ---
+    .content {
+
+        overflow: hidden; // Important for nested scroll/flex
+        display: flex;
+        flex-direction: row; // Arrange Modify | Recipe List side-by-side
+        gap: $gap-base;
+        min-height: 0; // Crucial for flex children height calculation
+        // Direct children (the containers for ModifyPanel and RecipeListPanel)
+        ModifyPanel { // Assuming ModifyPanel is first
+            flex-basis: 30%;
+            flex-shrink: 0; // Don't shrink modify panel
+            min-width: 250px; // Prevent excessive shrinking
+        }
+
+        RecipeListPanel { // Assuming RecipeListPanel is second
+            flex-basis: 70%;
+            flex-grow: 1; // Allow recipe list to take extra space
+            min-width: 300px; // Prevent excessive shrinking
+        }
+    }
+}

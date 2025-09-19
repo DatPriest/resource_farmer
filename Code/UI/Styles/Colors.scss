@@ -1,0 +1,63 @@
+// --- Solo Leveling Inspired Color Palette ---
+
+// Core Dark Tones
+$primary-dark: #0A0C12; // Deepest background
+$primary-medium: #141822; // Panel backgrounds
+$primary-light: #1E2330; // Slightly lighter panels/hover
+
+// Accent Colors (Electric Blues, Purples, Golds)
+$accent-blue: #4D9DFF;
+$accent-blue-light: #7AC0FF;
+$accent-purple: #9B59FF;
+$accent-purple-light: #BF8FFF;
+$accent-gold: #FFD700;
+$accent-gold-light: #FFEA70;
+
+// Text Colors
+$text-primary: #E0E5EC; // Main bright text
+$text-secondary: #A0A8B8; // Dimmer text, labels
+$text-muted: #7A8290; // Very dim text, placeholders
+$text-accent: $accent-blue;
+$text-accent-hover: $accent-blue-light;
+$text-warning: $accent-gold;
+$text-danger: #FF4D4D;
+$text-success: #59FFAA;
+$text-disabled: #555C6A;
+
+// Functional Colors
+$border-color: rgba($accent-blue, 0.2); // Default subtle border
+$border-highlight: $accent-blue; // Bright border for focus/hover
+$border-purple: rgba($accent-purple, 0.3);
+$border-gold: rgba($accent-gold, 0.4);
+$shadow-color: rgba($accent-blue, 0.3); // For glows/shadows
+$shadow-purple: rgba($accent-purple, 0.25);
+$shadow-gold: rgba($accent-gold, 0.35);
+$background-transparent-dark: rgba($primary-dark, 0.92);
+$background-transparent-medium: rgba($primary-medium, 0.88);
+$backdrop-blur-strength: 5px; // Adjust blur amount
+
+// Button Specific
+$button-bg-start: rgba($primary-light, 0.5);
+$button-bg-end: rgba($primary-medium, 0.6);
+$button-border: $accent-blue;
+$button-text: $text-primary;
+$button-hover-bg-start: rgba($accent-blue, 0.2);
+$button-hover-bg-end: rgba($accent-blue, 0.1);
+$button-hover-border: $accent-blue-light;
+$button-hover-text: $text-primary;
+$button-active-bg: rgba($accent-blue, 0.3);
+$button-active-border: $accent-blue-light;
+$button-disabled-bg: #2A2F3A;
+$button-disabled-border: #404652;
+$button-disabled-text: $text-disabled;
+
+// Health/Resource Bars
+$health-color: #FF4D4D;
+$mana-color: $accent-blue;
+$stamina-color: $accent-gold;
+$exp-color: $accent-purple;
+$bar-background: rgba($primary-dark, 0.7);
+$bar-border: rgba($text-secondary, 0.2);
+
+// Shadows
+$panel-shadow: 0 0 20px rgba($shadow-color, 0.5); // Panel shadow

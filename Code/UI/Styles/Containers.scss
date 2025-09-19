@@ -1,0 +1,277 @@
+// --- Container Styles ---
+@import "Colors.scss";
+@import "Layout.scss";
+@import "Text.scss"; // Import Text for font variables
+
+// Base Panel Style (Apply this class to main window/panel elements)
+.panel {
+  display: flex;
+  flex-direction: column;
+  background-color: $background-transparent-medium;
+  border: $border-width-base solid $border-color;
+  border-radius: $border-radius-slight;
+  padding: $padding-base;
+  box-shadow: 0 0 10px 2px rgba($shadow-color, 0.7); // Defined glow
+  backdrop-filter: blur($backdrop-blur-strength);
+  color: $text-primary;
+  overflow: hidden; // Prevent content spillover by default
+  // Intro/Outro Transitions (S&box specific)
+  transition: all 0.3s ease-out;
+  transform: scale(1);
+  opacity: 1;
+
+  &:intro {
+    transform: scale(0.9) translateY(10px);
+    opacity: 0;
+  }
+
+  &:outro {
+    transform: scale(1.05) translateY(-5px);
+    opacity: 0;
+  }
+}
+
+// Panel Header
+.panel__header {
+  padding: $padding-medium $padding-base;
+  margin: -$padding-base -$padding-base $margin-base -$padding-base; // Extend to edges
+  border-bottom: $border-width-base solid $border-color;
+  background-color: rgba($primary-light, 0.3); // Slight header background
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; // Prevent header shrinking
+
+  .title {
+    font-size: $font-size-large;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 4px $shadow-color;
+  }
+
+  .close-button {
+    display: flex; // Use flex for alignment within button
+    align-items: center;
+    justify-content: center;
+    padding: $padding-small $padding-base; // Overridden below
+    border-radius: $border-radius-slight; // Overridden below
+    border: $border-width-base solid $button-border; // Overridden below
+    background-image: linear-gradient(
+      180deg,
+      $button-bg-start,
+      $button-bg-end
+    ); // Overridden below
+    color: $button-text; // Overridden below
+    font-family: $font-family-main; // Use variable directly
+    font-size: $font-size-base; // Overridden below
+    font-weight: $font-weight-semibold; // Use variable directly
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 0 6px rgba($shadow-color, 0.6); // Overridden below
+    min-height: 32px; // Overridden below
+    white-space: nowrap; // Prevent text wrapping
+
+    &.disabled {
+      background-image: none;
+      background-color: $button-disabled-bg;
+      border-color: $button-disabled-border;
+      color: $button-disabled-text;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+
+      &:hover,
+      &:active {
+        // Prevent visual changes when disabled
+        background-color: $button-disabled-bg;
+        border-color: $button-disabled-border;
+        color: $button-disabled-text;
+        box-shadow: none;
+        transform: none;
+      }
+    }
+
+    background-image: none;
+    background-color: transparent; // Overridden below
+    border-color: rgba($button-border, 0.6); // Overridden below
+    color: $text-secondary; // Overridden below
+    box-shadow: none; // Overridden below
+
+    &:hover {
+      background-color: rgba($button-hover-bg-end, 0.5); // Overridden below
+      border-color: $button-hover-border; // Overridden below
+      color: $button-hover-text; // Overridden below
+      box-shadow: 0 0 6px rgba($shadow-color, 0.6); // Overridden below
+      transform: translateY(-1px); // Overridden below
+    }
+
+    &:active {
+      background-color: rgba($button-active-bg, 0.8); // Overridden below
+      border-color: $button-active-border; // Overridden below
+      transform: translateY(0px); // Overridden below
+      box-shadow: none; // Overridden below
+    }
+
+    padding: $padding-tiny; // Smaller padding
+    min-height: 24px;
+    min-width: 24px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%; // Make it round
+    font-size: 14px;
+    line-height: 1; // Adjust line-height for icon/text centering
+
+    &:hover {
+      background-color: rgba($text-danger, 0.4);
+      border-color: $text-danger;
+      color: #ffffff;
+      transform: none; // Override base button hover transform
+      box-shadow: none; // Override base button hover shadow
+    }
+  }
+}
+
+// Panel Content Area
+.panel__content {
+  flex-grow: 1; // Allow content to fill remaining space
+  overflow-y: scroll; // Add scrollbar ONLY if content exceeds panel height
+  overflow-x: hidden;
+  padding: $padding-tiny $padding-small; // Add some padding around content
+  margin: 0 -$padding-small; // Adjust for padding if needed
+  display: flex;
+  flex-direction: column;
+  gap: $gap-medium;
+}
+
+// Panel Footer
+.panel__footer {
+  padding: $padding-medium $padding-base;
+  margin: $margin-base -$padding-base -$padding-base -$padding-base; // Extend to edges
+  border-top: $border-width-base solid $border-color;
+  background-color: rgba($primary-light, 0.3);
+  display: flex;
+  justify-content: flex-end; // Align buttons to the right typically
+  align-items: center;
+  gap: $gap-medium;
+  flex-shrink: 0; // Prevent footer shrinking
+}
+
+// Variations
+.panel--sharp {
+  border-radius: $border-radius-sharp;
+
+  .panel__header,
+  .panel__footer {
+    // Adjust header/footer if panel is sharp
+    margin-left: -$padding-base;
+    margin-right: -$padding-base;
+  }
+
+  .panel__header {
+    margin-top: -$padding-base;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .panel__footer {
+    margin-bottom: -$padding-base;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.panel--accent-purple {
+  border-color: $border-purple;
+  box-shadow: 0 0 10px 2px rgba($shadow-purple, 0.7);
+
+  .panel__header,
+  .panel__footer {
+    border-color: $border-purple;
+  }
+
+  .panel__header .title {
+    text-shadow: 0 0 4px $shadow-purple;
+  }
+}
+
+.panel--accent-gold {
+  border-color: $border-gold;
+  box-shadow: 0 0 10px 2px rgba($shadow-gold, 0.7);
+
+  .panel__header,
+  .panel__footer {
+    border-color: $border-gold;
+  }
+
+  .panel__header .title {
+    text-shadow: 0 0 4px $shadow-gold;
+  }
+}
+
+// Tooltip Container
+.tooltip {
+  display: flex;
+  flex-direction: column;
+  background-color: $background-transparent-medium; // Overridden below
+  border: $border-width-base solid $border-color; // Overridden below
+  border-radius: $border-radius-slight; // Overridden below
+  padding: $padding-base; // Overridden below
+  box-shadow: 0 0 10px 2px rgba($shadow-color, 0.7); // Overridden below
+  backdrop-filter: blur($backdrop-blur-strength); // Overridden below
+  color: $text-primary;
+  overflow: hidden; // Prevent content spillover by default
+  transition: all 0.3s ease-out; // Overridden below
+  transform: scale(1); // Overridden below
+  opacity: 1; // Overridden below
+
+  &:intro {
+    transform: scale(0.9) translateY(10px); // Overridden below
+    opacity: 0; // Overridden below
+  }
+
+  &:outro {
+    transform: scale(1.05) translateY(-5px); // Overridden below
+    opacity: 0; // Overridden below
+  }
+
+  padding: $padding-small $padding-medium;
+  border-radius: $border-radius-medium;
+  background-color: rgba($primary-dark, 0.96); // More opaque
+  box-shadow: 0 2px 5px rgba($primary-dark, 0.5);
+  border-color: rgba($border-highlight, 0.5);
+  max-width: 250px;
+  pointer-events: none; // Tooltips shouldn't be interactive
+  z-index: 999; // Ensure tooltips are on top
+  // Override intro/outro if needed
+  &:intro,
+  &:outro {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+// Generic Section within a Panel
+.section {
+  padding: $padding-medium;
+  background-color: rgba($primary-light, 0.1);
+  border: $border-width-base solid rgba($border-color, 0.5);
+  border-radius: $border-radius-medium;
+  display: flex;
+  flex-direction: column;
+  gap: $gap-small;
+}
+
+.section__title {
+  font-size: $font-size-medium;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+  margin-bottom: $margin-tiny;
+  padding-bottom: $padding-tiny;
+  border-bottom: 1px solid rgba($border-color, 0.5);
+}

@@ -1,0 +1,124 @@
+[
+  {
+    "Id": "wooden_axe_1",
+    "Name": "Wooden Axe",
+    "Category": "Axes",
+    "ToolType": "Wood",
+    "Material": "Wood",
+    "Level": 1,
+    "RequiredProfessionLevel": 1,
+    "Costs": {
+      "Wood": 7.0
+    }
+  },
+  {
+    "Id": "stone_axe_2",
+    "Name": "Stone Axe",
+    "Category": "Axes",
+    "ToolType": "Wood",
+    "Material": "Stone",
+    "Level": 2,
+    "RequiredProfessionLevel": 2,
+    "Costs": {
+      "Wood": 3.0,
+      "Stone": 11.0
+    }
+  },
+  {
+    "Id": "iron_axe_3",
+    "Name": "Iron Axe",
+    "Category": "Axes",
+    "ToolType": "Wood",
+    "Material": "Iron",
+    "Level": 3,
+    "RequiredProfessionLevel": 5,
+    "Costs": {
+      "Wood": 5.0,
+      "IronOre": 15.0,
+      "Coal": 5.0
+    }
+  },
+  {
+    "Id": "steel_axe_4",
+    "Name": "Steel Axe",
+    "Category": "Axes",
+    "ToolType": "Wood",
+    "Material": "Steel",
+    "Level": 4,
+    "RequiredProfessionLevel": 10,
+    "Costs": {
+      "Wood": 7.0,
+      "IronOre": 20.0,
+      "Coal": 10.0
+    }
+  },
+  {
+    "Id": "stone_pickaxe_1",
+    "Name": "Stone Pickaxe",
+    "Category": "Pickaxes",
+    "ToolType": "Stone", // Relevant profession for Pickaxe
+    "Material": "Stone",
+    "Level": 1,
+    "RequiredProfessionLevel": 1,
+    "Costs": {
+      "Wood": 3.0,
+      "Stone": 11.0
+    }
+  },
+  {
+    "Id": "iron_pickaxe_2",
+    "Name": "Iron Pickaxe",
+    "Category": "Pickaxes",
+    "ToolType": "Stone",
+    "Material": "Iron",
+    "Level": 2,
+    "RequiredProfessionLevel": 3,
+    "Costs": {
+      "Wood": 4.0,
+      "IronOre": 14.0,
+      "Coal": 4.0
+    }
+  },
+  {
+    "Id": "steel_pickaxe_3",
+    "Name": "Steel Pickaxe",
+    "Category": "Pickaxes",
+    "ToolType": "Stone",
+    "Material": "Steel",
+    "Level": 3,
+    "RequiredProfessionLevel": 8,
+    "Costs": {
+      "Wood": 6.0,
+      "IronOre": 25.0,
+      "Coal": 12.0
+    }
+  }
+  // --- Add more recipes here (up to 20 or more) ---
+  // Example: Shovel (Fiber?)
+  // {
+  //   "Id": "wooden_shovel_1",
+  //   "Name": "Wooden Shovel",
+  //   "Category": "Shovels",
+  //   "ToolType": "Fiber", // Assuming Fiber is the relevant skill
+  //   "Material": "Wood",
+  //   "Level": 1,
+  //   "RequiredProfessionLevel": 1,
+  //   "Costs": {
+  //     "Wood": 5.0
+  //   }
+  // },
+  // Example: Fishing Rod?
+  // {
+  //   "Id": "basic_rod_1",
+  //   "Name": "Basic Fishing Rod",
+  //   "Category": "Fishing",
+  //   "ToolType": "Fiber", // Or a new Fishing skill?
+  //   "Material": "Wood",
+  //   "Level": 1,
+  //   "RequiredProfessionLevel": 1,
+  //   "Costs": {
+  //     "Wood": 4.0,
+  //     "Fiber": 2.0
+  //   }
+  // }
+]

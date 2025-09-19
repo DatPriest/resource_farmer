@@ -1,0 +1,322 @@
+// File: resource_farmer/Code/UI/Crafting/RecipeItem.razor.scss
+@import "../Styles/Theme.scss";
+
+.recipe-item {
+    // Base Appearance
+    background-color: rgba($primary-dark, 0.3);
+    border: $border-width-base solid rgba($border-color, 0.5);
+    border-left-width: 3px;
+    border-left-color: $text-muted; // Default state color
+    border-radius: $border-radius-slight;
+    padding: $padding-small $padding-medium;
+    min-height: 65px; // Slightly increased height for stats preview
+    // Layout
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $gap-base;
+    transition: all 0.2s ease;
+    flex-shrink: 0; // Important for scroll list
+    position: relative; // REQUIRED for absolute tooltip positioning
+
+
+    &:hover {
+        background-color: rgba($accent-blue, 0.1);
+        border-color: rgba($accent-blue, 0.4);
+        border-left-color: $accent-blue;
+
+        .recipe-tooltip {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+        // Corrected hover transform
+    }
+
+    &--cannot-craft {
+        border-left-color: $text-disabled; // Use disabled color
+        opacity: 0.7;
+
+        &:hover {
+            border-left-color: $text-secondary; // Slightly brighter on hover
+            background-color: rgba($primary-light, 0.1); // Minimal background change
+            border-color: rgba($border-color, 0.5); // Keep border dim
+        }
+
+        .name {
+            color: $text-secondary;
+        }
+        // Dim name
+        .button { // Apply disabled styles copied from Buttons.scss
+            background-image: none;
+            background-color: $button-disabled-bg;
+            border-color: $button-disabled-border;
+            color: $button-disabled-text;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+
+            &:hover, &:active {
+                background-color: $button-disabled-bg;
+                border-color: $button-disabled-border;
+                color: $button-disabled-text;
+                box-shadow: none;
+                transform: none;
+            }
+        }
+    }
+    // --- Internal Sections ---
+    .details {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        gap: $gap-tiny; // Small gap between name/reqs/stats
+        min-width: 0; // Allow shrinking
+    }
+
+    .name {
+        font-size: $font-size-base;
+        font-weight: $font-weight-semibold;
+        color: $text-primary;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .reqs {
+        font-size: $font-size-tiny;
+        color: $text-secondary;
+        display: flex;
+        flex-wrap: wrap;
+        gap: $gap-tiny $gap-small; // Vertical and horizontal gap
+        flex-direction: column; // Default direction
+
+        .req-tag {
+            padding: 2px 5px;
+            margin: 0 5px;
+            border-radius: $border-radius-slight;
+            font-weight: $font-weight-medium;
+            border: $border-width-base solid transparent;
+            white-space: nowrap;
+            display: flex;
+            flex-direction: row;
+            // Modifiers
+            &--met {
+                color: $accent-blue-light;
+                background-color: rgba($accent-blue, 0.1);
+                border-color: rgba($accent-blue, 0.2);
+            }
+
+            &--not-met {
+                color: $text-danger;
+                background-color: rgba($text-danger, 0.1);
+                text-decoration-line: line-through;
+                opacity: 0.8;
+            }
+
+            &--prof {
+                color: $accent-purple-light;
+                background-color: rgba($accent-purple, 0.1);
+                border-color: rgba($accent-purple, 0.2);
+
+                &.req-tag--not-met {
+                    color: $text-danger;
+                    background-color: rgba($text-danger, 0.1);
+                    border-color: transparent;
+                }
+                // Override when prof req not met
+            }
+        }
+    }
+
+    .stats-preview {
+        font-size: $font-size-tiny;
+        color: $text-secondary;
+        display: flex;
+        flex-wrap: wrap;
+        gap: $gap-tiny $gap-small;
+        margin-top: 4px; // Small space above stats line
+
+        .stat-tag {
+            padding: 1px 4px;
+            border-radius: $border-radius-sharp;
+            background-color: rgba($primary-medium, 0.2);
+            white-space: nowrap;
+
+            &.bonus-potential { // Style bonus potential differently
+                background-color: rgba($accent-gold, 0.1);
+                color: $accent-gold;
+                font-style: italic;
+            }
+        }
+    }
+
+    .button-container {
+        flex-shrink: 0; // Prevent button squashing
+
+        .button { // Styles for the craft button
+            // Base styles copied from Buttons.scss
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: $padding-small $padding-base;
+            border-radius: $border-radius-slight;
+            border: $border-width-base solid $button-border;
+            background-image: linear-gradient(180deg, $button-bg-start, $button-bg-end);
+            color: $button-text;
+            font-family: $font-family-main;
+            font-size: $font-size-base;
+            font-weight: $font-weight-semibold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 0 6px rgba($shadow-color, 0.6);
+            min-height: 32px;
+            white-space: nowrap;
+
+            &.disabled {
+                background-image: none;
+                background-color: $button-disabled-bg;
+                border-color: $button-disabled-border;
+                color: $button-disabled-text;
+                cursor: not-allowed;
+                box-shadow: none;
+                transform: none;
+            }
+
+            &:hover {
+                background-image: linear-gradient(180deg, $button-hover-bg-start, $button-hover-bg-end);
+                border-color: $button-hover-border;
+                color: $button-hover-text;
+                box-shadow: 0 0 10px rgba($shadow-color, 0.8);
+                transform: translateY(-1px);
+            }
+
+            &:active {
+                background-image: none;
+                background-color: $button-active-bg;
+                border-color: $button-active-border;
+                transform: translateY(0px);
+                box-shadow: 0 0 4px rgba($shadow-color, 0.5);
+            }
+            // Craft Modifier copied from Buttons.scss or defined locally
+            &.button--craft {
+                width: auto;
+                padding: $padding-tiny $padding-medium;
+                min-width: 70px;
+                font-size: $font-size-small;
+                text-transform: none;
+                letter-spacing: 0.2px;
+            }
+            // Disabled state handled by parent &--cannot-craft rule targeting .button
+        }
+    }
+    // --- Tooltip Panel Styles (Fixed Positioning, No Wrap) ---
+    // --- NEW Tooltip Styles ---
+    .recipe-tooltip {
+        // Appearance (Solo Leveling Theme Inspired)
+        background-color: $background-transparent-dark; // Use theme dark
+        border: $border-width-base solid $accent-blue; // Accent border
+        border-radius: $border-radius-slight; // Sharp radius
+        padding: $padding-medium;
+        box-shadow: 0 0 15px rgba($shadow-color, 0.6); // Theme shadow, maybe stronger
+        color: $text-primary;
+        font-family: $font-family-main;
+        font-size: $font-size-small;
+        // Sizing
+        width: auto; // Let content define width
+        min-width: 200px;
+        max-width: 300px; // Limit width
+        // Positioning (Absolute, to the Right of item)
+        top: 0; // Align top with item's top
+        left: 100%; // Start at the right edge of the item
+        margin-left: $margin-base; // Gap between item and tooltip
+        z-index: 200;
+        // Initial State & Transition
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-10px); // Start slightly shifted left
+        transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+        white-space: nowrap; // Prevent wrapping for the whole tooltip initially
+        // Tooltip Content Styling
+        .tooltip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: $margin-tiny;
+
+            .item-name {
+                font-size: $font-size-medium; // Larger name
+                font-weight: $font-weight-semibold;
+                color: $text-primary;
+            }
+
+            .item-level {
+                font-size: $font-size-small;
+                font-weight: $font-weight-medium;
+                color: $text-secondary;
+            }
+        }
+
+        .separator {
+            height: $border-width-base;
+            background-color: rgba($border-color, 0.5);
+            margin: $margin-small 0;
+        }
+
+        .tooltip-section {
+            display: flex;
+            flex-direction: column;
+            gap: $gap-tiny;
+            margin-bottom: $margin-small; // Space between sections
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        .section-title {
+            font-size: $font-size-small; // Consistent size
+            font-weight: $font-weight-semibold;
+            color: $text-accent; // Use theme accent
+            margin-bottom: $margin-tiny;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .property-list, .bonus-list {
+            display: flex;
+            flex-direction: column;
+            gap: 3px; // Tight spacing
+        }
+
+        .property-item {
+            display: flex;
+            justify-content: space-between;
+
+            .prop-name {
+                color: $text-secondary;
+            }
+
+            .prop-value {
+                color: $text-primary;
+                font-weight: $font-weight-medium;
+            }
+        }
+
+        .bonus-name, .bonus-more {
+            color: $text-secondary;
+            font-style: italic;
+            font-size: $font-size-tiny; // Smaller for bonus list
+            overflow: hidden;
+            text-overflow: ellipsis; // Handle long bonus names
+        }
+
+        .info-text-small { // For "Standard Bonus Pool" etc.
+            font-size: $font-size-tiny;
+            color: $text-muted;
+            font-style: italic;
+        }
+    }
+}
