@@ -1,6 +1,7 @@
 using Sandbox;
 using Sandbox.UI;
 using ResourceFarmer.UI.MainMenu;
+using ResourceFarmer.Game;
 
 namespace ResourceFarmer.UI;
 
@@ -104,7 +105,7 @@ public sealed class MainMenuManager : Component
 		
 		// In S&box, scene loading might be handled differently
 		// For now, we'll just transition to game mode
-		var gameManager = Game.ActiveScene?.GetAllComponents<Game.GameManager>().FirstOrDefault();
+		var gameManager = Game.ActiveScene?.GetAllComponents<GameManager>().FirstOrDefault();
 		gameManager?.EnterGameMode();
 	}
 
