@@ -1,0 +1,122 @@
+@using ResourceFarmer.Resources
+@using Sandbox
+@using Sandbox.UI
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.Components
+
+<div class="inventory-slot @GetRarityClass()" 
+	 ondragstart="@OnDragStartHandler"
+	 draggable="@IsDraggable"
+	 onmouseenter="@OnMouseEnter"
+	 onmouseleave="@OnMouseLeave">
+	
+	<div class="resource-icon">
+		@GetResourceIcon()
+	</div>
+	
+	<div class="resource-info">
+		<div class="resource-name">@GetDisplayName()</div>
+		<div class="resource-amount">@Amount.ToString("F1")</div>
+	</div>
+	
+	@if (ShowActions)
+	{
+		<div class="resource-actions">
+			<BaseButton 
+				Text="Use" 
+				CssClass="use-btn" 
+				Variant="BaseButton.ButtonVariant.Primary"
+				OnClick="@(() => OnUse?.Invoke(ResourceType))"
+				Tooltip="@($"Use 1 {ResourceType}")" />
+			<BaseButton 
+				Text="Sell" 
+				CssClass="sell-btn" 
+				Variant="BaseButton.ButtonVariant.Secondary"
+				OnClick="@(() => OnSell?.Invoke(ResourceType))"
+				Tooltip="@($"Sell all {ResourceType}")" />
+		</div>
+	}
+</div>
+
+@code {
+	[Property] public ResourceType ResourceType { get; set; } = ResourceType.None;
+	[Property] public float Amount { get; set; } = 0f;
+	[Property] public bool IsDraggable { get; set; } = true;
+	[Property] public bool ShowActions { get; set; } = true;
+	[Property] public Action<ResourceType> OnUse { get; set; }
+	[Property] public Action<ResourceType> OnSell { get; set; }
+	[Property] public Action<DragEvent, ResourceType> OnDragStart { get; set; }
+	[Property] public Action<ResourceType> OnMouseHover { get; set; }
+	[Property] public Action OnMouseExit { get; set; }
+
+	private void OnDragStartHandler(DragEvent e)
+	{
+		if (IsDraggable)
+		{
+			OnDragStart?.Invoke(e, ResourceType);
+		}
+	}
+
+	private void OnMouseEnter()
+	{
+		OnMouseHover?.Invoke(ResourceType);
+	}
+
+	private void OnMouseLeave()
+	{
+		OnMouseExit?.Invoke();
+	}
+
+	private string GetResourceIcon()
+	{
+		return ResourceType switch
+		{
+			ResourceType.Wood => "🪵",
+			ResourceType.Stone => "🪨",
+			ResourceType.Fiber => "🌾",
+			ResourceType.CopperOre => "🟤",
+			ResourceType.TinOre => "⚪",
+			ResourceType.IronOre => "⚫",
+			ResourceType.Coal => "⚫",
+			ResourceType.SilverOre => "⚪",
+			ResourceType.GoldOre => "🟡",
+			ResourceType.MithrilOre => "💎",
+			ResourceType.AdamantiteOre => "💎",
+			ResourceType.Quartz => "🔹",
+			ResourceType.RubyRough => "🔴",
+			ResourceType.SapphireRough => "🔵",
+			ResourceType.EmeraldRough => "🟢",
+			ResourceType.DiamondRough => "💎",
+			ResourceType.EssenceDust => "✨",
+			ResourceType.CrystalShard => "🔸",
+			ResourceType.DragonScale => "🐉",
+			ResourceType.PhoenixFeather => "🔥",
+			_ => "❓"
+		};
+	}
+
+	private string GetDisplayName()
+	{
+		return ResourceType.ToString().Replace("Ore", " Ore").Replace("Rough", " (Rough)");
+	}
+
+	private string GetRarityClass()
+	{
+		return ResourceType switch
+		{
+			ResourceType.Wood or ResourceType.Stone or ResourceType.Fiber => "common",
+			ResourceType.CopperOre or ResourceType.TinOre or ResourceType.Coal => "uncommon",
+			ResourceType.IronOre or ResourceType.SilverOre => "rare",
+			ResourceType.GoldOre or ResourceType.Quartz => "epic",
+			ResourceType.MithrilOre or ResourceType.AdamantiteOre => "legendary",
+			ResourceType.EssenceDust or ResourceType.CrystalShard => "magical",
+			ResourceType.DragonScale or ResourceType.PhoenixFeather => "mythic",
+			_ => "common"
+		};
+	}
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine(ResourceType, Amount, IsDraggable, ShowActions);
+	}
+}

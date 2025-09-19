@@ -15,6 +15,12 @@
 @import "../Components/BasePanel.razor.scss";
 @import "../Components/BaseSlider.razor.scss";
 
+// Import inventory components
+@import "../Components/InventorySlot.razor.scss";
+@import "../Components/ItemTooltip.razor.scss";
+@import "../Components/FilterButtons.razor.scss";
+@import "../Components/InventoryHeader.razor.scss";
+
 // Import main menu components
 @import "../MainMenu/MainMenuPanel.razor.scss";
 @import "../MainMenu/MultiplayerSection.razor.scss";

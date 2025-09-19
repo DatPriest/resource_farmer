@@ -1,0 +1,71 @@
+@using Sandbox
+@using Sandbox.UI
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.Components
+
+<div class="inventory-header">
+	<div class="title">
+		<i class="icon">@TitleIcon</i>
+		<span>@Title</span>
+	</div>
+	
+	@if (ShowCapacityInfo)
+	{
+		<div class="capacity-info">
+			<span class="capacity-text">@GetCapacityText()</span>
+			<div class="capacity-bar">
+				<div class="capacity-fill" style="width: @GetCapacityPercentage()%;"></div>
+			</div>
+		</div>
+	}
+	
+	@if (ShowCloseButton)
+	{
+		<BaseButton 
+			Text="×" 
+			CssClass="close-btn" 
+			Variant="BaseButton.ButtonVariant.Secondary"
+			OnClick="@OnClose"
+			Tooltip="Close (ESC)" />
+	}
+</div>
+
+@code {
+	[Property] public string Title { get; set; } = "Inventory";
+	[Property] public string TitleIcon { get; set; } = "📦";
+	[Property] public bool ShowCapacityInfo { get; set; } = true;
+	[Property] public bool ShowCloseButton { get; set; } = true;
+	[Property] public float CurrentCapacity { get; set; } = 0f;
+	[Property] public float MaxCapacity { get; set; } = 1000f;
+	[Property] public Action OnClose { get; set; }
+
+	private string GetCapacityText()
+	{
+		return $"{CurrentCapacity:F0} / {MaxCapacity:F0}";
+	}
+
+	private float GetCapacityPercentage()
+	{
+		if (MaxCapacity <= 0) return 0f;
+		return Math.Clamp((CurrentCapacity / MaxCapacity) * 100f, 0f, 100f);
+	}
+
+	private string GetCapacityColor()
+	{
+		var percentage = GetCapacityPercentage();
+		
+		if (percentage >= 90f)
+			return "#ff4757"; // Red - almost full
+		else if (percentage >= 75f)
+			return "#ffa502"; // Orange - getting full
+		else if (percentage >= 50f)
+			return "#ffdd59"; // Yellow - half full
+		else
+			return "#5fb3d4"; // Blue - plenty of space
+	}
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine(Title, TitleIcon, ShowCapacityInfo, ShowCloseButton, CurrentCapacity, MaxCapacity);
+	}
+}

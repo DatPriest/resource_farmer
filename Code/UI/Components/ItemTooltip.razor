@@ -1,0 +1,186 @@
+@using ResourceFarmer.Resources
+@using Sandbox
+@using Sandbox.UI
+@inherits PanelComponent
+@namespace ResourceFarmer.UI.Components
+
+@if (IsVisible && ResourceType != ResourceType.None)
+{
+	<div class="item-tooltip @GetRarityClass()" style="@GetPositionStyle()">
+		<div class="tooltip-header">
+			<span class="tooltip-icon">@GetResourceIcon()</span>
+			<span class="tooltip-title">@GetDisplayName()</span>
+		</div>
+		
+		<div class="tooltip-body">
+			<div class="tooltip-row">
+				<span class="label">Amount:</span>
+				<span class="value">@Amount.ToString("F1")</span>
+			</div>
+			
+			<div class="tooltip-row">
+				<span class="label">Category:</span>
+				<span class="value">@GetResourceCategory()</span>
+			</div>
+			
+			@if (ShowValue)
+			{
+				<div class="tooltip-row">
+					<span class="label">Value:</span>
+					<span class="value">@GetResourceValue().ToString("C2")</span>
+				</div>
+				
+				<div class="tooltip-row">
+					<span class="label">Total Value:</span>
+					<span class="value">@((Amount * GetResourceValue()).ToString("C2"))</span>
+				</div>
+			}
+		</div>
+		
+		<div class="tooltip-footer">
+			<div class="description">@GetResourceDescription()</div>
+			@if (ShowHelp)
+			{
+				<div class="help-text">Click to select • Drag to move</div>
+			}
+		</div>
+	</div>
+}
+
+@code {
+	[Property] public ResourceType ResourceType { get; set; } = ResourceType.None;
+	[Property] public float Amount { get; set; } = 0f;
+	[Property] public bool IsVisible { get; set; } = false;
+	[Property] public bool ShowValue { get; set; } = true;
+	[Property] public bool ShowHelp { get; set; } = true;
+	[Property] public float MouseX { get; set; } = 0f;
+	[Property] public float MouseY { get; set; } = 0f;
+
+	private string GetPositionStyle()
+	{
+		// Offset tooltip to avoid cursor overlap
+		var x = MouseX + 15;
+		var y = MouseY - 10;
+		return $"left: {x}px; top: {y}px;";
+	}
+
+	private string GetResourceIcon()
+	{
+		return ResourceType switch
+		{
+			ResourceType.Wood => "🪵",
+			ResourceType.Stone => "🪨",
+			ResourceType.Fiber => "🌾",
+			ResourceType.CopperOre => "🟤",
+			ResourceType.TinOre => "⚪",
+			ResourceType.IronOre => "⚫",
+			ResourceType.Coal => "⚫",
+			ResourceType.SilverOre => "⚪",
+			ResourceType.GoldOre => "🟡",
+			ResourceType.MithrilOre => "💎",
+			ResourceType.AdamantiteOre => "💎",
+			ResourceType.Quartz => "🔹",
+			ResourceType.RubyRough => "🔴",
+			ResourceType.SapphireRough => "🔵",
+			ResourceType.EmeraldRough => "🟢",
+			ResourceType.DiamondRough => "💎",
+			ResourceType.EssenceDust => "✨",
+			ResourceType.CrystalShard => "🔸",
+			ResourceType.DragonScale => "🐉",
+			ResourceType.PhoenixFeather => "🔥",
+			_ => "❓"
+		};
+	}
+
+	private string GetDisplayName()
+	{
+		return ResourceType.ToString().Replace("Ore", " Ore").Replace("Rough", " (Rough)");
+	}
+
+	private string GetRarityClass()
+	{
+		return ResourceType switch
+		{
+			ResourceType.Wood or ResourceType.Stone or ResourceType.Fiber => "rarity-common",
+			ResourceType.CopperOre or ResourceType.TinOre or ResourceType.Coal => "rarity-uncommon",
+			ResourceType.IronOre or ResourceType.SilverOre => "rarity-rare",
+			ResourceType.GoldOre or ResourceType.Quartz => "rarity-epic",
+			ResourceType.MithrilOre or ResourceType.AdamantiteOre => "rarity-legendary",
+			ResourceType.EssenceDust or ResourceType.CrystalShard => "rarity-magical",
+			ResourceType.DragonScale or ResourceType.PhoenixFeather => "rarity-mythic",
+			_ => "rarity-common"
+		};
+	}
+
+	private string GetResourceCategory()
+	{
+		return ResourceType switch
+		{
+			ResourceType.Wood or ResourceType.Stone or ResourceType.Fiber => "Basic",
+			ResourceType.CopperOre or ResourceType.TinOre or ResourceType.IronOre or 
+			ResourceType.Coal or ResourceType.SilverOre or ResourceType.GoldOre or 
+			ResourceType.MithrilOre or ResourceType.AdamantiteOre => "Ores",
+			ResourceType.Quartz or ResourceType.RubyRough or ResourceType.SapphireRough or 
+			ResourceType.EmeraldRough or ResourceType.DiamondRough => "Gems",
+			ResourceType.EssenceDust or ResourceType.CrystalShard or 
+			ResourceType.DragonScale or ResourceType.PhoenixFeather => "Magical",
+			_ => "Other"
+		};
+	}
+
+	private float GetResourceValue()
+	{
+		return ResourceType switch
+		{
+			ResourceType.Wood => 0.5f,
+			ResourceType.Stone => 0.8f,
+			ResourceType.Fiber => 0.3f,
+			ResourceType.CopperOre => 1.5f,
+			ResourceType.TinOre => 1.8f,
+			ResourceType.IronOre => 3.0f,
+			ResourceType.Coal => 1.0f,
+			ResourceType.SilverOre => 5.0f,
+			ResourceType.GoldOre => 8.0f,
+			ResourceType.MithrilOre => 15.0f,
+			ResourceType.AdamantiteOre => 25.0f,
+			ResourceType.Quartz => 2.0f,
+			ResourceType.RubyRough => 10.0f,
+			ResourceType.SapphireRough => 10.0f,
+			ResourceType.EmeraldRough => 12.0f,
+			ResourceType.DiamondRough => 20.0f,
+			ResourceType.EssenceDust => 50.0f,
+			ResourceType.CrystalShard => 100.0f,
+			ResourceType.DragonScale => 500.0f,
+			ResourceType.PhoenixFeather => 1000.0f,
+			_ => 0.1f
+		};
+	}
+
+	private string GetResourceDescription()
+	{
+		return ResourceType switch
+		{
+			ResourceType.Wood => "Basic building and crafting material from trees.",
+			ResourceType.Stone => "Common material for construction and tools.",
+			ResourceType.Fiber => "Plant material used in crafting and textiles.",
+			ResourceType.CopperOre => "Common metal ore used in basic alloys.",
+			ResourceType.TinOre => "Metal ore used to create bronze when combined with copper.",
+			ResourceType.IronOre => "Valuable metal ore for strong tools and weapons.",
+			ResourceType.Coal => "Fuel source for smelting and advanced crafting.",
+			ResourceType.SilverOre => "Precious metal ore with magical properties.",
+			ResourceType.GoldOre => "Valuable precious metal ore for high-end crafting.",
+			ResourceType.MithrilOre => "Legendary lightweight metal with magical properties.",
+			ResourceType.AdamantiteOre => "Extremely rare and durable metal ore.",
+			ResourceType.EssenceDust => "Magical dust used in enchantments.",
+			ResourceType.CrystalShard => "Crystallized magical energy for powerful enchantments.",
+			ResourceType.DragonScale => "Rare scale from ancient dragons, extremely valuable.",
+			ResourceType.PhoenixFeather => "Mystical feather with regenerative properties.",
+			_ => "A mysterious resource."
+		};
+	}
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine(ResourceType, Amount, IsVisible, ShowValue, ShowHelp, MouseX, MouseY);
+	}
+}

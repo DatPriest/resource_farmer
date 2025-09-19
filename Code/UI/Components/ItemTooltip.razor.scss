@@ -1,0 +1,147 @@
+@import "../Styles/Theme.scss";
+
+.item-tooltip {
+    position: fixed;
+    z-index: 9999;
+    background: linear-gradient(145deg, rgba(20, 25, 35, 0.98), rgba(30, 35, 45, 0.98));
+    border-radius: 8px;
+    border: 1px solid rgba(110, 120, 140, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 12px;
+    min-width: 200px;
+    max-width: 300px;
+    font-family: "Poppins", "Inter", sans-serif;
+    pointer-events: none;
+    animation: tooltipFadeIn 0.2s ease-out;
+
+    .tooltip-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(110, 120, 140, 0.2);
+
+        .tooltip-icon {
+            font-size: 18px;
+        }
+
+        .tooltip-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+    }
+
+    .tooltip-body {
+        margin-bottom: 8px;
+
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 12px;
+
+            .label {
+                color: #8a93a2;
+                font-weight: 500;
+            }
+
+            .value {
+                color: #cdd1d8;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .tooltip-footer {
+        padding-top: 6px;
+        border-top: 1px solid rgba(110, 120, 140, 0.2);
+
+        .description {
+            font-size: 11px;
+            color: #b8c5d6;
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+
+        .help-text {
+            font-size: 10px;
+            color: #6e788c;
+            font-style: italic;
+            text-align: center;
+        }
+    }
+
+    // Rarity-based border colors
+    &.rarity-common {
+        border-color: rgba(155, 155, 155, 0.5);
+    }
+
+    &.rarity-uncommon {
+        border-color: rgba(30, 255, 0, 0.5);
+    }
+
+    &.rarity-rare {
+        border-color: rgba(0, 112, 221, 0.5);
+    }
+
+    &.rarity-epic {
+        border-color: rgba(163, 53, 238, 0.5);
+    }
+
+    &.rarity-legendary {
+        border-color: rgba(255, 128, 0, 0.5);
+    }
+
+    &.rarity-magical {
+        border-color: rgba(255, 20, 147, 0.5);
+    }
+
+    &.rarity-mythic {
+        border: 2px solid transparent;
+        background: linear-gradient(145deg, rgba(20, 25, 35, 0.98), rgba(30, 35, 45, 0.98));
+        background-clip: padding-box;
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                rgba(255, 0, 0, 0.6), 
+                rgba(255, 128, 0, 0.6), 
+                rgba(255, 255, 0, 0.6), 
+                rgba(0, 255, 0, 0.6), 
+                rgba(0, 255, 255, 0.6), 
+                rgba(0, 0, 255, 0.6), 
+                rgba(128, 0, 255, 0.6), 
+                rgba(255, 0, 255, 0.6)
+            );
+            border-radius: 8px;
+            z-index: -1;
+            animation: rainbow-pulse 2s ease-in-out infinite alternate;
+        }
+    }
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes rainbow-pulse {
+    0% { opacity: 0.6; }
+    100% { opacity: 0.9; }
+}

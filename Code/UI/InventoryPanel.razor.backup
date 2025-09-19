@@ -5,25 +5,43 @@
 @using System;
 @using System.Collections.Generic;
 @using ResourceFarmer.Resources;
-@using ResourceFarmer.UI.Components;
 @inherits PanelComponent
 @namespace ResourceFarmer.UI
 
 <root class="inventory_panel">
-	<InventoryHeader 
-		Title="Inventory" 
-		TitleIcon="📦"
-		CurrentCapacity="@(InventoryComponent?.CurrentCapacity ?? 0f)"
-		MaxCapacity="@(InventoryComponent?.MaxCapacity ?? 1000f)"
-		OnClose="@CloseInventory" />
+	<div class="inventory_header">
+		<div class="title">
+			<i class="icon">📦</i>
+			<span>Inventory</span>
+		</div>
+		<div class="capacity_info">
+			<span class="capacity_text">@GetCapacityText()</span>
+			<div class="capacity_bar">
+				<div class="capacity_fill" style="width: @GetCapacityPercentage()%;"></div>
+			</div>
+		</div>
+		<button class="close_btn" onclick="@CloseInventory">×</button>
+	</div>
 
-	<FilterButtons 
-		@ref="filterButtonsComponent"
-		SearchFilter="@SearchFilter" 
-		SortMode="@SortMode"
-		SearchPlaceholder="Search resources..."
-		OnSearchChanged="@OnSearchFilterChanged"
-		OnSortChanged="@OnSortModeChanged" />
+	<div class="inventory_controls">
+		<div class="search_container">
+			<input class="search_input" @bind="SearchFilter" @bind:event="oninput" placeholder="Search resources..." />
+			<i class="search_icon">🔍</i>
+		</div>
+		<div class="sort_container">
+			<select class="sort_select" @bind="SortMode">
+				<option value="Name">Sort by Name</option>
+				<option value="Amount">Sort by Amount</option>
+				<option value="Type">Sort by Type</option>
+			</select>
+		</div>
+		<div class="action_buttons">
+			<button class="action_btn" onclick="@SellAllResources" disabled="@(!HasResources)">
+				<i class="icon">💰</i>
+				Sell All
+			</button>
+		</div>
+	</div>
 
 	<div class="inventory_content">
 		@if (HasResources)
@@ -31,14 +49,28 @@
 			<div class="resource_grid">
 				@foreach (var resource in GetFilteredAndSortedResources())
 				{
-					<InventorySlot 
-						ResourceType="@resource.Key"
-						Amount="@resource.Value"
-						OnUse="@UseResource"
-						OnSell="@SellResource"
-						OnDragStart="@OnDragStart"
-						OnMouseHover="@OnResourceHover"
-						OnMouseExit="@OnResourceMouseExit" />
+					<div class="resource_slot @GetResourceRarityClass(resource.Key)" 
+						 ondragstart="@((e) => OnDragStart(e, resource.Key))"
+						 draggable="true"
+						 title="@GetResourceTooltip(resource.Key, resource.Value)">
+						<div class="resource_icon">
+							@GetResourceIcon(resource.Key)
+						</div>
+						<div class="resource_info">
+							<div class="resource_name">@GetResourceDisplayName(resource.Key)</div>
+							<div class="resource_amount">@resource.Value.ToString("F1")</div>
+						</div>
+						<div class="resource_actions">
+							<button class="use_btn" onclick="@(() => UseResource(resource.Key))" 
+									title="Use 1 @resource.Key">
+								Use
+							</button>
+							<button class="sell_btn" onclick="@(() => SellResource(resource.Key))" 
+									title="Sell all @resource.Key">
+								Sell
+							</button>
+						</div>
+					</div>
 				}
 			</div>
 		}
@@ -51,13 +83,6 @@
 			</div>
 		}
 	</div>
-
-	<ItemTooltip 
-		ResourceType="@TooltipResource"
-		Amount="@(TooltipResource != ResourceType.None ? GetResourceAmount(TooltipResource) : 0f)"
-		IsVisible="@ShowTooltip"
-		MouseX="@MouseX"
-		MouseY="@MouseY" />
 
 	@if (SelectedResource != ResourceType.None)
 	{
@@ -78,15 +103,6 @@
 	private string SortMode { get; set; } = "Name";
 	private ResourceType SelectedResource { get; set; } = ResourceType.None;
 	
-	// Component references
-	private FilterButtons filterButtonsComponent;
-	
-	// Tooltip state
-	private ResourceType TooltipResource { get; set; } = ResourceType.None;
-	private bool ShowTooltip { get; set; } = false;
-	private float MouseX { get; set; } = 0f;
-	private float MouseY { get; set; } = 0f;
-	
 	public bool HasResources => LocalPlayer?.Inventory?.Any() == true;
 
 	protected override void OnStart()
@@ -104,12 +120,6 @@
 			FindLocalPlayer();
 		}
 		
-		// Setup filter buttons after component is rendered
-		if (filterButtonsComponent != null && filterButtonsComponent.ActionButtons.Count == 0)
-		{
-			SetupFilterButtons();
-		}
-		
 		// Handle keyboard shortcuts when inventory is open
 		if (Style.Display == DisplayMode.Flex)
 		{
@@ -118,53 +128,6 @@
 				CloseInventory();
 			}
 		}
-	}
-
-	private void SetupFilterButtons()
-	{
-		if (filterButtonsComponent != null)
-		{
-			filterButtonsComponent.AddActionButton("Sell All", "💰", SellAllResources);
-		}
-	}
-
-	// Filter event handlers
-	private void OnSearchFilterChanged(string filter)
-	{
-		if (SearchFilter != filter)
-		{
-			SearchFilter = filter ?? "";
-			StateHasChanged();
-		}
-	}
-
-	private void OnSortModeChanged(string sortMode)
-	{
-		if (SortMode != sortMode)
-		{
-			SortMode = sortMode ?? "Name";
-			StateHasChanged();
-		}
-	}
-
-	// Tooltip event handlers
-	private void OnResourceHover(ResourceType resourceType)
-	{
-		TooltipResource = resourceType;
-		ShowTooltip = true;
-		
-		// Get mouse position (simplified - in real implementation you'd get actual mouse coords)
-		MouseX = 100; // This would be actual mouse X
-		MouseY = 100; // This would be actual mouse Y
-		
-		StateHasChanged();
-	}
-
-	private void OnResourceMouseExit()
-	{
-		ShowTooltip = false;
-		TooltipResource = ResourceType.None;
-		StateHasChanged();
 	}
 
 	void FindLocalPlayer()
@@ -219,6 +182,66 @@
 		return resources;
 	}
 
+	private string GetCapacityText()
+	{
+		if (InventoryComponent == null) return "0 / 1000";
+		return $"{InventoryComponent.CurrentCapacity:F0} / {InventoryComponent.MaxCapacity:F0}";
+	}
+
+	private float GetCapacityPercentage()
+	{
+		if (InventoryComponent == null) return 0f;
+		return (InventoryComponent.CurrentCapacity / InventoryComponent.MaxCapacity) * 100f;
+	}
+
+	private string GetResourceIcon(ResourceType resourceType)
+	{
+		return resourceType switch
+		{
+			ResourceType.Wood => "🪵",
+			ResourceType.Stone => "🪨",
+			ResourceType.Fiber => "🌾",
+			ResourceType.CopperOre => "🟤",
+			ResourceType.TinOre => "⚪",
+			ResourceType.IronOre => "⚫",
+			ResourceType.Coal => "⚫",
+			ResourceType.SilverOre => "⚪",
+			ResourceType.GoldOre => "🟡",
+			ResourceType.MithrilOre => "💎",
+			ResourceType.AdamantiteOre => "💎",
+			ResourceType.Quartz => "🔹",
+			ResourceType.RubyRough => "🔴",
+			ResourceType.SapphireRough => "🔵",
+			ResourceType.EmeraldRough => "🟢",
+			ResourceType.DiamondRough => "💎",
+			ResourceType.EssenceDust => "✨",
+			ResourceType.CrystalShard => "🔸",
+			ResourceType.DragonScale => "🐉",
+			ResourceType.PhoenixFeather => "🔥",
+			_ => "❓"
+		};
+	}
+
+	private string GetResourceDisplayName(ResourceType resourceType)
+	{
+		return resourceType.ToString().Replace("Ore", " Ore").Replace("Rough", " (Rough)");
+	}
+
+	private string GetResourceRarityClass(ResourceType resourceType)
+	{
+		return resourceType switch
+		{
+			ResourceType.Wood or ResourceType.Stone or ResourceType.Fiber => "common",
+			ResourceType.CopperOre or ResourceType.TinOre or ResourceType.Coal => "uncommon",
+			ResourceType.IronOre or ResourceType.SilverOre => "rare",
+			ResourceType.GoldOre or ResourceType.Quartz => "epic",
+			ResourceType.MithrilOre or ResourceType.AdamantiteOre => "legendary",
+			ResourceType.EssenceDust or ResourceType.CrystalShard => "magical",
+			ResourceType.DragonScale or ResourceType.PhoenixFeather => "mythic",
+			_ => "common"
+		};
+	}
+
 	private string GetResourceCategory(ResourceType resourceType)
 	{
 		return resourceType switch
@@ -232,6 +255,34 @@
 			ResourceType.EssenceDust or ResourceType.CrystalShard or 
 			ResourceType.DragonScale or ResourceType.PhoenixFeather => "Magical",
 			_ => "Other"
+		};
+	}
+
+	private string GetResourceTooltip(ResourceType resourceType, float amount)
+	{
+		return $"{GetResourceDisplayName(resourceType)}\nAmount: {amount:F1}\nCategory: {GetResourceCategory(resourceType)}\nClick to select, drag to move";
+	}
+
+	private string GetResourceDescription(ResourceType resourceType)
+	{
+		return resourceType switch
+		{
+			ResourceType.Wood => "Basic building and crafting material from trees.",
+			ResourceType.Stone => "Common material for construction and tools.",
+			ResourceType.Fiber => "Plant material used in crafting and textiles.",
+			ResourceType.CopperOre => "Common metal ore used in basic alloys.",
+			ResourceType.TinOre => "Metal ore used to create bronze when combined with copper.",
+			ResourceType.IronOre => "Valuable metal ore for strong tools and weapons.",
+			ResourceType.Coal => "Fuel source for smelting and advanced crafting.",
+			ResourceType.SilverOre => "Precious metal ore with magical properties.",
+			ResourceType.GoldOre => "Valuable precious metal ore for high-end crafting.",
+			ResourceType.MithrilOre => "Legendary lightweight metal with magical properties.",
+			ResourceType.AdamantiteOre => "Extremely rare and durable metal ore.",
+			ResourceType.EssenceDust => "Magical dust used in enchantments.",
+			ResourceType.CrystalShard => "Crystallized magical energy for powerful enchantments.",
+			ResourceType.DragonScale => "Rare scale from ancient dragons, extremely valuable.",
+			ResourceType.PhoenixFeather => "Mystical feather with regenerative properties.",
+			_ => "A mysterious resource."
 		};
 	}
 
@@ -281,35 +332,6 @@
 	private void SellAllResources()
 	{
 		LocalPlayer?.SellResources();
-	}
-
-	// Helper methods for components
-	private string GetResourceDisplayName(ResourceType resourceType)
-	{
-		return resourceType.ToString().Replace("Ore", " Ore").Replace("Rough", " (Rough)");
-	}
-
-	private string GetResourceDescription(ResourceType resourceType)
-	{
-		return resourceType switch
-		{
-			ResourceType.Wood => "Basic building and crafting material from trees.",
-			ResourceType.Stone => "Common material for construction and tools.",
-			ResourceType.Fiber => "Plant material used in crafting and textiles.",
-			ResourceType.CopperOre => "Common metal ore used in basic alloys.",
-			ResourceType.TinOre => "Metal ore used to create bronze when combined with copper.",
-			ResourceType.IronOre => "Valuable metal ore for strong tools and weapons.",
-			ResourceType.Coal => "Fuel source for smelting and advanced crafting.",
-			ResourceType.SilverOre => "Precious metal ore with magical properties.",
-			ResourceType.GoldOre => "Valuable precious metal ore for high-end crafting.",
-			ResourceType.MithrilOre => "Legendary lightweight metal with magical properties.",
-			ResourceType.AdamantiteOre => "Extremely rare and durable metal ore.",
-			ResourceType.EssenceDust => "Magical dust used in enchantments.",
-			ResourceType.CrystalShard => "Crystallized magical energy for powerful enchantments.",
-			ResourceType.DragonScale => "Rare scale from ancient dragons, extremely valuable.",
-			ResourceType.PhoenixFeather => "Mystical feather with regenerative properties.",
-			_ => "A mysterious resource."
-		};
 	}
 
 	private float GetResourceValue(ResourceType resourceType)
