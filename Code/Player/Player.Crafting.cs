@@ -93,23 +93,37 @@ public sealed partial class Player : Component
 	}
 
 	/// <summary>
-	/// RPC called by the client to request upgrading the equipped tool. Runs on Host/Server.
+	/// Server command for upgrading equipped tool. Called from client via ConsoleSystem.Run.
 	/// </summary>
-	[Rpc.Broadcast(NetFlags.Reliable )]
-	public void RequestUpgradeEquippedTool()
+	[ConCmd.Server("upgrade_tool")]
+	public static void UpgradeEquippedTool()
+	{
+		var caller = ConsoleSystem.Caller;
+		if ( caller?.Pawn is not Player player )
+		{
+			Log.Warning( "[UpgradeEquippedTool] Invalid caller or player not found." );
+			return;
+		}
+
+		Log.Info( $"[UpgradeEquippedTool] Player {caller.DisplayName} requesting tool upgrade" );
+		player.ProcessToolUpgrade();
+	}
+
+	/// <summary>
+	/// Processes the actual tool upgrade request.
+	/// </summary>
+	public void ProcessToolUpgrade()
 	{
 		if ( EquippedTool == null )
 		{
-			Log.Warning( $"[Player Upgrade Host] Request failed: No tool equipped." );
-			// NotifyClientUpgradeResult(false, "No tool equipped."); // Optional feedback
+			Log.Warning( "[Player] Upgrade request failed: No tool equipped." );
 			return;
 		}
 
 		var costs = GetCurrentToolUpgradeCost();
 		if ( costs == null )
 		{
-			Log.Warning( $"[Player Upgrade Host] Request failed: Tool cannot be upgraded further or cost not defined." );
-			// NotifyClientUpgradeResult(false, "Cannot upgrade further.");
+			Log.Warning( "[Player] Upgrade request failed: Tool cannot be upgraded further or cost not defined." );
 			return;
 		}
 
@@ -118,8 +132,7 @@ public sealed partial class Player : Component
 		{
 			if ( !Inventory.TryGetValue( cost.Key, out var currentAmount ) || currentAmount < cost.Value )
 			{
-				Log.Warning( $"[Player Upgrade Host] Upgrade failed. Not enough {cost.Key}. Need {cost.Value:F1}, Have {currentAmount:F1}" );
-				// NotifyClientUpgradeResult(false, $"Not enough {cost.Key}.");
+				Log.Warning( $"[Player] Upgrade failed. Not enough {cost.Key}. Need {cost.Value:F1}, Have {currentAmount:F1}" );
 				return;
 			}
 		}
@@ -130,7 +143,7 @@ public sealed partial class Player : Component
 			Inventory[cost.Key] -= cost.Value;
 			if ( Inventory[cost.Key] <= 0.01f ) Inventory.Remove( cost.Key );
 		}
-		Log.Info( $"[Player Upgrade Host] Deducted resources for upgrading {EquippedTool.Material} {EquippedTool.ToolType}." );
+		Log.Info( $"[Player] Deducted resources for upgrading {EquippedTool.Material} {EquippedTool.ToolType}." );
 
 
 		// --- Apply Upgrade ---
@@ -153,7 +166,7 @@ public sealed partial class Player : Component
 			if ( newBonusList.Any() && !previousBonuses.Any( b => b.Name == newBonusList[0].Name ) ) // Ensure it's actually new
 			{
 				finalBonuses.Add( newBonusList[0] );
-				Log.Info( $"[Player Upgrade Host] Added new bonus: {newBonusList[0].Name}" );
+				Log.Info( $"[Player] Added new bonus: {newBonusList[0].Name}" );
 			}
 		}
 
@@ -170,7 +183,7 @@ public sealed partial class Player : Component
 		// Assign the new instance
 		EquippedTool = upgradedTool;
 
-		Log.Info( $"[Player Upgrade Host] Upgraded Tool to Lvl:{newLevel} Q:{newQuality:P1} Bonuses:[{string.Join( ",", finalBonuses.Select( b => b.Name ) )}]" );
+		Log.Info( $"[Player] Upgraded Tool to Lvl:{newLevel} Q:{newQuality:P1} Bonuses:[{string.Join( ",", finalBonuses.Select( b => b.Name ) )}]" );
 
 		// Grant XP for upgrading?
 		AddExperience( newLevel * 10 ); // Example XP
@@ -196,50 +209,122 @@ public sealed partial class Player : Component
 		return new Dictionary<ResourceType, float> { { ResourceType.EssenceDust, 20 } }; // Example cost
 	}
 
-	[Rpc.Broadcast(NetFlags.Reliable)]
-	public void RequestAddBonus()
+	[ConCmd.Server("add_tool_bonus")]
+	public static void AddToolBonus()
 	{
-		Log.Info( $"[Player Bonus Host] Received RequestAddBonus" );
-		// TODO: Implement cost check (GetAddBonusCost), deduction, max bonus check, add bonus logic (similar to upgrade), assign NEW ToolBase instance.
-	}
-
-	[Rpc.Broadcast(NetFlags.Reliable)]
-	public void RequestRemoveBonus( ToolBonusName bonusName ) // Pass Name to identify
-	{
-		Log.Info( $"[Player Bonus Host] Received RequestRemoveBonus for {bonusName}" );
-		// TODO: Implement cost check (GetRemoveBonusCost), deduction, find bonus by Name in list, create NEW ToolBase instance *without* that bonus, assign instance.
-	}
-
-	// Add RPC for crafting request
-	[Rpc.Broadcast( NetFlags.Reliable )]
-	public void RequestCraftItem( CraftingRecipeResource recipe )
-	{
-		if ( Networking.IsClient ) return; // Server-side only
-
-		if ( recipe == null )
+		var caller = ConsoleSystem.Caller;
+		if ( caller?.Pawn is not Player player )
 		{
-			Log.Warning( "[Player Host] Crafting request received, but recipe is null." );
-			// NotifyClientCraftResult(false, "Recipe not found."); // Optional: Send feedback
+			Log.Warning( "[AddToolBonus] Invalid caller or player not found." );
 			return;
 		}
 
-		Log.Info( $"[Player Host] Received craft request for: {recipe.Name}" );
+		Log.Info( $"[AddToolBonus] Player {caller.DisplayName} requesting to add tool bonus" );
+		player.ProcessAddBonus();
+	}
+
+	[ConCmd.Server("remove_tool_bonus")]
+	public static void RemoveToolBonus( string bonusName )
+	{
+		var caller = ConsoleSystem.Caller;
+		if ( caller?.Pawn is not Player player )
+		{
+			Log.Warning( "[RemoveToolBonus] Invalid caller or player not found." );
+			return;
+		}
+
+		if ( !Enum.TryParse<ToolBonusName>( bonusName, true, out var parsedBonusName ) )
+		{
+			Log.Warning( $"[RemoveToolBonus] Invalid bonus name: {bonusName}" );
+			return;
+		}
+
+		Log.Info( $"[RemoveToolBonus] Player {caller.DisplayName} requesting to remove bonus {bonusName}" );
+		player.ProcessRemoveBonus( parsedBonusName );
+	}
+
+	public void ProcessAddBonus()
+	{
+		Log.Info( "[Player] Processing RequestAddBonus" );
+		// TODO: Implement cost check (GetAddBonusCost), deduction, max bonus check, add bonus logic (similar to upgrade), assign NEW ToolBase instance.
+	}
+
+	public void ProcessRemoveBonus( ToolBonusName bonusName )
+	{
+		Log.Info( $"[Player] Processing RequestRemoveBonus for {bonusName}" );
+		// TODO: Implement cost check (GetRemoveBonusCost), deduction, find bonus by Name in list, create NEW ToolBase instance *without* that bonus, assign instance.
+	}
+
+	/// <summary>
+	/// Server command for crafting items. Called from client via ConsoleSystem.Run.
+	/// </summary>
+	/// <param name="toolType">The tool type to craft (e.g., "Axe")</param>
+	/// <param name="material">The material name (e.g., "Wood")</param>
+	/// <param name="level">The level of the item to craft</param>
+	[ConCmd.Server("craft_item")]
+	public static void CraftItem( string toolType, string material, int level )
+	{
+		var caller = ConsoleSystem.Caller;
+		if ( caller?.Pawn is not Player player )
+		{
+			Log.Warning( "[CraftItem] Invalid caller or player not found." );
+			return;
+		}
+
+		// Parse the tool type
+		if ( !Enum.TryParse<ResourceType>( toolType, true, out var parsedToolType ) )
+		{
+			Log.Warning( $"[CraftItem] Invalid tool type: {toolType}" );
+			return;
+		}
+
+		// Find the recipe
+		var recipe = RecipeManager.Instance?.FindRecipe( parsedToolType, material, level );
+		if ( recipe == null )
+		{
+			Log.Warning( $"[CraftItem] Recipe not found for {toolType} {material} Level {level}" );
+			return;
+		}
+
+		Log.Info( $"[CraftItem] Player {caller.DisplayName} requesting craft: {recipe.Name}" );
+
+		// Use the existing crafting logic
+		player.ProcessCraftingRequest( recipe );
+	}
+
+	/// <summary>
+	/// Processes the actual crafting request. Moved from RequestCraftItem for reuse.
+	/// </summary>
+	/// <param name="recipe">The recipe to craft</param>
+	public void ProcessCraftingRequest( CraftingRecipeResource recipe )
+	{
+		if ( recipe == null )
+		{
+			Log.Warning( "[Player] Crafting request received, but recipe is null." );
+			return;
+		}
+
+		Log.Info( $"[Player] Processing craft request for: {recipe.Name}" );
 
 		// --- Check Requirements (Resources, Profession Level) ---
-		if ( recipe.Costs == null ) { /* Log Error */ return; }
+		if ( recipe.Costs == null ) 
+		{ 
+			Log.Error( $"[Player] Recipe {recipe.Name} has no costs defined." );
+			return; 
+		}
 		foreach ( var cost in recipe.Costs )
 		{
 			if ( !Inventory.TryGetValue( cost.Key, out var currentAmount ) || currentAmount < cost.Value )
 			{
-				Log.Warning( $"[Player Host] Crafting {recipe.Name} failed. Not enough {cost.Key}." );
+				Log.Warning( $"[Player] Crafting {recipe.Name} failed. Not enough {cost.Key}." );
 				return; // Not enough resources
 			}
 		}
 
-		int playerProfessionLevel = GetProfessionLevel( recipe.ToolType ); // Use placeholder/real method
+		int playerProfessionLevel = GetProfessionLevel( recipe.ToolType );
 		if ( playerProfessionLevel < recipe.RequiredProfessionLevel )
 		{
-			Log.Warning( $"[Player Host] Crafting {recipe.Name} failed. Required Level {recipe.RequiredProfessionLevel}, Player Level {playerProfessionLevel}" );
+			Log.Warning( $"[Player] Crafting {recipe.Name} failed. Required Level {recipe.RequiredProfessionLevel}, Player Level {playerProfessionLevel}" );
 			return; // Level too low
 		}
 
@@ -249,7 +334,7 @@ public sealed partial class Player : Component
 			Inventory[cost.Key] -= cost.Value;
 			if ( Inventory[cost.Key] <= 0.01f ) Inventory.Remove( cost.Key );
 		}
-		Log.Info( $"[Player Host] Deducted resources for {recipe.Name}." );
+		Log.Info( $"[Player] Deducted resources for {recipe.Name}." );
 
 
 		// --- Calculate Final Quality ---
@@ -275,7 +360,7 @@ public sealed partial class Player : Component
 		// Apply variance and clamp the result (e.g., between 5% and 100%)
 		float finalQuality = Math.Clamp( baseQuality + qualityVariance, 0.05f, 1.0f );
 
-		Log.Info( $"[Player Host] Quality Calc for {recipe.Name}: Base={baseQuality:P1}, SkillRatio={skillRatio:P1}, Variance={qualityVariance:P2}, Final={finalQuality:P1}" );
+		Log.Info( $"[Player] Quality Calc for {recipe.Name}: Base={baseQuality:P1}, SkillRatio={skillRatio:P1}, Variance={qualityVariance:P2}, Final={finalQuality:P1}" );
 
 
 		// --- Determine Bonuses ---
@@ -285,7 +370,7 @@ public sealed partial class Player : Component
 			appliedBonuses = ToolBonusRegistry.GetRandomBonuses( recipe.MinBonuses, recipe.MaxBonuses ); // Get list of instances
 			if ( appliedBonuses?.Any() == true )
 			{
-				Log.Info( $"[Player Host] Generated Bonuses for {recipe.Name}: {string.Join( ", ", appliedBonuses.Select( b => $"{b.Name}({b.ActualMagnitude:F3})" ) )}" );
+				Log.Info( $"[Player] Generated Bonuses for {recipe.Name}: {string.Join( ", ", appliedBonuses.Select( b => $"{b.Name}({b.ActualMagnitude:F3})" ) )}" );
 			}
 		}
 
@@ -297,7 +382,7 @@ public sealed partial class Player : Component
 			finalQuality, // Use calculated final quality
 			appliedBonuses // Assign list of AppliedBonusInstance
 		);
-		Log.Info( $"[Player Host] Created Tool: {craftedTool.Material} {craftedTool.ToolType} Lvl:{craftedTool.Level} Q:{craftedTool.Quality:P1} Bonuses:[{string.Join( ",", craftedTool.AppliedBonuses?.Select( b => b.Name ) ?? new List<ToolBonusName>() )}]" );
+		Log.Info( $"[Player] Created Tool: {craftedTool.Material} {craftedTool.ToolType} Lvl:{craftedTool.Level} Q:{craftedTool.Quality:P1} Bonuses:[{string.Join( ",", craftedTool.AppliedBonuses?.Select( b => b.Name ) ?? new List<ToolBonusName>() )}]" );
 		// --- Equip & Finalize ---
 		EquippedTool = craftedTool;
 		AddExperience( (double)recipe.ToolType * 5 + recipe.Level * 2 ); // Grant XP

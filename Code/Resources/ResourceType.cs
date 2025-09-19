@@ -2,6 +2,9 @@ namespace ResourceFarmer.Resources;
 public enum ResourceType
 {
 	None,
+	// Tools
+	Axe,
+	Pickaxe,
 	// Basic
 	Wood,
 	Stone,

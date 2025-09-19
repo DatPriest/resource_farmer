@@ -1,0 +1,23 @@
+{
+  "Name": "Wooden Pickaxe",
+  "Category": "Pickaxes",
+  "ToolType": "Pickaxe",
+  "Material": "Wood",
+  "Level": 1,
+  "OutputQuality": 0.08,
+  "CanHaveBonuses": true,
+  "MinBonuses": 0,
+  "MaxBonuses": 2,
+  "BasePower": 0.9,
+  "PossibleBonuses": [
+    "Efficient",
+    "Sturdy"
+  ],
+  "RequiredProfessionLevel": 1,
+  "Costs": {
+    "Wood": 2,
+    "Fiber": 1
+  },
+  "__references": [],
+  "__version": 0
+}
