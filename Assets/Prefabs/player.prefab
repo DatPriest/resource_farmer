@@ -238,9 +238,11 @@
         "OwnerPlayer": null
       },
       {
-        "__type": "ResourceFarmer.UI.WorldPanelManager",
+        "__type": "ResourceFarmer.UI.Components.WorldPanelVisibilityManager",
         "__guid": "76862795-7121-476b-94a8-70e745996ff6",
-        "CountActivePanels": 0,
+        "EnableDebugLogging": false,
+        "ManagedPanelCount": 0,
+        "MaxScanRange": 500,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,

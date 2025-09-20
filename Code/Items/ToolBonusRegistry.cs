@@ -7,6 +7,10 @@ using Sandbox; // For Game.Random
 
 namespace ResourceFarmer.Items
 {
+	// TODO: Cannot remove this yet as the supposed replacement "BonusManager" does not exist in the codebase.
+	// This class is actively used in 10+ locations across ToolBase.cs, ToolBonusExtensions.cs, 
+	// CraftingRecipeResource.cs, and Player.Crafting.cs. A proper BonusManager implementation
+	// must be created first before this class can be safely removed.
 	[Obsolete( "Its functionality is replaced by BonusManager" )]
 	public static class ToolBonusRegistry
 	{

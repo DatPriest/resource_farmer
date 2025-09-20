@@ -36,7 +36,8 @@ public sealed class WorldPanelManager : Component
 		_visibilityManager = Components.GetOrCreate<WorldPanelVisibilityManager>();
 		_visibilityManager.UpdateInterval = UpdateInterval;
 		
-		Log.Warning("[WorldPanelManager] This component is deprecated. Use WorldPanelVisibilityManager directly for new implementations.");
+		Log.Warning("[WorldPanelManager] This component is deprecated. Use WorldPanelVisibilityManager directly for new implementations. " +
+		           "Update your prefabs and scene files to use ResourceFarmer.UI.Components.WorldPanelVisibilityManager instead.");
 	}
 
 
