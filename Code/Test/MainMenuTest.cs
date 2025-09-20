@@ -94,30 +94,27 @@ public static class MainMenuTestCommands
 	[ConCmd.Server("test_main_menu")]
 	public static void TestMainMenu()
 	{
-		var caller = ConsoleSystem.Caller;
-		if (caller == null) return;
+		// For test commands, we can use Game.ActiveScene to find components
+		var testComponents = Scene.Active?.GetAllComponents<MainMenuTest>();
+		if (testComponents?.Any() != true)
+		{
+			Log.Warning("[MainMenuTestCommands] No MainMenuTest components found in scene.");
+			return;
+		}
 
 		Log.Info("[MainMenuTestCommands] Running main menu test...");
-		
-		var testComponent = caller.GameObject?.Components.Get<MainMenuTest>();
-		if (testComponent == null)
-		{
-			testComponent = caller.GameObject?.Components.Create<MainMenuTest>();
-		}
-		
 		Log.Info("[MainMenuTestCommands] Test component ready.");
 	}
 	
 	[ConCmd.Server("show_main_menu")]
 	public static void ShowMainMenu()
 	{
-		var caller = ConsoleSystem.Caller;
-		if (caller == null) return;
-
-		var mainMenuManager = caller.GameObject?.Components.Get<MainMenuManager>();
+		// For test commands, find any MainMenuManager in the scene
+		var mainMenuManager = Scene.Active?.GetAllComponents<MainMenuManager>().FirstOrDefault();
 		if (mainMenuManager == null)
 		{
-			mainMenuManager = caller.GameObject?.Components.Create<MainMenuManager>();
+			Log.Warning("[MainMenuTestCommands] No MainMenuManager found in scene.");
+			return;
 		}
 		
 		mainMenuManager.ShowMainMenu();

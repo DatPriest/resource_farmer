@@ -85,7 +85,7 @@ public sealed class GameManager : Component
 		// This could include resource spawning, NPC management, etc.
 		
 		// Example: Enable resource spawning
-		var resourceSpawner = Game.ActiveScene?.GetAllComponents<Resources.ResourceSpawner>().FirstOrDefault();
+		var resourceSpawner = Scene.Active?.GetAllComponents<Resources.ResourceSpawner>().FirstOrDefault();
 		resourceSpawner?.Enable();
 	}
 
@@ -95,7 +95,7 @@ public sealed class GameManager : Component
 		// This could include stopping resource spawning, clearing temporary data, etc.
 		
 		// Example: Disable resource spawning
-		var resourceSpawner = Game.ActiveScene?.GetAllComponents<Resources.ResourceSpawner>().FirstOrDefault();
+		var resourceSpawner = Scene.Active?.GetAllComponents<Resources.ResourceSpawner>().FirstOrDefault();
 		resourceSpawner?.Disable();
 	}
 

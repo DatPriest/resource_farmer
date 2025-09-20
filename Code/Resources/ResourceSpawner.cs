@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ResourceFarmer.Resources; // Make sure this namespace is correct for ResourceType and ResourceNode
 
+namespace ResourceFarmer.Resources;
+
 /// <summary>
 /// This component randomly spawns specified resource prefabs onto a target terrain surface.
 /// It finds random locations within the terrain bounds and uses raycasting to place
@@ -169,7 +171,7 @@ public sealed class ResourceSpawner : Component
                 GameObject spawnedObject = selectedPrefabSource.Clone(spawnPosition);
 
                 // Set the parent if found
-                if (_resourceNodeParent.IsValid())
+                if (_resourceNodeParent.IsValid)
                 {
                     spawnedObject.SetParent(_resourceNodeParent, false); // worldPositionStays = false to keep world position
                 }
@@ -219,7 +221,7 @@ public sealed class ResourceSpawner : Component
         Log.Info($"[{nameof(ResourceSpawner)}] Cleaning up {_spawnedResources.Count} previously spawned resources...");
         foreach (var resource in _spawnedResources)
         {
-            if (resource.IsValid()) // Check if it hasn't been destroyed already
+            if (resource.IsValid) // Check if it hasn't been destroyed already
             {
                 resource.Destroy();
             }

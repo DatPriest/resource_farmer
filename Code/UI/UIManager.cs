@@ -55,7 +55,7 @@ public sealed class UIManager : Component
 
 	public void ToggleCraftingPanel()
 	{
-		if (_craftingPanelInstance != null && _craftingPanelInstance.IsValid())
+		if (_craftingPanelInstance != null && _craftingPanelInstance.IsValid)
 		{
 			CloseCraftingPanel();
 		}
@@ -68,7 +68,7 @@ public sealed class UIManager : Component
 
 	public void ToggleSettingsPanel() // New method for settings
 	{
-		if (_settingsPanelInstance != null && _settingsPanelInstance.IsValid())
+		if (_settingsPanelInstance != null && _settingsPanelInstance.IsValid)
 		{
 			CloseSettingsPanel();
 		}
@@ -81,7 +81,7 @@ public sealed class UIManager : Component
 
 	public void ToggleInventoryPanel() // New method for inventory
 	{
-		if (_inventoryPanelInstance != null && _inventoryPanelInstance.IsValid())
+		if (_inventoryPanelInstance != null && _inventoryPanelInstance.IsValid)
 		{
 			CloseInventoryPanel();
 		}
@@ -96,7 +96,7 @@ public sealed class UIManager : Component
 	// Helper methods to explicitly close panels
 	private void CloseCraftingPanel()
 	{
-		if (_craftingPanelInstance != null && _craftingPanelInstance.IsValid())
+		if (_craftingPanelInstance != null && _craftingPanelInstance.IsValid)
 		{
 			_craftingPanelInstance.Destroy();
 			_craftingPanelInstance = null;
@@ -106,7 +106,7 @@ public sealed class UIManager : Component
 
 	private void CloseSettingsPanel()
 	{
-		if (_settingsPanelInstance != null && _settingsPanelInstance.IsValid())
+		if (_settingsPanelInstance != null && _settingsPanelInstance.IsValid)
 		{
 			_settingsPanelInstance.Destroy();
 			_settingsPanelInstance = null;
@@ -116,7 +116,7 @@ public sealed class UIManager : Component
 
 	private void CloseInventoryPanel()
 	{
-		if (_inventoryPanelInstance != null && _inventoryPanelInstance.IsValid())
+		if (_inventoryPanelInstance != null && _inventoryPanelInstance.IsValid)
 		{
 			_inventoryPanelInstance.CloseInventory();
 			_inventoryPanelInstance.Destroy();

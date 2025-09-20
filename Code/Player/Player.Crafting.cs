@@ -93,28 +93,20 @@ public sealed partial class Player : Component
 	}
 
 	/// <summary>
-	/// Server command for upgrading equipped tool. Called from client via ConsoleSystem.Run.
+	/// Server RPC for upgrading equipped tool. Called from client.
 	/// </summary>
-	[ConCmd.Server("upgrade_tool")]
-	public static void UpgradeEquippedTool()
+	[Rpc.Server]
+	public void UpgradeEquippedTool()
 	{
-		var caller = ConsoleSystem.Caller;
-		if ( caller == null )
+		// In modern S&box, 'this' refers to the component and Rpc.Caller gives us the connection
+		if ( Rpc.Caller?.Pawn != this.GameObject )
 		{
-			Log.Warning( "[UpgradeEquippedTool] Invalid caller." );
-			return;
-		}
-
-		// Find the player component from the caller's GameObject
-		var player = caller.GameObject?.Components.Get<Player>();
-		if ( player == null )
-		{
-			Log.Warning( "[UpgradeEquippedTool] Player component not found." );
+			Log.Warning( "[UpgradeEquippedTool] RPC called by non-owner." );
 			return;
 		}
 
 		Log.Info( $"[UpgradeEquippedTool] Player requesting tool upgrade" );
-		player.ProcessToolUpgrade();
+		ProcessToolUpgrade();
 	}
 
 	/// <summary>
@@ -257,46 +249,27 @@ public sealed partial class Player : Component
 		return new Dictionary<ResourceType, float> { { ResourceType.EssenceDust, 20 } }; // Example cost
 	}
 
-	[ConCmd.Server("add_tool_bonus")]
-	public static void AddToolBonus()
+	[Rpc.Server]
+	public void AddToolBonus()
 	{
-		var caller = ConsoleSystem.Caller;
-		if ( caller == null )
+		if ( Rpc.Caller?.Pawn != this.GameObject )
 		{
-			Log.Warning( "[AddToolBonus] Invalid caller." );
-			return;
-		}
-
-		// Find the player component from the caller's GameObject
-		var player = caller.GameObject?.Components.Get<Player>();
-		if ( player == null )
-		{
-			Log.Warning( "[AddToolBonus] Player component not found." );
+			Log.Warning( "[AddToolBonus] RPC called by non-owner." );
 			return;
 		}
 
 		Log.Info( $"[AddToolBonus] Player requesting to add tool bonus" );
-		player.ProcessAddBonus();
+		ProcessAddBonus();
 	}
 
-	[ConCmd.Server("remove_tool_bonus")]
-	public static void RemoveToolBonus( string bonusName )
+	[Rpc.Server]
+	public void RemoveToolBonus( string bonusName )
 	{
-		var caller = ConsoleSystem.Caller;
-		if ( caller == null )
+		if ( Rpc.Caller?.Pawn != this.GameObject )
 		{
-			Log.Warning( "[RemoveToolBonus] Invalid caller." );
+			Log.Warning( "[RemoveToolBonus] RPC called by non-owner." );
 			return;
 		}
-
-		// Find the player component from the caller's GameObject
-		var player = caller.GameObject?.Components.Get<Player>();
-		if ( player == null )
-		{
-			Log.Warning( "[RemoveToolBonus] Player component not found." );
-			return;
-		}
-
 		if ( !Enum.TryParse<ToolBonusName>( bonusName, true, out var parsedBonusName ) )
 		{
 			Log.Warning( $"[RemoveToolBonus] Invalid bonus name: {bonusName}" );
@@ -304,7 +277,7 @@ public sealed partial class Player : Component
 		}
 
 		Log.Info( $"[RemoveToolBonus] Player requesting to remove bonus {bonusName}" );
-		player.ProcessRemoveBonus( parsedBonusName );
+		ProcessRemoveBonus( parsedBonusName );
 	}
 
 	public void ProcessAddBonus()
@@ -320,26 +293,17 @@ public sealed partial class Player : Component
 	}
 
 	/// <summary>
-	/// Server command for crafting items. Called from client via ConsoleSystem.Run.
+	/// Server RPC for crafting items. Called from client.
 	/// </summary>
 	/// <param name="toolType">The tool type to craft (e.g., "Axe")</param>
 	/// <param name="material">The material name (e.g., "Wood")</param>
 	/// <param name="level">The level of the item to craft</param>
-	[ConCmd.Server("craft_item")]
-	public static void CraftItem( string toolType, string material, int level )
+	[Rpc.Server]
+	public void CraftItem( string toolType, string material, int level )
 	{
-		var caller = ConsoleSystem.Caller;
-		if ( caller == null )
+		if ( Rpc.Caller?.Pawn != this.GameObject )
 		{
-			Log.Warning( "[CraftItem] Invalid caller." );
-			return;
-		}
-
-		// Find the player component from the caller's GameObject
-		var player = caller.GameObject?.Components.Get<Player>();
-		if ( player == null )
-		{
-			Log.Warning( "[CraftItem] Player component not found." );
+			Log.Warning( "[CraftItem] RPC called by non-owner." );
 			return;
 		}
 
@@ -361,7 +325,7 @@ public sealed partial class Player : Component
 		Log.Info( $"[CraftItem] Player requesting craft: {recipe.Name}" );
 
 		// Use the existing crafting logic
-		player.ProcessCraftingRequest( recipe );
+		ProcessCraftingRequest( recipe );
 	}
 
 	/// <summary>

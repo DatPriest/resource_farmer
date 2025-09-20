@@ -135,7 +135,7 @@ public abstract class WorldPanelComponent : PanelComponent
 	/// </summary>
 	protected virtual void UpdatePositioning()
 	{
-		if (!IsEnabled || TargetObject == null || !TargetObject.IsValid())
+		if (!IsEnabled || TargetObject == null || !TargetObject.IsValid)
 			return;
 			
 		// Calculate world position with height offset

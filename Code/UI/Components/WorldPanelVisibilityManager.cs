@@ -60,7 +60,7 @@ public sealed class WorldPanelVisibilityManager : Component
 		// Check all world panels in the scene
 		foreach (var panel in _allPanelsCache)
 		{
-			if (panel == null || !panel.IsValid() || !panel.GameObject.IsValid())
+			if (panel == null || !panel.IsValid || !panel.GameObject.IsValid)
 				continue;
 				
 			processedPanels.Add(panel);
@@ -116,7 +116,7 @@ public sealed class WorldPanelVisibilityManager : Component
 	private void CleanupStalePanels(HashSet<WorldPanelComponent> processedPanels)
 	{
 		var stalePanels = _managedPanels.Where(p => 
-			p == null || !p.IsValid() || !p.GameObject.IsValid() || !processedPanels.Contains(p)
+			p == null || !p.IsValid || !p.GameObject.IsValid || !processedPanels.Contains(p)
 		).ToList();
 		
 		foreach (var stalePanel in stalePanels)
@@ -134,7 +134,7 @@ public sealed class WorldPanelVisibilityManager : Component
 		// Disable all panels we were managing when this manager is disabled
 		foreach (var panel in _managedPanels)
 		{
-			if (panel != null && panel.IsValid())
+			if (panel != null && panel.IsValid)
 			{
 				panel.UpdateVisibility(false, null, float.MaxValue);
 			}

@@ -1,5 +1,8 @@
 using ResourceFarmer.PlayerBase;
 using ResourceFarmer.Items;
+
+namespace ResourceFarmer;
+
 public interface IGatherable
 {
     /// <summary>

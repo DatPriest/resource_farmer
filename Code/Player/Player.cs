@@ -107,8 +107,8 @@ public sealed partial class Player : Component
 		if (inventoryComp != null) inventoryComp.OwnerPlayer = this;
 
 
-		if ( Body.IsValid() && BodyRenderer == null ) BodyRenderer = Body.Components.Get<SkinnedModelRenderer>();
-		if ( BodyRenderer != null && Body.IsValid() ) ClothingContainer.CreateFromLocalUser().Apply( BodyRenderer );
+		if ( Body.IsValid && BodyRenderer == null ) BodyRenderer = Body.Components.Get<SkinnedModelRenderer>();
+		if ( BodyRenderer != null && Body.IsValid ) ClothingContainer.CreateFromLocalUser().Apply( BodyRenderer );
 	}
 
 	private TimeSince _timeSinceLastSave = 0f; // Timer for auto-save
