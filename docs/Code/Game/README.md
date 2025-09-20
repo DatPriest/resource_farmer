@@ -71,8 +71,8 @@ Use the base components as templates:
 @inherits PanelComponent
 
 <BasePanel Title="My Custom Panel" Size="BasePanel.PanelSize.Medium">
-    <BaseButton Text="Action" 
-                Variant="BaseButton.ButtonVariant.Primary" 
+    <BaseButton Text="Action"
+                Variant="BaseButton.ButtonVariant.Primary"
                 OnClick="@HandleAction" />
 </BasePanel>
 ```
@@ -80,6 +80,7 @@ Use the base components as templates:
 ### Custom Styling
 
 Components use the existing SCSS system:
+
 - Extend `Colors.scss` for new color variables
 - Follow BEM naming convention
 - Use existing layout and typography variables
@@ -96,6 +97,7 @@ Components use the existing SCSS system:
 ## Integration Points
 
 The main menu integrates with:
+
 - Existing UIManager for in-game panels
 - Settings system for user preferences
 - Scene loading and transitions
@@ -105,6 +107,7 @@ The main menu integrates with:
 ## Testing
 
 To test the main menu system:
+
 1. Start the game with GameManager in scene
 2. Main menu should appear on startup
 3. Navigate through different sections

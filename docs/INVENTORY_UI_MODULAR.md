@@ -9,7 +9,7 @@ The inventory UI has been successfully refactored from a monolithic 383-line Raz
 ```
 InventoryPanel (Main Container)
 ├── InventoryHeader (Title, Capacity, Close Button)
-├── FilterButtons (Search, Sort, Action Buttons) 
+├── FilterButtons (Search, Sort, Action Buttons)
 ├── Inventory Content
 │   ├── InventorySlot × N (Individual Resource Items)
 │   └── Empty Inventory State
@@ -19,8 +19,10 @@ InventoryPanel (Main Container)
 ## Created Components
 
 ### 1. InventorySlot.razor
+
 **Purpose**: Individual resource item display with full interactivity
 **Features**:
+
 - Drag-and-drop support with event callbacks
 - Rarity-based visual styling (Common → Mythic with rainbow borders)
 - Resource icon, name, amount display
@@ -28,8 +30,10 @@ InventoryPanel (Main Container)
 - Hover effects and smooth transitions
 
 ### 2. ItemTooltip.razor
+
 **Purpose**: Rich tooltip component for resource information
 **Features**:
+
 - Detailed resource information (name, amount, category, value)
 - Rarity-based border styling
 - Position-aware display
@@ -37,8 +41,10 @@ InventoryPanel (Main Container)
 - Smooth fade-in animation
 
 ### 3. FilterButtons.razor
+
 **Purpose**: Reusable search, sort, and action controls
 **Features**:
+
 - Search input with icon
 - Configurable sort options
 - Dynamic action buttons with icons
@@ -46,8 +52,10 @@ InventoryPanel (Main Container)
 - Responsive design
 
 ### 4. InventoryHeader.razor
+
 **Purpose**: Panel header with title and capacity information
 **Features**:
+
 - Configurable title and icon
 - Visual capacity bar with color-coded fill
 - Close button with hover effects
@@ -56,21 +64,25 @@ InventoryPanel (Main Container)
 ## Key Architectural Improvements
 
 ### ✅ Separation of Concerns
+
 - **UI Components**: Handle presentation and user interaction
 - **Business Logic**: Remains in main InventoryPanel (UseResource, SellResource)
 - **Event Communication**: Clean callback-based component interaction
 
 ### ✅ Reusability
+
 - Components can be used in other inventory contexts (crafting, trading, etc.)
 - Configurable properties enable different use cases
 - Consistent API patterns with existing UI components
 
 ### ✅ Maintainability
+
 - Single responsibility components (~100-200 lines each vs 383 original)
 - Isolated SCSS files prevent style conflicts
 - Clear component boundaries and interfaces
 
 ### ✅ S&box Compliance
+
 - Follows PanelComponent inheritance pattern
 - Uses modern C# features (file-scoped namespaces, primary constructors)
 - Compatible with S&box's hot-reloading system
@@ -79,21 +91,25 @@ InventoryPanel (Main Container)
 ## Preserved Functionality
 
 ### ✅ Drag and Drop
+
 - Maintained through `OnDragStart` event callbacks
 - `InventorySlot` handles drag initiation
 - Main panel manages drag state and logic
 
 ### ✅ Resource Management
+
 - All business logic preserved (use, sell, filtering, sorting)
 - Resource value calculation intact
 - Inventory capacity management working
 
 ### ✅ Visual Design
+
 - Rarity color coding enhanced and modularized
 - Hover effects and animations preserved
 - Responsive design maintained
 
 ### ✅ Tooltips
+
 - Enhanced with modular `ItemTooltip` component
 - Richer information display
 - Better positioning and styling
@@ -128,6 +144,7 @@ Code/UI/
 ## Integration Points
 
 The modular components integrate seamlessly with:
+
 - Existing `BaseButton` and `BasePanel` components
 - Resource Farmer's networking layer (`[Net]` properties)
 - Player inventory management system
@@ -136,6 +153,7 @@ The modular components integrate seamlessly with:
 ## Future Enhancements
 
 With this modular foundation, future improvements become easier:
+
 - Drag-and-drop between different containers
 - Advanced filtering (by rarity, category, etc.)
 - Bulk operations (select multiple items)

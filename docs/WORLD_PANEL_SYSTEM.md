@@ -44,7 +44,7 @@ public abstract class WorldPanelComponent : PanelComponent
     [Property] public float MinScale { get; set; } = 0.5f;
     [Property] public float MaxScale { get; set; } = 1.2f;
     [Property] public GameObject TargetObject { get; set; }
-    
+
     // Override in subclasses to define panel content updates
     protected abstract void UpdateContent();
 }
@@ -103,11 +103,11 @@ var worldPanel = resourceNode.Components.Create<ResourceWorldPanel>();
 public class NPCInfoPanel : WorldPanelComponent
 {
     [Property] public NPC TargetNPC { get; set; }
-    
+
     protected override void UpdateContent()
     {
         if (TargetNPC == null) return;
-        
+
         // Update panel content based on NPC state
         // Access UI elements and update them
     }
@@ -146,6 +146,7 @@ visibilityManager.EnableDebugLogging = false;
 ### From Old System to New System
 
 **Old ResourceNodePanel:**
+
 ```razor
 @inherits PanelComponent
 // Tightly coupled to ResourceNode
@@ -153,6 +154,7 @@ visibilityManager.EnableDebugLogging = false;
 ```
 
 **New ResourceWorldPanel:**
+
 ```razor
 @inherits WorldPanelComponent
 // Modular, reusable design
@@ -163,16 +165,18 @@ visibilityManager.EnableDebugLogging = false;
 ### Migration Steps
 
 1. **Add WorldPanelVisibilityManager to Player:**
+
    ```csharp
    // Replace WorldPanelManager with WorldPanelVisibilityManager
    var visibilityManager = player.Components.Create<WorldPanelVisibilityManager>();
    ```
 
 2. **Replace ResourceNodePanel with ResourceWorldPanel:**
+
    ```csharp
    // Old
    var panel = resourceNode.Components.Create<ResourceNodePanel>();
-   
+
    // New
    var panel = resourceNode.Components.Create<ResourceWorldPanel>();
    ```
@@ -208,11 +212,11 @@ Panels use the existing theme system:
 @import "../Styles/Text.scss";
 
 .resource-world-panel {
-    .panel-container {
-        background-color: rgba($background-dark, 0.85);
-        border: $border-width-thin solid rgba($accent-blue, 0.6);
-        // ... more styling
-    }
+  .panel-container {
+    background-color: rgba($background-dark, 0.85);
+    border: $border-width-thin solid rgba($accent-blue, 0.6);
+    // ... more styling
+  }
 }
 ```
 
@@ -224,7 +228,7 @@ Panels use the existing theme system:
 protected override void OnPlayerEnterRange(GameObject player, float distance)
 {
     base.OnPlayerEnterRange(player, distance);
-    
+
     // Custom entrance animation
     Style.Opacity = 0f;
     Style.Transitions = new() { new() { Property = "opacity", Duration = 0.3f } };
@@ -265,11 +269,13 @@ statusPanel.HeightOffset = 80f;
 ### Common Issues
 
 1. **Panel not appearing:**
+
    - Ensure WorldPanelVisibilityManager is attached to Player
    - Check VisibilityRange vs actual distance
    - Verify TargetObject is set correctly
 
 2. **Performance issues:**
+
    - Increase UpdateInterval
    - Reduce MaxScanRange
    - Disable distance scaling if not needed

@@ -87,6 +87,28 @@
       ]
     },
     {
+      "__guid": "f1c1c3b9-1f1c-4e0f-92fb-5a3ffb2a8c0a",
+      "Flags": 0,
+      "Name": "Network",
+      "Enabled": true,
+      "Components": [
+        {
+          "__type": "ResourceFarmer.Game.PlayerSpawnSystem",
+          "__guid": "a742a9d2-2c48-4d2e-9f2f-6d9e6b1f7b1a",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "PlayerPrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/player.prefab"
+          }
+        }
+      ]
+    },
+    {
       "__guid": "bfc59c12-1ed2-4f91-8956-a95a315eac3c",
       "Flags": 0,
       "Name": "Sun",

@@ -9,12 +9,14 @@ The Contextual Controls feature provides dynamic HUD prompts that show players a
 ### Core Components
 
 1. **PlayerContextualControlsComponent** (`Code/Player/PlayerContextualControlsComponent.cs`)
+
    - Attached to each Player GameObject
    - Performs raycast scanning to detect interactive objects
    - Generates appropriate contextual prompts
    - Networked component for real-time updates
 
 2. **HUD Integration** (`Code/UI/HUD.razor`)
+
    - Displays contextual controls in bottom-center of screen
    - Renders prompts with highlighted keybinds
    - Smooth animations for show/hide states
@@ -58,6 +60,7 @@ The Contextual Controls feature provides dynamic HUD prompts that show players a
 ## Usage Examples
 
 ### Basic Resource Gathering
+
 ```
 Looking at Tree:
 "Press [LMB] to gather Wood"
@@ -70,6 +73,7 @@ Looking at Iron Ore with Bronze Pickaxe:
 ```
 
 ### Interactive Objects
+
 ```
 Looking at Merchant NPC:
 "Press [RMB] to Trade"
@@ -120,11 +124,13 @@ var parts = text.Split('[', ']');
 ## Configuration Options
 
 ### Scan Settings
+
 - `ScanDistance`: How far to raycast (default: 100 units)
 - `ScanRadius`: Raycast radius (default: 8 units)
 - `ScanInterval`: Update frequency (default: 0.1s = 10 Hz)
 
 ### Visual Customization
+
 - Colors defined in `Colors.scss` using existing theme
 - Animation timing adjustable via CSS transitions
 - Position and sizing configurable in SCSS
@@ -158,6 +164,7 @@ ContextualControlsTest.TestResourceNodePrompts();
 ### Debug Commands
 
 Enable debug logging to troubleshoot:
+
 ```csharp
 Log.Info($"Current prompt: {contextComp.CurrentPrompt}");
 Log.Info($"Has interactable: {contextComp.HasInteractable}");
