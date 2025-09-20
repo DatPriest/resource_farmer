@@ -80,4 +80,39 @@ public class ContextualControlsTest
 		
 		Log.Info("[ContextualControlsTest] Resource node prompt test completed!");
 	}
+	
+	/// <summary>
+	/// Test deprecated component replacement functionality
+	/// </summary>
+	public static void TestDeprecationMigration()
+	{
+		Log.Info("[ContextualControlsTest] Testing deprecated component migration...");
+		
+		// Test that WorldPanelVisibilityManager can be instantiated (validates the migration)
+		try
+		{
+			var testObject = new GameObject();
+			var visibilityManager = testObject.AddComponent<ResourceFarmer.UI.Components.WorldPanelVisibilityManager>();
+			
+			if (visibilityManager != null)
+			{
+				Log.Info("[ContextualControlsTest] ✅ WorldPanelVisibilityManager successfully instantiated");
+				visibilityManager.UpdateInterval = 0.1f;
+				visibilityManager.MaxScanRange = 100f;
+				Log.Info($"[ContextualControlsTest] ✅ Properties set: UpdateInterval={visibilityManager.UpdateInterval}, MaxScanRange={visibilityManager.MaxScanRange}");
+			}
+			else
+			{
+				Log.Error("[ContextualControlsTest] ❌ Failed to create WorldPanelVisibilityManager");
+			}
+			
+			testObject.Destroy();
+		}
+		catch (System.Exception ex)
+		{
+			Log.Error($"[ContextualControlsTest] ❌ Exception during WorldPanelVisibilityManager test: {ex.Message}");
+		}
+		
+		Log.Info("[ContextualControlsTest] Deprecation migration test completed!");
+	}
 }
